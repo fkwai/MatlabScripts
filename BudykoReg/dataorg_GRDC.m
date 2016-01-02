@@ -1,0 +1,39 @@
+load('Y:\DataAnaly\GRDCstr_sel.mat')
+GRDCstr=GRDCstr_sel;
+GRDCstr_t=GRDCstr_sel_t;
+iGRDC=1:length(GRDCstr_t);
+n=length(GRDCstr);
+P=zeros(n,1);E=zeros(n,1);Ep=zeros(n,1);Q=zeros(n,1);Snow=zeros(n,1);
+E2=zeros(n,1);Ep2=zeros(n,1);
+Amp0=zeros(n,1);Amp1=zeros(n,1);Ampf=zeros(n,1);Ampfn=zeros(n,1);
+Acf=zeros(n,1);Pcf2=zeros(n,1);Pcf3=zeros(n,1);
+Acfy=zeros(n,1);Pcfy2=zeros(n,1);Pcfy3=zeros(n,1);
+Acfd48=zeros(n,1);Pcfd48_2=zeros(n,1);Pcfd48_3=zeros(n,1);
+Acfd72=zeros(n,1);Pcfd72_2=zeros(n,1);Pcfd72_3=zeros(n,1);
+Hu=zeros(n,1);NDVI=zeros(n,1);SimInd=zeros(n,1);
+BasinID=zeros(n,1);
+for i=[1:154,156:n]
+    E2(i)=mean(GRDCstr(i).E_JBF_ts(iGRDC));
+    Q(i)=GRDCstr(i).Q;
+    Ep(i)=mean(GRDCstr(i).rET3(iGRDC));
+    Ep2(i)=GRDCstr(i).Ep_CGIAR;
+    P(i)=mean(GRDCstr(i).P_TRMM_ts(iGRDC));
+    Snow(i)=mean(GRDCstr(i).Snow_ts(iGRDC));
+    Amp0(i)=GRDCstr(i).Amp0;
+    Amp1(i)=GRDCstr(i).Amp1;
+    Ampf(i)=GRDCstr(i).Amp_fft;
+    Ampfn(i)=GRDCstr(i).Amp_fft_noband;
+    Acfd48(i)=GRDCstr(i).acf_dtr48;
+    Pcfd48_2(i)=GRDCstr(i).pcf_dtr48(3);
+    Pcfd48_3(i)=GRDCstr(i).pcf_dtr48(4);
+    Acfd72(i)=GRDCstr(i).acf_dtr72;
+    Pcfd72_2(i)=GRDCstr(i).pcf_dtr72(3);
+    Pcfd72_3(i)=GRDCstr(i).pcf_dtr72(4);
+    Hu(i)=GRDCstr(i).HurstExp;
+    NDVI(i)=GRDCstr(i).NDVI_avg;
+    BasinID(i)=GRDCstr(i).BasinID;
+    SimInd(i)=GRDCstr(i).SimIndex;
+end
+E=P-Q;
+E(E<0)=nan;
+E(Ep./P>10)=nan;
