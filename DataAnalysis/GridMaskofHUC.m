@@ -12,9 +12,13 @@ shapeall=shaperead(shapefile);
 
 mask = cell(length(shapeall),1);
 parfor i=1:length(shapeall)
-    i
+    i    
     shape=shapeall(i);    
-    mask{i} = GridinShp(shape,x,y,cellsize,factor );
+    try
+        mask{i} = GridinShp(shape,x,y,cellsize,factor );
+    catch
+        mask{i}=nan;
+    end
 end
 end
 
