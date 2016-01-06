@@ -1,4 +1,4 @@
-function [ rsp, rst, SimInd ] = SimIndex( P, T, n,varargin)
+function [ SimInd ] = SimIndex_cal( P, T, n,varargin)
 %SIMINDEX Summary of this function goes here
 %   Detailed explanation goes here
 % this function will calculate seasonality index
@@ -27,7 +27,7 @@ t=t(ind);
 if length(ind)==0
     rsp=0;
     rst=0;
-    SimInd=0;
+    SimInd=[];
 else
     [fpobj,fpgof,output]=fit(t,P,fp,'problem',{mean(P),n});
     ap=fpobj.a;
@@ -37,7 +37,10 @@ else
     at=ftobj.a;
     st=ftobj.s;
     rst=ftgof.rsquare;
-    SimInd=ap*sign(at)*cos(2*pi*(sp-st)/n);
+    SimInd.v=ap*sign(at)*cos(2*pi*(sp-st)/n);
+    SimInd.cos=cos(2*pi*(sp-st)/n);
+    SimInd.ap=ap;
+    SimInd.at=at;
     
     if doplot==1
         figure

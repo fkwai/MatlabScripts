@@ -15,6 +15,8 @@ for i=1:length(indpoly)-1
     
     X=shape.X(indpoly(i)+1:indpoly(i+1)-1);
     Y=shape.Y(indpoly(i)+1:indpoly(i+1)-1);
+%     X=[0,0,2,2,1,1];
+%     Y=[1,2,2,0,0,1];
     
     indx1=find(x<min(X));indx1=indx1(end);
     indx2=find(x>max(X));indx2=indx2(1);
@@ -40,10 +42,16 @@ for i=1:length(indpoly)-1
     inout = int32(zeros(size(px)));
     pnpoly(X,Y,px,py,inout);
     inout=double(inout);
+     
+%     mapshow(px(1,:),py(:,1),inout);hold on
+%     plot(X,Y,'-*r')    
     
     inout(inout~=1)=0;
-    outsub = gCopyDataRef(inout, DMf, DMc);
+    outsub = gCopyDataRef(inout, DMf, DMc);    
     outsub=flipud(outsub);
+    
+%     mapshow(x(indx),y(indy)',outsub);hold on
+%     plot(X,Y,'-*r')    
     
     outputtemp=zeros(length(y),length(x));
     outputtemp(indy,indx)=outsub;

@@ -23,7 +23,7 @@ x=mat.crd(:,1);
 y=mat.crd(:,2);
 %t=datenum(num2str(mat.t),'yyyymm');
 t=datenumMulti( mat.t,1 );
-datagrid=data2grid3d(data,x,y,1/8);
+datagrid=data2grid3d(data,x,y,x(2)-x(1));
 HUCstr = grid2HUC_month( HUCstrFieldname,datagrid,t,mask,HUCstr,HUCstr_t);
 
 end

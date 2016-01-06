@@ -9,7 +9,12 @@ shape=shaperead(hucshapefile);
 
 for i=1:length(shape)
     HUCid=eval(['shape(i).',IDfieldname]);
-    HUCstr(i,1).ID=str2num(HUCid);
+    if isstr(HUCid)
+        HUCstr(i,1).ID=str2num(HUCid);
+    else
+        HUCstr(i,1).ID=HUCid;
+    end
+
 end
 
 

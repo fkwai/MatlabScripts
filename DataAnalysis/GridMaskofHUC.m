@@ -11,7 +11,7 @@ function mask = GridMaskofHUC( shapefile,x,y,cellsize,factor )
 shapeall=shaperead(shapefile);
 
 mask = cell(length(shapeall),1);
-parfor i=1:length(shapeall)
+for i=1:length(shapeall)
     i    
     shape=shapeall(i);    
     try

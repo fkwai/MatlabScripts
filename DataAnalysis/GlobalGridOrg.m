@@ -14,16 +14,6 @@ strc=struct('grid',[],'lon',[],'lat',[]);
 E_JBF=strc;
 GRACE=strc;
 
-%% JBF E
-E_JBF_data=load(E_JBF_dir);
-grid=zeros(180,360,length(out.t));
-[C,ind1,ind2]=intersect(out.tym,E_JBF_data.tym);
-grid(:,:,ind1)=E_JBF_data.E_JBF(:,:,ind2);
-E_JBF.grid=grid;
-E_JBF.lon=-179.5:179.5;
-E_JBF.lat=89.5:-89.5;
-out.E_JBF=E_JBF;
-
 %% GRACE
 GRACE_data=load(GRACE_dir);
 grid=zeros(length(GRACE_data.y),length(GRACE_data.x),length(out.t))*nan;
@@ -103,6 +93,22 @@ out.Snowf_GLDAS.grid=out.Snowf_GLDAS.grid.*ndayG_GLDAS*60*60*24*12; %mm/s to mm/
 out.Prcp_GLDAS.grid=out.Rainf_GLDAS.grid+out.Snowf_GLDAS.grid;
 out.Prcp_GLDAS.lat=out.Rainf_GLDAS.lat;
 out.Prcp_GLDAS.lon=out.Rainf_GLDAS.lon;
+
+%% JBF E
+E_JBF_data=load(E_JBF_dir);
+grid=zeros(180,360,length(out.t));
+[C,ind1,ind2]=intersect(out.tym,E_JBF_data.tym);
+grid(:,:,ind1)=E_JBF_data.E_JBF(:,:,ind2);
+E_JBF.grid=grid;
+E_JBF.lon=-179.5:179.5;
+E_JBF.lat=89.5:-89.5;
+% change unit
+Y=floor(out.tym/100);M=out.tym-Y*100;
+ndayZ_JBF=reshape(eomday(Y,M),1,1,length(out.tym));
+ndayG_JBF=repmat(ndayZ_JBF,length(E_JBF.lat),length(E_JBF.lon));
+E_JBF.grid=wm2mmPerMonth(E_JBF.grid,out.Tair,ndayG_JBF)*12;
+
+out.E_JBF=E_JBF;
 
 %% SimIndex
 out.SimIndex.grid=zeros(length(out.Prcp_GLDAS.lat),length(out.Prcp_GLDAS.lon))*nan;
