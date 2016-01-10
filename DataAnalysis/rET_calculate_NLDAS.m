@@ -1,12 +1,11 @@
-function [rET1, rET3, t] = rET_calculate_NLDAS(dem,mask,FORAfolder,NOAHfolder,sd,ed)
+function [rET1, rET3, t] = rET_calculate_NLDAS(dem,FORAfolder,NOAHfolder,sd,ed)
 % Calculate rET from daily NLDAS data. 
 
-% load('E:\Kuai\DataAnaly\global_dem\dem_NLDAS.mat');
-% load('E:\Kuai\DataAnaly\mask_huc4_nldas_32.mat');
-% FORAfolder='Y:\NLDAS\3H\FORA_daily_mat';
-% NOAHfolder='Y:\NLDAS\3H\NOAH_daily_mat';
+% load('Y:\DataAnaly\global_dem\dem_NLDAS.mat');
+% FORAfolder='Y:\NLDAS\Hourly\FORA_daily_mat';
+% NOAHfolder='Y:\NLDAS\Hourly\NOAH_daily_mat';
 % sd=200001;
-% ed=201312;
+% ed=201409;
 
 sdn=datenum(num2str(sd),'yyyymm');
 edn=datenum(num2str(ed),'yyyymm');

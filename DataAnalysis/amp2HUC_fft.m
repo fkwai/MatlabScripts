@@ -6,14 +6,14 @@ function  HUCstr  = amp2HUC_fft( HUCstr,sd,ed)
 % sd=20031001;
 % ed=20121001;
 
-sdn=datenum(num2str(sd),'yyyymmdd');
-edn=datenum(num2str(ed),'yyyymmdd');
-tm=unique(str2num(datestr(sdn:edn,'yyyymm')));
+sdn=datenumMulti(sd,1);
+edn=datenumMulti(ed,1);
+tm=unique(datenumMulti(sdn:edn,3));
 
 for i=1:length(HUCstr)
     t=HUCstr(i).GRACEt;
     s=HUCstr(i).GRACE;
-    tmGRACE=str2num(datestr(t,'yyyymm'));
+    tmGRACE=datenumMulti(t,3);
     [C,iGrace,iInput]=intersect(tmGRACE,tm);
     if length(iInput)~=length(tm)
         warning('sd ed not fit')

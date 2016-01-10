@@ -1,4 +1,4 @@
-function [ BasinStr] = Global2Datastr_monthly( maskGLDAS,maskGRACE,maskNDVI,outmatfile,BasinStr,BasinStr_t)
+function [BasinStr,BasinStr_t]=Global2Datastr_monthly(maskGLDAS,maskGRACE,maskNDVI,BasinStr,BasinStr_t)
 %%Merge all useful GLDAS, TRMM, JBF and GRACE data to Str. Input mask. 
 % load('Y:\DataAnaly\mask\mask_GRDC.mat')
 % load('Y:\DataAnaly\HUCstr_new2.mat')
@@ -20,6 +20,7 @@ tym=datenumMulti(t,3);
 
 maskJBF=maskGRACE;
 maskTRMM=maskGRACE;
+maskRET=maskGRACE;
 
 %% GRACE
 % GRACE data
@@ -38,10 +39,10 @@ end
 
 % Amplitude
 sd=20021001;
-ed=20120930;
-BasinStr =amp2HUC( BasinStr,sd,ed,0,1001 );
-BasinStr =amp2HUC( BasinStr,sd,ed,1,1001 );
-BasinStr  = amp2HUC_fft( BasinStr,sd,ed);
+ed=20141001;
+BasinStr=amp2HUC( BasinStr,sd,ed,0,1001 );
+BasinStr=amp2HUC( BasinStr,sd,ed,1,1001 );
+BasinStr=amp2HUC_fft( BasinStr,sd,ed);
 
 % Acf and Pcf
 BasinStr  = acf2HUC_detrend( BasinStr,sd,ed);
@@ -66,7 +67,7 @@ matfile= [GLDAS_dir,'\',fieldstr,'.mat'];
 
 % rET 
 rETdata=load(GLDAS_rET_dir);
-BasinStr = grid2HUC_month('rET3',rETdata.rET3,rETdata.t,maskGLDAS,BasinStr,BasinStr_t);
+BasinStr = grid2HUC_month('rET3',rETdata.rET3,rETdata.t,maskRET,BasinStr,BasinStr_t);
 
 % change unit to mm/month
 Y=floor(tym/100);M=tym-Y*100;
@@ -81,6 +82,7 @@ toc
 %% E JBF
 disp('E_JBF');tic
 E_JBF_data=load(E_JBF_dir);
+E_JBF_data.E_JBF(E_JBF_data.E_JBF==-99)=nan;
 
 % Temp
 Tair_GLDAS_data=load([GLDAS_dir,'\Tair.mat']);
@@ -103,7 +105,7 @@ disp('P_TRMM');tic
 TRMM_data=load(TRMMdir);
 TRMM_grid_temp(41:140,:,:)=TRMM_data.TRMM_res;
 TRMM_grid_temp(141:180,:,:)=nan;
-TRMM_grid_temp(1:40)=nan;
+TRMM_grid_temp(1:40,:)=nan;
 TRMM_grid=[TRMM_grid_temp(:,181:360,:),TRMM_grid_temp(:,1:180,:)];
 BasinStr = grid2HUC_month('P_TRMM',TRMM_grid,TRMM_data.t,maskTRMM,BasinStr,BasinStr_t);
 toc
@@ -124,7 +126,6 @@ for i=1:length(BasinStr)
 end
 toc
 
-save(outmatfile, 'BasinStr', 'BasinStr_t')
 %save Y:\DataAnaly\GRDCstr_new.mat GRDCstr GRDCstr_t
 end
 

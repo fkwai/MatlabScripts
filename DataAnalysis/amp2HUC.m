@@ -6,14 +6,21 @@ function  HUCstr  = amp2HUC( HUCstr,sd,ed,option,startMD )
 % sd=20031001;
 % ed=20121001;
 
+sdn=datenumMulti(sd,1);
+edn=datenumMulti(ed,1);
+tm=unique(datenumMulti(sdn:edn,3));
+
 for i=1:length(HUCstr)
+    t=HUCstr(i).GRACEt;
+    v=HUCstr(i).GRACE;
+    tmGRACE=datenumMulti(t,3);
+    [C,iGrace,iInput]=intersect(tmGRACE,tm);
     ts=[];
-    ts.t=HUCstr(i).GRACEt;
-    ts.v=HUCstr(i).GRACE;
-    ind=find(~isnan(ts.v));
-    ts.t=ts.t(ind);
-    ts.v=ts.v(ind);
-    if(~isempty(ind))
+    ts.t=datenumMulti(t(iGrace),1);
+    ts.v=v(iGrace);
+    ts.v=interpTS(ts.v,ts.t,'spline');
+        
+    if(~isempty(ts.v))
         [Amp,AvgAmp,StdAmp]=ts2Amp( ts, sd, ed,option,startMD );
          if(option==0)
 %             HUCstr(i).Amp0=Amp;

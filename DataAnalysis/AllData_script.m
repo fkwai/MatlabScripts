@@ -1,4 +1,37 @@
+
+%% HUC4
+hucshapefile='Y:\HUCs\HUC4_main_data.shp';
+IDfieldname='HUC4';
+HUCstr = initialHUCstr( hucshapefile,IDfieldname );
+sd=200210;
+ed=201409;
+tym=unique(datenumMulti(datenumMulti(sd,1):datenumMulti(ed,1),3));
+t=datenumMulti(tym,1);
+HUCstr_t=t;
+load('Y:\DataAnaly\mask\mask_HUC4.mat')
+[HUCstr,HUCstr_t]=NAdata2Str_monthly( maskNLDAS,maskGRACE,maskNDVI,HUCstr,HUCstr_t);
+
+%add run off
+Qdata=load('Y:\DataAnaly\USGSQ\runoff_HUC4.mat');
+[C,tind1,tind2]=intersect(datenumMulti(HUCstr_t,3),Qdata.t);
+for i=1:length(HUCstr)
+    id=HUCstr(i).ID;
+    ind=find(Qdata.hucid==id);
+    HUCstr(i).usgsQ=Qdata.Q(tind2,ind);
+end
+
+save Y:\DataAnaly\BasinStr\HUCstr_new.mat HUCstr HUCstr_t
+
 %% GRDC
+shapefile='Y:\GRDC_UNH\GIS_dataset\grdc_basins_smoothed_sel.shp';
+GRDCstr = initialHUCstr( shapefile,'GRDC_NO' );
+sd=200210;
+ed=201009;
+tym=unique(datenumMulti(datenumMulti(sd,1):datenumMulti(ed,1),3));
+t=datenumMulti(tym,1);
+GRDCstr_t=t;
+load('Y:\DataAnaly\mask\mask_GRDC.mat')
+[GRDCstr,GRDCstr_t]=Global2Datastr_monthly(maskGLDAS,maskGRACE,maskNDVI,GRDCstr,GRDCstr_t);
 shape=shaperead('Y:\GRDC_UNH\GIS_dataset\grdc_basins_smoothed_sel.shp');
 shapeID=[shape.GRDC_NO]';
 for i=1:length(GRDCstr)
@@ -11,7 +44,8 @@ for i=1:length(GRDCstr)
         GRDCstr(i).Q=nan;
     end
 end
-save Y:\DataAnaly\Datastr\GRDCstr_new.mat GRDCstr GRDCstr_t
+save Y:\DataAnaly\BasinStr\GRDCstr_new.mat GRDCstr GRDCstr_t
+%save Y:\DataAnaly\GRDCstr_new.mat GRDCstr GRDCstr_t
 
 
 %% ggII

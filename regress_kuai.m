@@ -1,7 +1,7 @@
 function [yfit,R2,b] = regress_kuai( Y,X,varargin )
 % Doing linear regression. Also allow to feed in b and compute yfit and Rsq
 
-if ~isempty(varargin)
+if ~isempty(varargin) && ~isempty(varargin{1})
     b=varargin{1};
 else
     b=X\Y;

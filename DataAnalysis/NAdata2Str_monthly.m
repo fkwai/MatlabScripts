@@ -1,4 +1,4 @@
-function [BasinStr,BasinStr_t]=NAdata2Str_monthly( maskNLDAS,maskGRACE,maskNDVI,outmatfile,BasinStr, BasinStr_t)
+function [BasinStr,BasinStr_t]=NAdata2Str_monthly( maskNLDAS,maskGRACE,maskNDVI,BasinStr, BasinStr_t)
 %Merge all useful NLDAS and GRACE data to Str. Input shapefile. 
 
 % default set up of all data directory
@@ -49,10 +49,10 @@ end
 
 % Amplitude
 sd=20021001;
-ed=20120930;
-BasinStr =amp2HUC( BasinStr,sd,ed,0,1001 );
-BasinStr =amp2HUC( BasinStr,sd,ed,1,1001 );
-BasinStr  = amp2HUC_fft( BasinStr,sd,ed);
+ed=20140930;
+BasinStr=amp2HUC(BasinStr,sd,ed,0,1001);
+BasinStr=amp2HUC(BasinStr,sd,ed,1,1001);
+BasinStr=amp2HUC_fft(BasinStr,sd,ed);
 
 % Acf and Pcf
 BasinStr  = acf2HUC_detrend( BasinStr,sd,ed);
