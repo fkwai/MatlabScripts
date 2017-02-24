@@ -54,5 +54,5 @@ k5 = k0*nu*cos(lat)^3/6*(1-tan(lat)^2+ep2*cos(lat)^2);
 E = k4*p + k5*p^3 + 500000;
 
 if  strcmp(hs,'S')
-    N=N+1e7;
+    N=N+10000000;
 end

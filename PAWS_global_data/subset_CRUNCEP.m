@@ -27,27 +27,54 @@ prepfiles=CRUNCEP_daterange(dir(fullfile(prepdir,'clmforc*')),daterange);
 solarfiles=CRUNCEP_daterange(dir(fullfile(solardir,'clmforc*')),daterange);
 tempfiles=CRUNCEP_daterange(dir(fullfile(tempdir,'clmforc*')),daterange);
 
+h = waitbar(0, 'Subsetting CRUNCEP Prcp... 0%');
+time_used = 0;
 for i=1:length(prepfiles)
+    tic
     file = fullfile(prepdir,prepfiles(i).name);
     [PRECTmms,time,LONGXY,LATIXY,matfile]=subsetdata(file,'PRECTmms',boundingbox,prepdirNEW);
     save(matfile, 'PRECTmms','time','LONGXY','LATIXY');
+    
+    time_used = time_used + toc;
+    pct_done = i / length(prepfiles);
+    waitbar(pct_done, h, ['Subsetting CRUNCEP Prcp...',num2str(pct_done*100,'%.2f'), ...
+        '%, time used: ', num2str(time_used,'%.1f'), ' sec'])
 end
+close(h)
 
+h = waitbar(0, 'Subsetting CRUNCEP Solar... 0%');
+time_used = 0;
 for i=1:length(solarfiles)
+    tic
     file = fullfile(solardir,solarfiles(i).name);
     [FSDS,time,LONGXY,LATIXY,matfile]=subsetdata(file,'FSDS',boundingbox,solardirNEW);
     save(matfile, 'FSDS','time','LONGXY','LATIXY');
+    
+    time_used = time_used + toc;
+    pct_done = i / length(solarfiles);
+    waitbar(pct_done, h, ['Subsetting CRUNCEP Solar...',num2str(pct_done*100,'%.2f'), ...
+        '%, time used: ', num2str(time_used,'%.1f'), ' sec'])
 end
+close(h)
 
+h = waitbar(0, 'Subsetting CRUNCEP Climate... 0%');
+time_used = 0;
 for i=1:length(tempfiles)
+    tic
     file = fullfile(tempdir,tempfiles(i).name);
     [TBOT,time,LONGXY,LATIXY,matfile]=subsetdata(file,'TBOT',boundingbox,tempdirNEW);
     [QBOT,time,LONGXY,LATIXY,matfile]=subsetdata(file,'QBOT',boundingbox,tempdirNEW);
     [WIND,time,LONGXY,LATIXY,matfile]=subsetdata(file,'WIND',boundingbox,tempdirNEW);
     [FLDS,time,LONGXY,LATIXY,matfile]=subsetdata(file,'FLDS',boundingbox,tempdirNEW);
-    [PSRF,time,LONGXY,LATIXY,matfile]=subsetdata(file,'PSRF',boundingbox,tempdirNEW); 
+    [PSRF,time,LONGXY,LATIXY,matfile]=subsetdata(file,'PSRF',boundingbox,tempdirNEW);
     save(matfile, 'TBOT','QBOT','WIND','FLDS','PSRF','time','LONGXY','LATIXY');
+    
+    time_used = time_used + toc;
+    pct_done = i / length(tempfiles);
+    waitbar(pct_done, h, ['Subsetting CRUNCEP Climate...',num2str(pct_done*100,'%.2f'), ...
+        '%, time used: ', num2str(time_used,'%.1f'), ' sec'])
 end
+close(h)
 
 
 end

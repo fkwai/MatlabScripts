@@ -1,7 +1,7 @@
 function HUCstr = initialHUCstr( hucshapefile,IDfieldname )
 
 %   example
-%   hucshapefile='E:\work\DataAnaly\HUC\HUC4';
+%   hucshapefile='Y:\DataAnaly\HUC\HUC4_main.shp';
 %   IDfieldname='HUC4';
 
 HUCstr=struct('ID',[]);

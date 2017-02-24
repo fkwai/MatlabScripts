@@ -8,5 +8,12 @@ elseif strcmp(file(end-2:end), 'mat')
     data=temp.(field);
 end
 
+global dojie
+if ~dojie
+    if isa(data,'single')
+        data=double(data);
+    end
+end
+
 end
 

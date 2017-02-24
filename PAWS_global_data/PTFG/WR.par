@@ -1,0 +1,51 @@
+Brooks and Corey (1964) water retention model
+Saxton et al., 1986           
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.51094   0.08138   0.10105
+Campbell and Shiosawa, 1992   
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.51094   0.01869   0.08868
+Rawls and Brakensiek, 1985    
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.12176   0.51094   0.03924   0.18726
+Williams et al., 1992         
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.51094   0.10622   0.10580
+Williams et al., 1992         
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.51094   0.00000   0.09993
+Oosterveld and Chang, 1980    
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.51094   0.00469   0.19000
+Mayr and Jarvice, 1999        
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.47612   0.41658   0.34071
+
+van Genuchten (1980) water retention model
+Wosten et al., 1999           
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.01000   0.52000   0.03670   1.10120
+Varallyay et al., 1982        
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.54796   0.00009   0.38246
+Vereecken et al., 1989        
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.24105   0.48844   0.00000   0.51622
+Wosten et al., 1999           
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.01000   0.48801       NaN       NaN
+Tomasella and Hodnett, 1998   
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.16273   0.50204   0.12475   1.26018
+Rawls et al., 1982            
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.19246   0.51101   0.04231   1.27027
+Gupta and Larson, 1979        
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.24238   0.51292   0.04906   1.20692
+Rajkai and Varallyay, 1992    
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.00000   0.48079   0.00722   1.13322
+Rawls et al., 1983            
+ ID  Depth    ThetaR    ThetaS    alpha       n
+   1  343.   0.15754   0.51098   0.03746   1.21510

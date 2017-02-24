@@ -1,16 +1,25 @@
-function  HUCstr  = amp2HUC_fft( HUCstr,sd,ed)
+function  HUCstr  = amp2HUC_fft( HUCstr,sd,ed,varargin)
 %AMP2HUC Summary of this function goes here
 %   Detailed explanation goes here
+%   varargin{1}: ind of HUCstr that do calculation
+
 
 % load('HUCstr_HUC4_16.mat');
 % sd=20031001;
 % ed=20121001;
 
+if ~isempty(varargin)
+    iter=VectorDim(varargin{1},2);   % ind that do calculation
+else
+    iter=1:length(HUCstr);
+end
+
+
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tm=unique(datenumMulti(sdn:edn,3));
 
-for i=1:length(HUCstr)
+for i=iter
     t=HUCstr(i).GRACEt;
     s=HUCstr(i).GRACE;
     tmGRACE=datenumMulti(t,3);

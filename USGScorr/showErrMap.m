@@ -1,8 +1,8 @@
 function showErrMap( errmap )
 figure
 imagesc(errmap)
-xlabel('Prediction')
-ylabel('Truth')
+xlabel('Predicted Cluster')
+ylabel('Truth Cluster')
 axis off
 for i = 1:size(errmap,1)
     for j = 1:size(errmap,2)

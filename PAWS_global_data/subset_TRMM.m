@@ -15,7 +15,10 @@ sd=datenum(num2str(daterange(1)),'yyyymmdd');
 ed=datenum(num2str(daterange(2)),'yyyymmdd');
 datenums=sd:ed;
 
+h = waitbar(0, 'Subsetting CRUNCEP TRMM... 0%');
+time_used = 0;
 for i=1:length(datenums)
+    tic
     file = [TRMMdir,'\3B42_daily.',datestr(datenums(i), 'yyyy.mm.dd'),'.7.nc'];
     file=checkMatNc(file);
     lat=readGPdata(file,'latitude');
@@ -34,5 +37,11 @@ for i=1:length(datenums)
     [pathstr,name,ext]=fileparts(file);
     matfile=[TRMMdirNEW,'\',name,'.mat'];
     save(matfile,'r','latitude','longitude');
+    
+    time_used = time_used + toc;
+    pct_done = i / length(datenums);
+    waitbar(pct_done, h, ['Subsetting CRUNCEP TRMM...',num2str(pct_done*100,'%.2f'), ...
+        '%, time used: ', num2str(time_used,'%.1f'), ' sec'])
 end
+close(h)
 

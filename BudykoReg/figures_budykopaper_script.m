@@ -159,7 +159,19 @@ range=[-800,800];
 
 
 
-
+%% sp
+load('Y:\DataAnaly\BasinStr\HUCstr_new.mat')
+outputshpfile='Y:\HUCs\HUC4_main_data.shp';
+HUCshpfile='Y:\DataAnaly\HUC\HUC4_main.shp';
+[Enew,Ebudyko,R2,b,tout,emptybasin,imp,ind,bXe]= budykoReg_MS_SCP( HUCstr,HUCstr_t, {'AoP'}); % HUC4 regression
+for i=1:length(HUCstr)
+    if ismember(i,ind)
+        HUCstr(i).sel=1;
+    else
+        HUCstr(i).sel=0;
+    end
+end
+HUCstr2shp( HUCstr,HUCstr_t, HUCshpfile, outputshpfile )
 
 
 

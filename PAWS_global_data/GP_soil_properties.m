@@ -1,15 +1,11 @@
 function [] = soil_properties(rawdir,boundingbox,proj,savedir)
 % soil properties
 % input: boundingbox = 2 x 2 array [lon_left, lon_right; lat_bottom, lat_up]
+global dojie
 
 scriptpath=mfilename('fullpath');
 k=strfind(scriptpath, '\');
 scriptdir=scriptpath(1:k(end));
-
-lon_left = boundingbox(1,1);
-lon_right = boundingbox(2,1);
-lat_bottom = boundingbox(1,2);
-lat_up = boundingbox(2,2);
 
 soitexfile=[rawdir,'\mksrf_soitex.10level.c010119.nc'];
 soitexfile=checkMatNc(soitexfile);
@@ -36,12 +32,28 @@ om = readGPdata(orgnicfile, 'ORGANIC');   % kg OM/m3
 
 
 % extract for the watershed
-lonind=find(longxy(:,1)>lon_left & longxy(:,1)<lon_right);
-latind=find(latixy(1,:)>lat_bottom & latixy(1,:)<lat_up);
-long_range=[lonind(1)-2;lonind(1)-1;lonind;lonind(end)+1;lonind(end)+2];  % 1 cell buffer
-lati_range=[latind(1)-2,latind(1)-1,latind,latind(end)+1,latind(end)+2];
+% if ~dojie
+[long_range,lati_range]=bound2ind(boundingbox,longxy(:,1),latixy(1,:));
 m_longxy = longxy(long_range,lati_range);
 m_latixy = latixy(long_range,lati_range);
+% else
+%     %Jie
+%     lon_left = -60.4;
+%     lon_right = -59.2;
+%     lat_bottom = -3;
+%     lat_up = -1.8;
+%     
+%     lon=longxy(:,1);
+%     lat=latixy(1,:)';
+%     lat_ind1 = find(lat > lat_bottom, 1);
+%     lat_ind2 = find(lat > lat_up, 1);
+%     lon_ind1 = find(lon > lon_left, 1);
+%     lon_ind2 = find(lon > lon_right, 1);
+%     m_longxy = longxy(lon_ind1 : lon_ind2, lat_ind1 : lat_ind2);
+%     m_latixy = latixy(lon_ind1 : lon_ind2, lat_ind1 : lat_ind2);
+%     long_range=lon_ind1:lon_ind2;
+%     lati_range=lat_ind1:lat_ind2;
+% end
 
 m_mapunits = mapunits(long_range,lati_range);
 m_pct_clay = zeros(size(m_longxy, 1), size(m_longxy, 2), 10);
@@ -62,15 +74,25 @@ m_nM = zeros(size(m_pct_sand));
 m_bd = zeros(size(m_pct_sand));
 m_pct_om = zeros(size(m_pct_sand));
 m_zsoi = zeros(size(zsoi));
+
+currentdir=pwd;
+PTFGdir=[scriptdir,'\PTFG'];
+cd(PTFGdir)
+[ni,nj,nk]=size(m_pct_sand);
+h = waitbar(0, 'Reading CLM Soil... 0%');
+time_used = 0;
+
 for i = 1 : size(m_pct_sand, 1)
     for j = 1 : size(m_pct_sand, 2)
         for k = 1 : size(m_pct_sand, 3)
+            tic
+            
             fid = fopen('ptf.in', 'w');
             fprintf(fid, '%2d %7.2f %20.15f %20.15f %20.15f %3d %3d %3d', ...
                 1, zsoi(k)*100.0, m_pct_sand(i,j,k), m_pct_silt(i,j,k), m_pct_clay(i,j,k), ...
                 -1, -1, -1);
             fclose(fid);
-            status = system([scriptdir,'\PTFG.exe']);
+            status = system('PTFG.exe');
             if status
                 error('PTFG running error!');
             end
@@ -94,7 +116,7 @@ for i = 1 : size(m_pct_sand, 1)
                 1, zsoi(k)*100.0, m_pct_sand(i,j,k), m_pct_silt(i,j,k), m_pct_clay(i,j,k), ...
                 m_pct_om(i,j,k), m_bd(i,j,k), -1);
             fclose(fid);
-            status = system([scriptdir,'\PTFG.exe']);
+            status = system([scriptdir,'\PTFG\PTFG.exe']);
             if status
                 error('PTFG running error!');
             end
@@ -111,9 +133,18 @@ for i = 1 : size(m_pct_sand, 1)
             m_ThetaS(i,j,k) = temp(4);
             m_Alpha(i,j,k) = temp(5);
             m_nM(i,j,k) = temp(6);
+            
+            time_used = time_used + toc;
+            nf=(i-1)*nj*nk+(j-1)*nk+k;
+            pct_done = nf / (ni*nj*nk);
+            waitbar(pct_done, h, ['Reading CLM soil...',num2str(pct_done*100,'%.2f'), ...
+                '%, time used: ', num2str(time_used,'%.1f'), ' sec'])
         end
     end
 end
+close(h)
+
+cd(currentdir)
 m_KS = 86.4*25.4/3600*10.^(-0.6-0.0064*m_pct_clay+0.0126*m_pct_sand);  % unit: m/day
 m_Lambda = exp(-(1.197+0.00417*m_pct_silt-0.0045*m_pct_clay+...
     0.000894*m_pct_silt.*m_pct_clay-0.00001*m_pct_silt.^2.*m_pct_clay));

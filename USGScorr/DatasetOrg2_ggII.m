@@ -1,4 +1,4 @@
-function [dataset,field,type] = DatasetOrg2_ggII(ggII,S_I,ggIIstr,HUCstr)
+function [dataset,field,type] = DatasetOrg2_ggII(IDusgs,IDhuc,ggII,ggIIstr,HUCstr,varargin)
 % add data from ggII, HUCstr to a dataset for supervised learning
 % difference from DatasetOrg_ggII: using usgs drainage basins. 
 % 
@@ -7,9 +7,17 @@ function [dataset,field,type] = DatasetOrg2_ggII(ggII,S_I,ggIIstr,HUCstr)
 % load('Y:\ggII\MasterList\ggIIstr_USGScorr.mat ')    %ggIIstr
 % load('E:\work\DataAnaly\HUCstr_HUC4_32.mat')    %HUCstr
 
+% varargin: [usgsCorr_t, ggIIstr_t, HUCstr_t]
+doDateInterp=0;
+if ~isempty(varargin)
+    usgsCorr_t=varargin{1};
+    ggIIstr_t=varargin{2};
+    HUCstr_t=varargin{3};
+    doDateInterp=1;
+end
 
 % add ggII data
-idNew=[S_I.ID]';
+idNew=IDusgs;
 id=ggII.BasinID.STAID;
 %[C,indNew,ind]=intersect(idNew,id); 
 % bug cause C will be automatically sorted
@@ -118,16 +126,27 @@ snow_P=zeros(n,1);
 SimIndex=zeros(n,1);
 ggIIid=[ggIIstr.ID];
 P=zeros(n,1);
+
+if doDateInterp==0
+    tind=1:length(ggIIstr_t);
+elseif doDateInterp==1
+    [C,tind1,tind]=intersect(usgsCorr_t,ggIIstr_t);
+end
+
 for i=1:n
-    ind=find(ggIIid==S_I(i).ID);
-    Amp_P(i)=ggIIstr(ind).Amp_fft/nanmean(ggIIstr(ind).Rain+ggIIstr(ind).Snow)/12;
+    ind=find(ggIIid==IDusgs(i));
+    Amp_P(i)=ggIIstr(ind).Amp_fft/nanmean(ggIIstr(ind).Rain(tind)+ggIIstr(ind).Snow(tind))/12;
     Amp1(i)=ggIIstr(ind).Amp1;
     acf(i)=ggIIstr(ind).acf_dtr72;
-    Ep_P(i)=nanmean(ggIIstr(ind).rET3)/nanmean(ggIIstr(ind).Rain+ggIIstr(ind).Snow);
+    Ep_P(i)=nanmean(ggIIstr(ind).rET3(tind))/nanmean(ggIIstr(ind).Rain(tind)+ggIIstr(ind).Snow(tind));
     NDVI(i)=ggIIstr(ind).NDVI;
-    snow_P(i)=nanmean(ggIIstr(ind).Snow)/nanmean(ggIIstr(ind).Rain+ggIIstr(ind).Snow);
-    SimIndex(i)=ggIIstr(ind).SimInd;
-    P(i)=nanmean(ggIIstr(ind).Rain+ggIIstr(ind).Snow);
+    snow_P(i)=nanmean(ggIIstr(ind).Snow(tind))/nanmean(ggIIstr(ind).Rain(tind)+ggIIstr(ind).Snow(tind));
+    if ~isempty(ggIIstr(ind).SimInd)
+        SimIndex(i)=ggIIstr(ind).SimInd.v;
+    else
+        SimIndex(i)=nan;
+    end
+    P(i)=nanmean(ggIIstr(ind).Rain(tind)+ggIIstr(ind).Snow(tind));
 end
 dataset=[dataset,Amp_P,Amp1,acf,Ep_P,NDVI,snow_P,SimIndex,P];
 field=[field;'Amp/P';'Amp1';'acf';'Ep/P';'NDVI';'snow/P';'SimIndex';'P'];
@@ -142,18 +161,29 @@ Ep_P=zeros(n,1);
 NDVI=zeros(n,1);
 snow_P=zeros(n,1);
 SimIndex=zeros(n,1);
-HUCid=[HUCstr.HUCid];
+HUCid=[HUCstr.ID];
 P=zeros(n,1);
+
+if doDateInterp==0
+    tind=1:length(HUCstr_t);
+elseif doDateInterp==1
+    [C,tind1,tind]=intersect(usgsCorr_t,HUCstr_t);
+end
+
 for i=1:n
-    ind=find(HUCid==S_I(i).huc);
-    Amp_P(i)=HUCstr(ind).Amp_fft/nanmean(HUCstr(ind).Rain+HUCstr(ind).Snow)/12;
+    ind=find(HUCid==IDhuc(i));
+    Amp_P(i)=HUCstr(ind).Amp_fft/nanmean(HUCstr(ind).Rain(tind)+HUCstr(ind).Snow(tind))/12;
     Amp1(i)=HUCstr(ind).Amp1;
-    acf(i)=HUCstr(ind).acf;
-    Ep_P(i)=nanmean(HUCstr(ind).rET3)/nanmean(HUCstr(ind).Rain+HUCstr(ind).Snow);
-    NDVI(i)=HUCstr(ind).NDVI_avg;
-    snow_P(i)=nanmean(HUCstr(ind).Snow)/nanmean(HUCstr(ind).Rain+HUCstr(ind).Snow);
-    SimIndex(i)=HUCstr(ind).SimIndex;
-    P(i)=nanmean(HUCstr(ind).Rain+HUCstr(ind).Snow);
+    acf(i)=HUCstr(ind).acf_dtr72;
+    Ep_P(i)=nanmean(HUCstr(ind).rET3(tind))/nanmean(HUCstr(ind).Rain(tind)+HUCstr(ind).Snow(tind));
+    NDVI(i)=HUCstr(ind).NDVI;
+    snow_P(i)=nanmean(HUCstr(ind).Snow(tind))/nanmean(HUCstr(ind).Rain(tind)+HUCstr(ind).Snow(tind));
+    if ~isempty(HUCstr(ind).SimInd)
+        SimIndex(i)=HUCstr(ind).SimInd.v;
+    else
+        SimIndex(i)=nan;
+    end
+    P(i)=nanmean(HUCstr(ind).Rain(tind)+HUCstr(ind).Snow(tind));
 end
 dataset=[dataset,Amp_P,Amp1,acf,Ep_P,NDVI,snow_P,SimIndex,P];
 field=[field;'Amp/P(HUC4)';'Amp1(HUC4)';'acf(HUC4)';'Ep/P(HUC4)';'NDVI(HUC4)';'snow/P(HUC4)';'SimIndex(HUC4)';'P(HUC4)'];

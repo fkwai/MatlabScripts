@@ -1,14 +1,22 @@
-function  HUCstr  = acf2HUC_detrend( HUCstr,sd,ed)
+function  HUCstr  = acf2HUC_detrend( HUCstr,sd,ed,varargin)
 %AMP2HUC Summary of this function goes here
 %   add acf after detrend and hurst exp. Scale and data range is hard
 %   coded.
+%   varargin{1}: ind of HUCstr that do calculation
+
+
+if ~isempty(varargin)
+    iter=VectorDim(varargin{1},2);   % ind that do calculation
+else
+    iter=1:length(HUCstr);
+end
 
 sdn=datenum(num2str(sd),'yyyymmdd');
 edn=datenum(num2str(ed),'yyyymmdd');
 tm=unique(str2num(datestr(sdn:edn,'yyyymm')));
 
 
-for i=1:length(HUCstr)
+for i=iter
     t=HUCstr(i).GRACEt;
     s=HUCstr(i).GRACE;
     tmGRACE=str2num(datestr(t,'yyyymm'));

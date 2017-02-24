@@ -1,4 +1,4 @@
-load('Y:\TRMM\TRMM.mat')
+load('TRMM.mat')
 xq=0.5:359.5;
 yq=49.5:-1:-49.5;
 z=1:length(t);
@@ -8,4 +8,4 @@ z=1:length(t);
 zq=interp3(xm,ym,zm,TRMM,xqm,yqm,zqm);
 TRMM_res=zq;
 x=xq;y=yq;
-save Y:\TRMM\TRMM_res TRMM_res x y t
+save TRMM_res TRMM_res x y t

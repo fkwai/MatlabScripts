@@ -20,7 +20,7 @@ maxy=max(y);
 grid=ones(ny,nx,nt).*nan;
 
 for i=1:nc
-    if sum(~isnan(data(i,:)))==nt
+    if sum(~isnan(data(i,:)))~=0
         iy=int64((maxy-y(i))/cellsize+1);
         ix=int64((x(i)-minx)/cellsize+1);
         grid(iy,ix,:)=data(i,:);

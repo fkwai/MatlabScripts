@@ -1,4 +1,4 @@
-function grid = data2grid( data,x,y,cellsize)
+function [grid,xx,yy] = data2grid( data,x,y,cellsize)
 %   This function will fit data into grid. The (1,1) cell of grid is
 %   top-left cell. 
 
@@ -11,6 +11,8 @@ function grid = data2grid( data,x,y,cellsize)
 ncell=length(data);
 nx=length(unique(x));
 ny=length(unique(y));
+xx=sort(unique(x))';
+yy=sort(unique(y),'descend');
 minx=min(x);
 maxy=max(y);
 

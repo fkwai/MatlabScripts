@@ -10,7 +10,7 @@ function  writeASCII_GRACE( grid, x, y, file )
 [nr,nc]=size(grid);
 d.col = nc;
 d.row = nr;
-d.xllcorner = min(x)-360-0.5;
+d.xllcorner = min(x)-0.5;
 d.yllcorner = min(y)-0.5;
 d.cellsize = 1;
 d.z = grid;

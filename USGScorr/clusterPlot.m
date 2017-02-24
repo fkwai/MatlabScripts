@@ -25,7 +25,7 @@ else
     n=nclass;
 end
 for i=1:n
-    subplot(ceil(n/2),2,i)
+    h=subplot(ceil(n/2),2,i);
     class=tab(i,1);
     nind=tab(i,2);
     ind=find(T==class);
@@ -38,6 +38,8 @@ for i=1:n
     if ~isempty(center)
         plot(center(class,:),'*-r');hold on
     end
+    set(h,'xtick',[1:5:nattr])
+    set(h,'xticklabel',strread(num2str([1:5:nattr]),'%s'))    
     axis([0,nattr,-1,1])
     plot([0 nattr],[0 0],'k');hold on
     title(['class ',num2str(class),' size: ',num2str(nind),'/',num2str(nindAll)])

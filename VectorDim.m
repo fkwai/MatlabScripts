@@ -18,6 +18,8 @@ elseif(nr==1&&nc>1) %row
     elseif opt==2   %row
         out=vector;
     end
+elseif(nr==1&&nc==1)
+    out=vector;
 else
     error('not a 1D array')
 end

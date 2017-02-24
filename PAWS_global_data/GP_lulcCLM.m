@@ -1,12 +1,12 @@
 function [] = lulc(boundingbox,lulcFolder,proj,savedir)
 % land use and land cover
 % input: boundingbox = 2 x 2 array [lon_left, lon_right; lat_bottom, lat_up]
+% global dojie
 
-lon_left = boundingbox(1, 1);
-lon_right = boundingbox(2, 1);
-lat_bottom = boundingbox(1, 2);
-lat_up = boundingbox(2, 2);
-%load('GW_K.mat', 'g', 'Prob');
+% if dojie
+%     boundingbox=[-60.375,-2.875;-58.875,-1.875];
+% end
+
 
 pftfile=[lulcFolder,'\mksrf_24pftNT_landuse_rc2000_c121207.nc'];
 pftfile=checkMatNc(pftfile);
@@ -17,10 +17,7 @@ longxy = readGPdata(pftfile, 'LONGXY');
 pct_pft = readGPdata(pftfile, 'PCT_PFT');
 
 % extract for the watershed
-lonind = find(lon>lon_left & lon<lon_right);
-latind = find(lat>lat_bottom & lat<lat_up);
-long_range=[lonind(1)-2;lonind(1)-1;lonind;lonind(end)+1;lonind(end)+2];  % 1 cell buffer
-lati_range=[latind(1)-2;latind(1)-1;latind;latind(end)+1;latind(end)+2];
+[long_range,lati_range]=bound2ind(boundingbox,lon,lat);
 
 m_longxy_pft = round(double(longxy(long_range, lati_range)*1000))/1000;%round to 0.001
 m_latixy_pft = round(double(latixy(long_range, lati_range)*1000))/1000;
@@ -49,10 +46,7 @@ pct_lake = readGPdata(lakefile, 'PCT_LAKE');
 % extract for the watershed
 % lat lon may change due to different files
 % so these have to be re-calculated
-long_range = find(lon>lon_left & lon<lon_right);
-lati_range = find(lat>lat_bottom & lat<lat_up);
-long_range=[long_range(1)-1;long_range;long_range(end)+1];  % 1 cell buffer
-lati_range=[lati_range(1)-1;lati_range;lati_range(end)+1];
+[long_range,lati_range]=bound2ind(boundingbox,lon,lat);
 
 m_longxy = round(double(longxy(long_range, lati_range)*1000))/1000;%round to 0.001
 m_latixy = round(double(latixy(long_range, lati_range)*1000))/1000;
@@ -71,6 +65,9 @@ if isequal(m_East,m_East_pft)&&isequal(m_North,m_North_pft)
 else
     lake = interp2_irreguler(m_East,m_North,double(m_pct_lake),m_East_pft,m_North_pft, 'nearest');
     lake=lake';
+%     if dojie
+%         lake = interp2_irreguler(m_East',m_North',double(m_pct_lake'),m_East_pft',m_North_pft','nearest');
+%     end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,10 +80,7 @@ longxy = readGPdata(wetlandfile, 'LONGXY');
 pct_wetland = readGPdata(wetlandfile, 'PCT_WETLAND');
 
 % extract for the watershed
-long_range = find(lon>lon_left & lon<lon_right);
-lati_range = find(lat>lat_bottom & lat<lat_up);
-long_range=[long_range(1)-1;long_range;long_range(end)+1];  % 1 cell buffer
-lati_range=[lati_range(1)-1;lati_range;lati_range(end)+1];
+[long_range,lati_range]=bound2ind(boundingbox,lon,lat);
 
 m_longxy = round(double(longxy(long_range, lati_range)*1000))/1000;%round to 0.001
 m_latixy = round(double(latixy(long_range, lati_range)*1000))/1000;
@@ -105,6 +99,9 @@ if isequal(m_East,m_East_pft)&&isequal(m_North,m_North_pft)
 else
     wetland = interp2_irreguler(m_East,m_North,double(m_pct_wetland),m_East_pft,m_North_pft,'nearest');
     wetland=wetland';
+%     if dojie
+%         wetland = interp2_irreguler(m_East',m_North',double(m_pct_wetland'),m_East_pft',m_North_pft','nearest');
+%     end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,10 +114,7 @@ longxy = readGPdata(urbanfile, 'LONGXY');
 pct_urban = readGPdata(urbanfile, 'PCT_URBAN');
 
 % extract for the watershed
-long_range = find(lon>lon_left & lon<lon_right);
-lati_range = find(lat>lat_bottom & lat<lat_up);
-long_range=[long_range(1)-1;long_range;long_range(end)+1];  % 1 cell buffer
-lati_range=[lati_range(1)-1;lati_range;lati_range(end)+1];
+[long_range,lati_range]=bound2ind(boundingbox,lon,lat);
 
 m_longxy = round(double(longxy(long_range, lati_range)*1000))/1000;%round to 0.001
 m_latixy = round(double(latixy(long_range, lati_range)*1000))/1000;
@@ -140,6 +134,9 @@ else
     for i = 1 : size(m_pct_urban, 3)
         urbantemp = interp2_irreguler(m_East,m_North,double(m_pct_urban(:,:,i)),m_East_pft,m_North_pft,'nearest');
         urban(:,:,i)=urbantemp';
+%         if dojie
+%             urban(:,:,i) = interp2_irreguler(m_East',m_North',double(m_pct_urban(:,:,i)'),m_East_pft',m_North_pft','nearest');
+%         end
     end
 end
 urban = sum(urban, 3);  % sum up the 3 urban classes
@@ -149,3 +146,30 @@ pft = cat(3, pft, urban, lake, wetland);
 East_pft=m_East_pft';
 North_pft=m_North_pft';
 save([savedir,'\pft.mat'], 'pft','East_pft','North_pft');
+
+end
+
+
+% function [long_range,lati_range]=lonlatrange(boundingbox,lon,lat)
+% 
+% lon_left = boundingbox(1, 1);
+% lon_right = boundingbox(2, 1);
+% lat_bottom = boundingbox(1, 2);
+% lat_up = boundingbox(2, 2);
+% 
+% lonind = find(lon>lon_left & lon<lon_right);
+% latind = find(lat>lat_bottom & lat<lat_up);
+% long_range=[lonind(1)-2;lonind(1)-1;lonind;lonind(end)+1;lonind(end)+2];  % 1 cell buffer
+% lati_range=[latind(1)-2;latind(1)-1;latind;latind(end)+1;latind(end)+2];
+% 
+% global dojie
+% if dojie
+%     lat_ind1 = find(lat > lat_bottom, 1);
+%     lat_ind2 = find(lat > lat_up, 1);
+%     lon_ind1 = find(lon > lon_left, 1);
+%     lon_ind2 = find(lon > lon_right, 1);
+%     long_range=lon_ind1 : lon_ind2;
+%     lati_range=lat_ind1 : lat_ind2;
+% end
+% end
+

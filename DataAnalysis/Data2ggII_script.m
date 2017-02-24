@@ -3,24 +3,38 @@
 % ggIIStr_t=HUCstr_t;
 % ggIIdir='Y:\ggII';
 % 
+
+t1=datenumMulti(200210,1);
+t2=datenumMulti(201409,1);
+t=unique(datenumMulti(t1:t2,3));
+tnum=datenumMulti(t,1);
+
+%% add NLDAS and GRACE data
 for k=1:18
     disp(['basin',num2str(k)]);tic
     
+    t1=datenumMulti(200210,1);
+    t2=datenumMulti(201409,1);
+    t=unique(datenumMulti(t1:t2,3));
+    tnum=datenumMulti(t,1);
+    
     % put inside to empty memory
-    load('Y:\DataAnaly\HUCstr_HUC4_32.mat')
-    ggIIStr_t=HUCstr_t;
+    %load('Y:\DataAnaly\HUCstr_HUC4_32.mat')
+    ggIIstr_t=tnum;
     ggIIdir='Y:\ggII';
     
     ns=sprintf('%02d',k);
     maskfile=[ggIIdir,'\basins',ns,'\basins',ns,'_mask.mat'];
     shpfile=[ggIIdir,'\basins',ns,'\basins',ns,'.shp'];
-    outmatfile=[ggIIdir,'\basins',ns,'\basins',ns,'_str.mat'];
+    outmatfile=[ggIIdir,'\basins',ns,'\basins',ns,'_str2.mat'];
     ggIIstr=initialHUCstr( shpfile,'SITE_NO' );
     
     mask=load(maskfile);
-    ggIIstr=NAdata2Str_monthly( mask.maskNLDAS,mask.maskGRACE,mask.maskNDVI,outmatfile,ggIIstr,ggIIStr_t);
-    clear all
+    BasinStr=NAdata2Str_monthly( mask.maskNLDAS,mask.maskGRACE,mask.maskNDVI,ggIIstr,ggIIstr_t);
+    BasinStr_t=ggIIstr_t;
+    save(outmatfile,'BasinStr','BasinStr_t');
     toc
+    clear all    
 end
 
 % download and add usgs data
@@ -108,32 +122,46 @@ refTable.DArea_sqm=refTable.SQMI*(1609.34^2);
 save Y:\ggII\MasterList\refTable.mat refTable
 
 %% sum those data to USGScorr table
+
+% get common ID
 load('Y:\ggII\MasterList\refTable.mat')
-load('Y:\Kuai\USGSCorr\S_I.mat')
-% for i=1:length(S_I)
-%     S_I(i).ID=str2num(S_I(i).STAID);
-% end
-% save Y:\Kuai\USGSCorr\S_I.mat S_I
+load('E:\Kuai\SSRS\data\usgsCorr_5364.mat')
 IDall=refTable.ID;
-ID=[S_I.ID]';
-[C,ind,indall]=intersect(ID,IDall);
-S_I=S_I(ind);
-save Y:\Kuai\USGSCorr\S_I2.mat S_I
+[C,ind,indall]=intersect(ID,IDall,'stable');
+usgsCorr=usgsCorr(ind,:);
+ID=ID(ind);
+save('E:\Kuai\SSRS\data\usgsCorr_4949.mat','usgsCorr','ID');
+
+ 
+% % load('Y:\Kuai\USGSCorr\S_I.mat')
+% % for i=1:length(S_I)
+% %     S_I(i).ID=str2num(S_I(i).STAID);
+% % end
+% % save Y:\Kuai\USGSCorr\S_I.mat S_I
+% 
+% 
+% IDall=refTable.ID;
+% %ID=[S_I.ID]';
+% [C,ind,indall]=intersect(ID,IDall,'stable');
+% % S_I=S_I(ind);
+% % save Y:\Kuai\USGSCorr\S_I2.mat S_I
+
+
 for k=1:18
     ggIIdir='Y:\ggII';
     ns=sprintf('%02d',k);    
-    strmatfile=[ggIIdir,'\basins',ns,'\basins',ns,'_str.mat'];
+    strmatfile=[ggIIdir,'\basins',ns,'\basins',ns,'_str2.mat'];
     cmdstr=['basinstr_',ns,'=load(''',strmatfile,''')'];
     eval(cmdstr);
 end
 
-load Y:\Kuai\USGSCorr\S_I2.mat
+load 'E:\Kuai\SSRS\data\usgsCorr_4949.mat'
 load Y:\ggII\MasterList\refTable.mat
 fields=fieldnames(basinstr_01.BasinStr);
 ggIIstr=struct(basinstr_01.BasinStr(1));
-for i=1:length(S_I)
+for i=1:length(ID)
     i
-    id=S_I(i).ID;
+    id=ID(i);
     ind=find(refTable.ID==id);
     ns=refTable.REG(ind);
     cmdstr=['BasinStr=basinstr_',ns{1},'.BasinStr;'];
@@ -141,15 +169,16 @@ for i=1:length(S_I)
     ind2=find([BasinStr.ID]==id);
     ggIIstr(i)=BasinStr(ind2);
 end
-for i=1:length(S_I)
-    id=S_I(i).ID;
+
+for i=1:length(ID)
+    id=ID(i);
     ind=find(refTable.ID==id);
     ns=refTable.REG(ind);
     ggIIstr(i).Reg=ns;
     ggIIstr(i).Area_sqm=refTable.DArea_sqm(ind);
 end
 
-save Y:\ggII\MasterList\ggIIstr_USGScorr.mat ggIIstr ggIIstr_t
+save E:\Kuai\SSRS\data\ggIIstr_4949 ggIIstr ggIIstr_t
 
 %% use HUC4 GRACE related dataset for budyko regress
 load Y:\Kuai\USGSCorr\S_I.mat

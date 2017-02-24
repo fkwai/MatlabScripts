@@ -8,6 +8,7 @@ NLDAS_NOAH_folder='Y:\NLDAS\matfile\monthly\NOAH';
 NLDAS_FORA_folder='Y:\NLDAS\matfile\monthly\FORA';
 NLDAS_rET_file='Y:\DataAnaly\rET\rET_NLDAS_monthly.mat';
 GRACE_file='Y:\GRACE\gracegrid_CSR.mat';
+GRACEerr_file='Y:\GRACE\GRACE_ERR_grid.mat';
 
 NDVI_file='Y:\DataAnaly\GIMMS\NDVI_avg_NA.mat'; % Using NA data here result from memory issue
 
@@ -37,6 +38,11 @@ BasinStr = grid2HUC_month('rET3',rETdata.rET3,rETdata.t,maskNLDAS,BasinStr,Basin
 crdGRACE=load(crdGRACEfile);
 GRACEdata=load(GRACE_file);
 BasinStr = grid2HUC_month('S',GRACEdata.graceGrid*10,GRACEdata.t,maskGRACE,BasinStr,BasinStr_t);
+
+% GRACE Err
+GRACEerrdata=load(GRACEerr_file);
+BasinStr = grid2HUC_month('GRACE_leakageErr',GRACEerrdata.leakage_Err*10,1,maskGRACE,BasinStr,1);
+BasinStr = grid2HUC_month('GRACE_measureErr',GRACEerrdata.measure_Err*10,1,maskGRACE,BasinStr,1);
 
 % GRACE data of all time
 t=GRACEdata.t;

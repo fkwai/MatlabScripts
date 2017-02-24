@@ -1,4 +1,4 @@
-function [ output_args ] = subset_Soil_CLM( boundingbox,Soil_CLMdir,Soil_CLMdirNEW )
+function subset_Soil_CLM( boundingbox,Soil_CLMdir,Soil_CLMdirNEW )
 %SUBSET_SOIL_CLM Summary of this function goes here
 %   Detailed explanation goes here
 

@@ -30,7 +30,7 @@ for i=1:n
         
         area1=sum(m);
         area2=sum(m2);
-        if area2>=area1*0.8 % if 80% are covered go ahead
+        if area2>=area1*0 % if 80% are covered go ahead
             data(j)=sum(g2.*m2)/sum(m2);
         end
     end

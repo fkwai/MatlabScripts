@@ -18,10 +18,30 @@ for i=1:length(indpoly)-1
 %     X=[0,0,2,2,1,1];
 %     Y=[1,2,2,0,0,1];
     
-    indx1=find(x<min(X));indx1=indx1(end);
-    indx2=find(x>max(X));indx2=indx2(1);
-    indy1=find(y>max(Y));indy1=indy1(end);
-    indy2=find(y<min(Y));indy2=indy2(1);
+    indx1=find(x<min(X));
+    if isempty(indx1)
+        indx1=1;
+    else
+        indx1=indx1(end);
+    end
+    indx2=find(x>max(X));
+    if isempty(indx2)
+        indx2=length(x);
+    else
+        indx2=indx2(1);
+    end
+    indy1=find(y>max(Y));
+    if isempty(indy1)
+        indy1=1;
+    else
+        indy1=indy1(end);
+    end
+    indy2=find(y<min(Y));
+    if isempty(indy2)
+        indy2=length(y);
+    else
+        indy2=indy2(1);
+    end
     indx=indx1:indx2;
     indy=indy1:indy2;
     

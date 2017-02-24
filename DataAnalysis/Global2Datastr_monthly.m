@@ -10,6 +10,7 @@ function [BasinStr,BasinStr_t]=Global2Datastr_monthly(maskGLDAS,maskGRACE,maskND
 %% default set up of all data dir
 E_JBF_dir='Y:\ET_JBF\AET_JBF_10deg';
 GRACE_dir='Y:\GRACE\graceGrid_CSR.mat';
+GRACEerr_dir='Y:\GRACE\GRACE_ERR_grid.mat';
 GLDAS_dir='Y:\GLDAS\Monthly\GLDAS_matfile\NOAH_V2';
 NDVI_dir='Y:\DataAnaly\GIMMS\NDVI_avg.mat';
 GLDAS_rET_dir='Y:\DataAnaly\rET\rET_GLDAS_monthly.mat';
@@ -27,6 +28,10 @@ maskRET=maskGRACE;
 disp('GRACE');tic
 GRACEdata=load(GRACE_dir);
 BasinStr = grid2HUC_month('S',GRACEdata.graceGrid*10,GRACEdata.t,maskGRACE,BasinStr,BasinStr_t);
+GRACEerrdata=load(GRACEerr_dir);
+BasinStr = grid2HUC_month('GRACE_leakageErr',GRACEerrdata.leakage_Err*10,1,maskGRACE,BasinStr,1);
+BasinStr = grid2HUC_month('GRACE_measureErr',GRACEerrdata.measure_Err*10,1,maskGRACE,BasinStr,1);
+
 
 % GRACE data of all time
 t=GRACEdata.t;
@@ -39,7 +44,7 @@ end
 
 % Amplitude
 sd=20021001;
-ed=20141001;
+ed=20140930;
 BasinStr=amp2HUC( BasinStr,sd,ed,0,1001 );
 BasinStr=amp2HUC( BasinStr,sd,ed,1,1001 );
 BasinStr=amp2HUC_fft( BasinStr,sd,ed);

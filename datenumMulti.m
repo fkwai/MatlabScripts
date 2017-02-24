@@ -8,6 +8,7 @@ function tout = datenumMulti( t,opt )
 
 % just for normal case (about year 1500 - 2700)
 
+t=VectorDim(t,1);
 
 if t(1)>10000000 %yyyymmdd
     if opt==1

@@ -6,8 +6,9 @@ load Y:\Kuai\USGSCorr\dataset2.mat
 X=Corr_maxmin(i1,:);
 XX=dataset(i2,:);
 
-Area=[ggIIstr.Area_sqm]';
-r=find(isnan(sum(abs(X),2)) | sum(abs(X),2)==0 | Area<10*10^9);
+%Area=[ggIIstr.Area_sqm]';
+%r=find(isnan(sum(abs(X),2)) | sum(abs(X),2)==0 | Area<10*10^9);
+r=find(isnan(sum(abs(X),2)) | sum(abs(X),2)==0 );
 X(r,:)=[];
 XX(r,:)=[];
 XX(isnan(XX))=0;    %only na in FLOW_PCT_EST_VALUES
@@ -110,16 +111,31 @@ matfile='cluster_6_c.mat';
 
 %plot predictors
 load('Y:\Kuai\USGSCorr\cluster2_6_c.mat')
-clusterPlot( X,T )
+clusterPlot( X,T,C )
+[pT,perf,perfclass,errmap] = MLcluster_crossval( XXn,T,1,10,1);
+
+suffix = '.eps';
+fname='cluster_6_perf';
+fixFigure([],[fname,suffix]);
+saveas(gcf, fname);
+
 %predictorPlot_cluster( T,[],XXn,field,'Y:\Kuai\USGSCorr\figures\' )
 logfield=[1,19,20,22,24,29,34,36,38,40,41,48];
 predictorPlot_cluster( T,[],XXn,field,'Y:\Kuai\USGSCorr\figures\',[],logfield );
 predictorPlot2_cluster( T,XXn,field,'Y:\Kuai\USGSCorr\figures\' )
 
 % plot on map
-load('Y:\Kuai\USGSCorr\S_I.mat')
+load('Y:\Kuai\USGSCorr\S_I2.mat')
 [pT,perf,perfclass,errmap] = MLcluster_crossval( XXn,T,1,10,1 );
 ShpWrite_cluster( T,pT,S_I,'Y:\Kuai\USGSCorr\maps\cluster_6.shp' )
+
+bestCorr=max(X,[],2);
+for i=1:length(S_I)
+    S_I(i).bestCorr=bestCorr(i);
+end    
+shapewrite(S_I,'Y:\Kuai\USGSCorr\maps\bestCorr.shp');
+
+
 
 % find best predict n predictors
 [nind,npred ]=size(XXn);
@@ -177,4 +193,32 @@ clusterPlot( X,T )
 coeff = pca(XXn)
 
 %% explain cluster - predict probablity or distance
+
+%% MDS map
+D = pdist(X,'euclidean');
+Dm = squareform(D);
+[Y,stress,disparities] = mdscale(Dm,2);
+plot(Y(:,1),Y(:,2),'*')
+for i =1:length(unique(T))
+    ind=find(T==i);
+    plot(Y(ind,1),Y(ind,2),getS(i,'p'));hold on
+end
+legend('cluster 1','cluster 2','cluster 3','cluster 4','cluster 5','cluster 6')
+
+suffix = '.eps';
+fname='cluster_6_MDS';
+fixFigure([],[fname,suffix]);
+saveas(gcf, fname);
+
+    
+%test
+i1=randi([1,length(X)]);
+i2=randi([1,length(X)]);
+d1=pdist([X(i1,:)',X(i2,:)']')
+d2=pdist([Y(i1,:)',Y(i2,:)']')
+
+D2 = pdist(Y,'euclidean');
+Dm2 = squareform(D2);
+
+
 
