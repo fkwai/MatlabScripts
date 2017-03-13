@@ -7,8 +7,8 @@ if ~isdir(folder)
     mkdir(folder)
 end
 
-if ~isdir([folder,'\data'])
-    mkdir([folder,'\data'])
+if ~isdir([folder,'/data'])
+    mkdir([folder,'/data'])
 end
 
 mask1d=mask(:);
@@ -51,7 +51,7 @@ end
 matout(isnan(matout))=-9999;
 
 parfor i=1:length(ind)
-    dlmwrite([folder,'\data\',sprintf('%06d',i),'.csv'], matout(i,:)','precision',8,'-append');
+    dlmwrite([folder,'/data/',sprintf('%06d',i),'.csv'], matout(i,:)','precision',8,'-append');
 end
 
 end

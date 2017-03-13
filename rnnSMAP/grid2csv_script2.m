@@ -1,12 +1,12 @@
 tic
-SMAP=load('Y:\SMAP\SMP_L2_q.mat');
+SMAP=load('/home/kxf227/work/GLDAS/SMP_L2_q.mat');
 toc
 tic
-GLDAS=load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\GLDAS_NOAH_SoilM.mat');
+GLDAS=load('/home/kxf227/work/GLDAS/GLDAS_NOAH_SoilM.mat');
 toc
 
 
-load('Y:\GLDAS\maskGLDAS_025.mat')
+load('/home/kxf227/work/GLDAS/maskGLDAS_025.mat')
 
 tic
 dataSMAP_q=zeros(length(GLDAS.lat),length(GLDAS.lon),length(GLDAS.tnum))*nan;
@@ -18,8 +18,23 @@ for j=1:length(SMAP.tnum)
     C=cat(3,gridtemp,dataSMAP_q(:,:,iGLDAS));
     dataSMAP_q(:,:,iGLDAS)=nanmean(C,3);
 end
-grid2csv_time( dataSMAP_q,GLDAS.lat,GLDAS.lon,GLDAS.tnum,mask,'D:\Kuai\rnnSMAP\tDB_SMPq\' )
+data=dataSMAP_q-repmat(nanmean(dataSMAP_q,3),[1,1,length(GLDAS.tnum)]);
+%grid2csv_time( dataSMAP_q,GLDAS.lat,GLDAS.lon,GLDAS.tnum,mask,'/home/kxf227/work/GLDAS/database/tDB_SMPq/')
+grid2csv_time( data,GLDAS.lat,GLDAS.lon,GLDAS.tnum,mask,'/home/kxf227/work/rnnSMAP/database/tDB_SMPq_Anomaly/')
 toc
+
+data=data(:);
+data(isnan(data))=[];
+perc=10;
+lb=prctile(data,perc);
+ub=prctile(data,100-perc);
+data80=data(data>=lb &data<=ub);
+m=mean(data80);
+sigma=std(data80);
+stat=[lb;ub;m;sigma];
+statFile=['~/work/rnnSMAP/database/tDB_SMPq_Anomaly/stat.csv'];
+dlmwrite(statFile, stat,'precision',8);
+
 
 %% read all GLDAS data
 
@@ -61,7 +76,7 @@ end
 
 %% update ub, lb for normalization
 filename='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\2016\001\GLDAS_NOAH025SUBP_3H.A2016001.0000.001.2016041013331.grb';
-ParamTable='Y:\GLDAS\gribtab_GLDAS_NOAH.txt';
+ParamTable='Y:\GLDAS\gribtab_GLDAS_NOAH.txt';.
 gldas=read_grib(filename,ParamTable,-1,'ScreenDiag',0);
 fieldLst={gldas.parameter}';
 fieldLst{14}='SoilTemp';
@@ -157,24 +172,16 @@ grid2csv_time_const(gridLULC_int,lat,lon,mask,'Y:\Kuai\rnnSMAP\Database\tDBconst
 
 %% GLDAS soilM anormly
 tic
-GLDAS=load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\GLDAS_NOAH_SoilM.mat');
+GLDAS=load('~/workl/GLDAS/GLDAS_NOAH_SoilM.mat');
 toc
 
 % loop due to memory issue
-%data=GLDAS.data-repmat(nanmean(GLDAS.data,3),[1,1,length(GLDAS.tnum)]);
-tic
-for j=1:length(GLDAS.lat)
-    for i=1:length(GLDAS.lon)
-        m=nanmean(GLDAS.data(j,i,:));
-        GLDAS.data(j,i,:)=GLDAS.data(j,i,:)-m;        
-    end
-end
-toc
+data=data(:,:,1:length(tnum));
+data=data-repmat(nanmean(data,3),[1,1,length(tnum)]);
+load('~/work/GLDAS/maskGLDAS_025.mat')
+grid2csv_time(data,lat,lon,tnum,mask,'~/work/rnnSMAP/database/tDB_soilM_Anormly/')
 
-load('Y:\GLDAS\maskGLDAS_025.mat')
-grid2csv_time(GLDAS.data,GLDAS.lat,GLDAS.lon,GLDAS.tnum,mask,'D:\Kuai\rnnSMAP\tDB_soilM_Anormly\')
-
-data=GLDAS.data(:);
+data=data(:);
 data(isnan(data))=[];
 perc=10;
 lb=prctile(data,perc);
@@ -183,5 +190,8 @@ data80=data(data>=lb &data<=ub);
 m=mean(data80);
 sigma=std(data80);
 stat=[lb;ub;m;sigma];
-statFile=['D:\Kuai\rnnSMAP\tDB_soilM_Anormly\stat.csv'];
+statFile=['~/work/rnnSMAP/database/tDB_soilM_Anomaly/stat.csv'];
 dlmwrite(statFile, stat,'precision',8);
+
+
+
