@@ -64,7 +64,7 @@ while(~isempty(tsStr))
     
     if ix<1 || ix>nx || iy<1 || iy>ny
         tsStr=[];
-        if ~exist('fc')
+        if exist('fc','var')
             close(fc)
         end
     else
@@ -73,7 +73,7 @@ while(~isempty(tsStr))
             t=tsStr(k).t;
             legendStr=[legendStr,{tsStr(k).legendStr}];
             v=reshape(tsStr(k).grid(iy,ix,:),length(t),1);
-            if ~exist('fc')
+            if ~exist('fc','var')
                 fc=figure('Position',[100,100,1000,200]);
             else
                 figure(fc)

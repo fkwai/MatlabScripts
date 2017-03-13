@@ -13,13 +13,14 @@ function statBoxPlot( statLSTM,statGLDAS,statCov,covMethod,figfolder,varargin )
 
 %
 postStr=[];
-% if ~isempty(varargin)
-%     postStr=varargin{1};
-% end
+if ~isempty(varargin)
+    postStr=varargin{1};
+end
 
 figPos=[100,100,800,600];
 statLst={'nash','rsq','rmse','bias'};
-plotRangeLst=[-10,1;0,1;0,0.5;0,0.5];
+titleLst={'Comparison of Nash','Comparison of R^2','Comparison of RMSE','Comparison of Bias',};
+plotRangeLst=[-1,1;0,1;0,0.1;-0.05,0.05];
 
 for k=1:4
     stat=statLst{k};
@@ -33,20 +34,24 @@ for k=1:4
     f=figure('Position',figPos);
     boxplot(plotData,'Labels',plotLabel);
     ylim(plotRange);
-    title(stat)
-    fixFigure()
-    savefig([figfolder,'\',stat,'Box',postStr,'.fig'])
+    title(titleLst{k})
+    suffix = '.eps';
+    fname=[figfolder,'\',stat,'Box',postStr];
+    fixFigure([],[fname,suffix]);    
+    txt = findobj(gca,'Type','text');
+    set(txt(1:end),'FontSize',18,'VerticalAlignment', 'Middle');
+    saveas(gcf, fname);
     close(f)
     
-    f=figure('Position',figPos);
-    H=notBoxPlot(plotData,[],'jitter',0.5);
-    ylim(plotRange);
-    set([H.data],'markersize',2)
-    set(gca,'XTickLabel',plotLabel)
-    title(stat)
-    fixFigure()
-    savefig([figfolder,'\',stat,'notBox',postStr,'.fig'])
-    close(f)    
+    %     f=figure('Position',figPos);
+    %     H=notBoxPlot(plotData,[],'jitter',0.5);
+    %     ylim(plotRange);
+    %     set([H.data],'markersize',2)
+    %     set(gca,'XTickLabel',plotLabel)
+    %     title(stat)
+    %     fixFigure()
+    %     savefig([figfolder,'\',stat,'notBox',postStr,'.fig'])
+    %     close(f)
 end
 
 

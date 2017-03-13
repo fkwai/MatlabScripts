@@ -7,8 +7,12 @@ function [output,indRegion]=splitSubset_shapefile( shapefile,saveName,varargin)
 % varargin{1} -> subset. Pick a grid every varargin{1} grids
 
 dSub=1;
+offset=0;
 if ~isempty(varargin)
     dSub=varargin{1};    
+end
+if length(varargin)>1
+    offset=varargin{2};    
 end
 
 load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat');
@@ -22,8 +26,8 @@ for k=1:length(shape)
 end
 
 maskInd = mask2Ind_SMAP;
-maskInd=maskInd(1:dSub:end,1:dSub:end);
-output=output(1:dSub:end,1:dSub:end);
+maskInd=maskInd(1+offset:dSub:end,1+offset:dSub:end);
+output=output(1+offset:dSub:end,1+offset:dSub:end);
 
 indRegion={};
 for k=1:length(shape)

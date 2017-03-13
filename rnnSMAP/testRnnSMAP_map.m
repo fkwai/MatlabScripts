@@ -1,4 +1,4 @@
-function testRnnSMAP_map(outFolder,trainName,testName,iter,varargin)
+function [gridStat,xx,yy,cellsize]=testRnnSMAP_map(outFolder,trainName,testName,iter,varargin)
 % First test for trained rnn model. 
 % plot nash/rmse map for given testset and click map to plot timeseries
 % comparison between GLDAS, SMAP and RNN prediction. 
@@ -13,23 +13,25 @@ function testRnnSMAP_map(outFolder,trainName,testName,iter,varargin)
 % shapefile -> shapefile plot in map
 % doAnorm -> if the result is anormaly then doAnorm=1
 
-pnames={'shapefile','stat','opt','colorRange','doAnorm'};
-dflts={[],'nash',1,[],0};
-[shapefile,stat,opt,colorRange,doAnorm]=...
+pnames={'shapefile','stat','opt','colorRange','optSMAP','optGLDAS'};
+dflts={[],'nash',1,[],1,1};
+[shapefile,stat,opt,colorRange,optSMAP,optGLDAS]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
-dirSMAP='Y:\Kuai\rnnSMAP\Database\tDB_SMPq\';
-load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat','tnum');
+dirSMAP='E:\Kuai\rnnSMAP\Database\tDB_SMPq_Anomaly_Daily\';
+tInd=csvread([dirSMAP,'\tIndex.csv']);
+tStr=num2str(tInd,'%8.0f');
+tnum=datenum(tStr,'yyyymmdd');
 
 testFile=[outFolder,'\',testName,'.csv'];
 testInd=csvread(testFile);
-nt=4160;
-ntrain=2209;
+nt=520;
+ntrain=277;
 
 %% read data
-[ySMAP,yLSTM,yGLDAS,yCov,covMethod]=...
-    testRnnSMAP_readData(outFolder,trainName,testName,iter,'doAnorm',1);
+[ySMAP,yLSTM,yGLDAS,yCov,covMethod]=testRnnSMAP_readData(...
+    outFolder,trainName,testName,iter,'optSMAP',optSMAP,'optGLDAS',optGLDAS,'readCov',1);
 
 
 %% calculate stat
@@ -44,12 +46,12 @@ toc
 
 
 %% transfer to grid
-crdFile=[dirSMAP,'crdIndex.csv'];
+crdFile=['Y:\Kuai\rnnSMAP\Database\tDB_SMPq\crdIndex.csv'];
 crdAll=csvread(crdFile);
 crdTest=crdAll(testInd,:);
 xSort=sort(unique(crdTest(:,1)));
 cellsize=xSort(2)-xSort(1); %!!!may modify later
-[gridStat,xx,yy] = data2grid( statLSTM(opt+1).(stat),crdTest(:,2),crdTest(:,1),cellsize);
+[gridStatLSTM,xx,yy] = data2grid( statLSTM(opt+1).(stat),crdTest(:,2),crdTest(:,1),cellsize);
 
 [gridSMAP,xx,yy] = data2grid3d(ySMAP',crdTest(:,2),crdTest(:,1),cellsize);
 tsStr(1).grid=gridSMAP;
@@ -69,15 +71,22 @@ tsStr(3).t=tnum;
 tsStr(3).symb='-k';
 tsStr(3).legendStr='GLDAS';
 
-% for k=1:length(yCov)
-%     [gridTemp,xx,yy] = data2grid3d(yCov{k}',crdTest(:,2),crdTest(:,1),cellsize);
-%     tsStrTemp.grid=gridTemp;
-%     tsStrTemp.t=tnum;
-%     tsStrTemp.symb=getS(k,'l');
-%     tsStrTemp.legendStr=covMethod{k};
-%     tsStr=[tsStr,tsStrTemp];
-% end
+yCov=yCov([1,3]);
+covMethod=covMethod([1,3]);
+if length(covMethod)==4
+    symMethod={'y.','yo','g.','go'};    
+elseif length(covMethod)==2
+    symMethod={'yo','go'};
+end
+for k=1:length(yCov)
+    [gridTemp,xx,yy] = data2grid3d(yCov{k}',crdTest(:,2),crdTest(:,1),cellsize);
+    tsStrTemp.grid=gridTemp;
+    tsStrTemp.t=tnum;
+    tsStrTemp.symb=symMethod{k};
+    tsStrTemp.legendStr=covMethod{k};
+    tsStr=[tsStr,tsStrTemp];
+end
 
-showGrid( gridStat,xx,yy,cellsize,'colorRange',colorRange,'tsStr',tsStr,'shapefile',shapefile)
+showGrid( gridStatLSTM,xx,yy,cellsize,'colorRange',colorRange,'tsStr',tsStr,'shapefile',shapefile)
 end
 

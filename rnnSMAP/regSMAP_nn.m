@@ -1,4 +1,4 @@
-function [yNNnorm,net] = regSMAP_nn(xDataNorm,yDataNorm,varargin)
+function [yNNnorm,net] = regSMAP_nn(xDataNorm,yDataNorm,nTrain,varargin)
 % regress using neural network to predict SMAP
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
 % trainName='indUSsub4';
@@ -6,7 +6,6 @@ function [yNNnorm,net] = regSMAP_nn(xDataNorm,yDataNorm,varargin)
 % [xDataNorm,yDataNorm,xStat,yStat]=readDatabaseSMAP(outFolder,trainName);
 
 %% predefine
-nTrain=2209;
 [nt,nGrid,nField]=size(xDataNorm);
 
 net=[];
@@ -26,7 +25,7 @@ if isempty(net)
     xTrain=xTrainVec;xTrain(ivTrain,:)=[];
     yTrain=yTrainVec;yTrain(ivTrain)=[];
     
-    hiddensize = 100;
+    hiddensize=100;
     net = fitnet(hiddensize);
     net.divideParam.trainRatio=1;
     disp('NN training')

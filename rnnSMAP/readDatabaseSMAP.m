@@ -3,24 +3,38 @@ function [xOut,yOut,xStat,yStat]=readDatabaseSMAP(trainFolder,trainName,varargin
 %% example
 % trainFolder='Y:\Kuai\rnnSMAP\output\NA_division\';
 % trainName='div1';
-% mode = 0 -> raw data; 1 -> normalization; 
+% xField: 1 -> real; 2 -> anomaly; 0 -> no soilM
+% yField: 1 -> real; 2 -> anomaly
+% mode = 0 -> raw data; 1 -> normalization;
 pnames={'mode','xField','xField_const','yField'};
-dflts={1,0,0,0};
+dflts={1,1,0,1};
 [mode,xField,xField_const,yField]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
+nt=520;
+
 
 %% Default setting
-dataFolder='Y:\Kuai\rnnSMAP\Database\';
+dataFolder='E:\Kuai\rnnSMAP\Database\';
 if xField==0
-    xField={'soilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf'};
+    xField={'Evap_Daily','Rainf_Daily','Tair_Daily',...
+        'Wind_Daily','PSurf_Daily','Canopint_Daily','Snowf_Daily'};
+elseif xField==1
+    xField={'soilM_Daily','Evap_Daily','Rainf_Daily','Tair_Daily',...
+        'Wind_Daily','PSurf_Daily','Canopint_Daily','Snowf_Daily'};
+elseif xField==2
+    xField={'soilM_Anomaly_Daily','Evap_Daily','Rainf_Daily','Tair_Daily',...
+        'Wind_Daily','PSurf_Daily','Canopint_Daily','Snowf_Daily'};
 end
+
 if xField_const==0
     xField_const={'DEM','Slope','Sand','Silt','Clay','LULC','NDVI'};
 end
-if yField==0
-    yField='SMPq';
+
+if yField==1
+    yField='SMPq_Daily';
+elseif yField==2
+    yField='SMPq_Anomaly_Daily';
 end
-nt=4160;
 
 %% load X data
 trainFile=[trainFolder,trainName,'.csv'];
@@ -43,7 +57,6 @@ end
 for kk=1:length(xField_const)
     k=kk+length(xField);
     xfolder=[dataFolder,'\tDBconst_',xField_const{kk},'\'];
-    nt=4160;
     xfile=[xfolder,'\data.csv'];
     xRaw=csvread(xfile);
     x=xRaw(trainInd);
@@ -57,7 +70,6 @@ end
 trainFile=[trainFolder,trainName,'.csv'];
 trainInd=csvread(trainFile);
 yData=zeros(nt,length(trainInd))*nan;
-yStat=zeros(4,length(xField)+length(xField_const))*nan;
 
 yfolder=[dataFolder,'\tDB_',yField,'\'];
 for i=1:length(trainInd)
@@ -76,9 +88,9 @@ elseif mode==1
     xDataNorm=zeros(nt,length(trainInd),length(xField)+length(xField_const))*nan;
     for k=1:length(xField)+length(xField_const)
         xtemp=xData(:,:,k);
-        xDataNorm(:,:,k)=(xtemp-xStat(1,k))/(xStat(2,k))*2-1;
+        xDataNorm(:,:,k)=(xtemp-xStat(1,k))/(xStat(2,k)-xStat(1,k))*2-1;
     end
-    yDataNorm=(yData-yStat(1))/(yStat(2))*2-1;
+    yDataNorm=(yData-yStat(1))/(yStat(2)-xStat(1,k))*2-1;
     xOut=xDataNorm;
     yOut=yDataNorm;
 end

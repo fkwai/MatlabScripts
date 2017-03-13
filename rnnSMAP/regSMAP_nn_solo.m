@@ -1,4 +1,4 @@
-function [yNNnorm] = regSMAP_nn_solo(xDataNorm,yDataNorm)
+function [yNNnorm] = regSMAP_nn_solo(xDataNorm,yDataNorm,nTrain)
 % regress using neural network to predict SMAP
 
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
@@ -6,7 +6,6 @@ function [yNNnorm] = regSMAP_nn_solo(xDataNorm,yDataNorm)
 % [xDataNorm,yDataNorm,xStat,yStat]=readDatabaseSMAP(outFolder,trainName);
 
 %% predefine
-nTrain=2209;
 [nt,nGrid,nField]=size(xDataNorm);
 indTrain=1:nTrain;
 
@@ -23,7 +22,7 @@ for k=1:nGrid
 
     if ~isempty(yTrain)
         % train NN
-        hiddensize = 10;
+        hiddensize = 100;
         net = fitnet(hiddensize);
         net.divideParam.trainRatio=1;
         [net,tr] = train(net,xTrain',yTrain');        

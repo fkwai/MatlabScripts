@@ -1,27 +1,29 @@
 function stat=statCal(x,y)
 % calculate nash, R2, bias, rmse between two time series
-% x: [#time step * #points * #models]
+% x: [#time step * #points]
 % y: [#time step * #points]
 
-[nt,nInd,nModel]=size(x);
+[nt,nInd]=size(x);
+nModel=1;
 nash=zeros(nInd,nModel)*nan;
 rsq=zeros(nInd,nModel)*nan;
 bias=zeros(nInd,nModel)*nan;
 rmse=zeros(nInd,nModel)*nan;
 
-for k=1:nModel
-    nashTemp=[1-nansum((x(:,:,k)-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';    
-    rsqTemp=zeros(nInd,1);
-    for j=1:nInd
-        rsqTemp(j)=RsqCalculate(y(:,j),x(:,j,k));
-    end
-    biasTemp=nanmean(x(:,:,k)-y)';
-    rmseTemp=sqrt(nanmean((x(:,:,k)-y).^2))';
-    nash(:,k)=nashTemp;
-    rsq(:,k)=rsqTemp;
-    bias(:,k)=biasTemp;
-    rmse(:,k)=rmseTemp;
+indV=find(sum(isnan(x),1)./nt<0.1); % assume x is complete time seris and remove ones with too many nans
+
+nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
+rsqTemp=zeros(nInd,1);
+for j=1:nInd
+    rsqTemp(j)=RsqCalculate(y(:,j),x(:,j));
 end
+biasTemp=nanmean(x-y)';
+rmseTemp=sqrt(nanmean((x-y).^2))';
+nash(indV)=nashTemp(indV);
+rsq(indV)=rsqTemp(indV);
+bias(indV)=biasTemp(indV);
+rmse(indV)=rmseTemp(indV);
+
 
 stat.nash=nash;
 stat.rsq=rsq;

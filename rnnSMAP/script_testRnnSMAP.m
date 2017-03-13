@@ -1,53 +1,24 @@
 
-%% PA
-outFolder='Y:\Kuai\rnnSMAP\output\PA\';
-trainName='PA';
-testName='PA';
-epoch=2000; 
-shapefile='Y:\Maps\State\PA.shp';
+%% CONUS test
+outFolder='E:\Kuai\rnnSMAP\output\CONUS_nosoil\';
+trainName='CONUS_sub16';
+testName='CONUS_sub16_m';
+epoch=2000;
+%[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch);
+
+shapefile='Y:\Maps\USA.shp';
 stat='nash';% or rmse, rsq, bias
 colorRange=[-1,1];
 opt=1; %0->all; 1->train; 2->test
 testRnnSMAP_map(outFolder,trainName,testName,epoch,...
     'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
 
-%% OK
-outFolder='Y:\Kuai\rnnSMAP\output\OK\';
-trainName='OK';
-testName='OK';
-epoch=600;
-shapefile='Y:\Maps\State\OK.shp';
-stat='nash';% or rmse, rsq, bias
-colorRange=[-1,1];
-opt=1; %0->all; 1->train; 2->test
-testRnnSMAP_map(outFolder,trainName,testName,epoch,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
-
-%% US sub 16
-outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
-trainName='indUSsub4';
-testName='indUSsub4';
-epoch=16000;
-shapefile='Y:\Maps\USA.shp';
-stat='nash';% or rmse, rsq, bias
-colorRange=[-0.8,0.8];
-opt=1; %0->all; 1->train; 2->test
-[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-testRnnSMAP_map(outFolder,trainName,testName,epoch,'doAnorm',1,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
-%% test
-outFolder='Y:\Kuai\rnnSMAP\output\test_CONUS\';
-trainName='indUSSub4';
-testName='indUSSub4';
-epoch=800;
-shapefile='Y:\Maps\USA.shp';
-colorRange=[-0.8,0.8];
-opt=1;
-stat='nash';% or rmse, rsq, bias
-[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-%testRnnSMAP_ts(outFolder,trainName,testName,100);
-testRnnSMAP_map(outFolder,trainName,testName,epoch,'doAnorm',1,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
+%% Leave one out
+outFolder='E:\Kuai\rnnSMAP\output\CONUS_div_n\';
+trainName='div_sub4_N1';
+testName='div_sub4_1';
+epoch=500;
+[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch);
 
 %% US sub 4 - onecell
 outFolder='Y:\Kuai\rnnSMAP\output\onecell_NA\';
