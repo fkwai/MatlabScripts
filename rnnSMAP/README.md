@@ -30,8 +30,8 @@ also two files: **const_var.csv** and **const_var_stat.csv**. For example, const
 ## subset of database
 subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
 ### code to divide subset:
-divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
-divide subset by NDVI, LULC, divisions: **not updated yet**
+- divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
+- divide subset by NDVI, LULC, divisions: **not updated yet**
 ## construct database
 ### raw data: 
 SMAP and GLDAS matfiles
