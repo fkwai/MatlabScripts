@@ -117,8 +117,9 @@ toc
 LULCFile='Y:\NLCD\nlcd_2011_landcover_2011_edition_2014_10_10\nlcd_2011_landcover_proj_resample.tif';
 NDVIFile='Y:\GIMMS\avg.tif';
 load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat')
-load('Y:\GLDAS\maskGLDAS_025.mat')
-
+%load('Y:\GLDAS\maskGLDAS_025.mat')
+load('Y:\GLDAS\maskCONUS.mat')
+mask=maskCONUS;
 % NDVI
 [gridNDVI,refNDVI]=geotiffread(NDVIFile);
 lonNDVI=refNDVI.LongitudeLimits(1)+refNDVI.CellExtentInLongitude/2:...
@@ -128,7 +129,7 @@ latNDVI=[refNDVI.LatitudeLimits(2)-refNDVI.CellExtentInLatitude/2:...
     -refNDVI.CellExtentInLatitude:...
     refNDVI.LatitudeLimits(1)+refNDVI.CellExtentInLatitude/2]';
 gridNDVI_int=interp2(lonNDVI,latNDVI,gridNDVI,lon,lat);
-grid2csv_time_const(gridNDVI_int,lat,lon,mask,'Y:\Kuai\rnnSMAP\Database\tDBconst_NDVI\')
+grid2csv_time_const(gridNDVI_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\tDBconst_NDVI\')
 
 % LULC (only CONUS)
 [gridLULC,cmapLULC,refLULC]=geotiffread(LULCFile);
@@ -153,7 +154,7 @@ lonUS=lon(lonIndUS);
 vq=interpGridArea(lonLULC,latLULC,gridLULC,lonUS,latUS,'mode');
 gridLULC_int=zeros(size(mask));
 gridLULC_int(latIndUS,lonIndUS)=vq;
-grid2csv_time_const(gridLULC_int,lat,lon,mask,'Y:\Kuai\rnnSMAP\Database\tDBconst_LULC\')
+grid2csv_time_const(gridLULC_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\tDBconst_LULC\')
 
 %% GLDAS soilM anormly
 tic

@@ -1,4 +1,4 @@
-function [yLRnorm,b]=regSMAP_LR(xDataNorm,yDataNorm,nTrain,varargin)
+function [yLR,b]=regSMAP_LR(xData,yData,varargin)
 % regress using LR to predict SMAP
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
 % trainName='indUSsub4';
@@ -6,35 +6,29 @@ function [yLRnorm,b]=regSMAP_LR(xDataNorm,yDataNorm,nTrain,varargin)
 % [xDataNorm,yDataNorm,xStat,yStat]=readDatabaseSMAP(outFolder,trainName);
 
 %% predefine
-[nt,nGrid,nField]=size(xDataNorm);
+[nt,nGrid,nField]=size(xData);
 b=[];
+doTrain=1;
 if ~isempty(varargin)
+    doTrain=0;
     b=varargin{1};
 end
 
-%% linear regression
-if isempty(b)
-    indTrain=1:nTrain;
-    xTrainMat=xDataNorm(indTrain,:,:);
-    yTrainMat=yDataNorm(indTrain,:);
-    xMat=reshape(xTrainMat,[nTrain*nGrid,nField]);
-    yMat=reshape(yTrainMat,[nTrain*nGrid,1]);
+%% flatten dataset
+xMat=reshape(xData,[nt*nGrid,nField]);
+yMat=reshape(yData,[nt*nGrid,1]);
+
+%% train and regression
+if doTrain==1
     tempMat=[xMat,yMat];
-    ind=find(isnan(sum(tempMat,2)));
-    xMatFit=xMat;xMatFit(ind,:)=[];
-    yMatFit=yMat;yMatFit(ind)=[];
-    %xMatFit=[ones(size(xMatFit,1),1),xMatFit];
-    [yfitTemp,R2Temp,b]=regress_kuai(yMatFit,xMatFit);
-    R2Temp
+    ind=find(~isnan(sum(tempMat,2)));
+    xMatFit=xMat(ind,:);
+    yMatFit=yMat(ind,:);    
+    [yfit,R2Temp,b]=regress_kuai(yMatFit,xMatFit);
 end
 
-%% forward
-xMatTest=reshape(xDataNorm,[nt*nGrid,nField]);
-%xMatTest=[ones(size(xMatTest,1),1),xMatTest];
-yMatTest=reshape(yDataNorm,[nt*nGrid,1]);
-[yfit,Rsq,bb]=regress_kuai(yMatTest,xMatTest,b);
-yLRnorm=reshape(yfit,[nt,nGrid]);
-%yLR=(yLRnorm+1).*(yStat(2)-yStat(1))./2+yStat(1);
+[yfit,R2Temp,b2]=regress_kuai(yMat,xMat,b);
+yLR=reshape(yfit,[nt,nGrid]);
 
 end
 

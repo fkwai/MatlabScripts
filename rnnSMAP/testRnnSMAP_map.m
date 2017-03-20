@@ -51,21 +51,21 @@ crdAll=csvread(crdFile);
 crdTest=crdAll(testInd,:);
 xSort=sort(unique(crdTest(:,1)));
 cellsize=xSort(2)-xSort(1); %!!!may modify later
-[gridStatLSTM,xx,yy] = data2grid( statLSTM(opt+1).(stat),crdTest(:,2),crdTest(:,1),cellsize);
+[gridStatLSTM,xx,yy] = data2grid( statLSTM(opt+1).(stat),crdTest(:,2),crdTest(:,1));
 
-[gridSMAP,xx,yy] = data2grid3d(ySMAP',crdTest(:,2),crdTest(:,1),cellsize);
+[gridSMAP,xx,yy] = data2grid3d(ySMAP',crdTest(:,2),crdTest(:,1));
 tsStr(1).grid=gridSMAP;
 tsStr(1).t=tnum;
 tsStr(1).symb='or';
 tsStr(1).legendStr='SMAP';
 
-[gridLSTM,xx,yy] = data2grid3d(yLSTM',crdTest(:,2),crdTest(:,1),cellsize);
+[gridLSTM,xx,yy] = data2grid3d(yLSTM',crdTest(:,2),crdTest(:,1));
 tsStr(2).grid=gridLSTM;
 tsStr(2).t=tnum;
 tsStr(2).symb='-b';
 tsStr(2).legendStr='LSTM';
 
-[gridGLDAS,xx,yy] = data2grid3d(yGLDAS',crdTest(:,2),crdTest(:,1),cellsize);
+[gridGLDAS,xx,yy] = data2grid3d(yGLDAS',crdTest(:,2),crdTest(:,1));
 tsStr(3).grid=gridGLDAS;
 tsStr(3).t=tnum;
 tsStr(3).symb='-k';
@@ -79,7 +79,7 @@ elseif length(covMethod)==2
     symMethod={'yo','go'};
 end
 for k=1:length(yCov)
-    [gridTemp,xx,yy] = data2grid3d(yCov{k}',crdTest(:,2),crdTest(:,1),cellsize);
+    [gridTemp,xx,yy] = data2grid3d(yCov{k}',crdTest(:,2),crdTest(:,1));
     tsStrTemp.grid=gridTemp;
     tsStrTemp.t=tnum;
     tsStrTemp.symb=symMethod{k};

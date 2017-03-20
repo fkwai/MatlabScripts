@@ -2,8 +2,8 @@ function [output,indRegion]=splitSubset_shapefile( shapefile,saveName,varargin)
 % split gridInd by shapefile
 
 % example: 
-% shapefile='Y:\Maps\physio_shp\physio_division_SMAP.shp';
-% saveName='Y:\Kuai\rnnSMAP\output\div';
+% shapefile='Y:\Maps\CONUS.shp';
+% saveName='E:\Kuai\rnnSMAP\output\indFile\CONUS';
 % varargin{1} -> subset. Pick a grid every varargin{1} grids
 
 dSub=1;
