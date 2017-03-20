@@ -24,12 +24,12 @@ dates of all time steps (520) in yyyymmdd
 coordinate of all grids (12540). Column 1 for latitude and column2 for longitude. Each row refers a grid.
 - forcing 
 each variable is described by two files: **var.csv** and **var_stat.csv**. For example, SMAP.csv and SMAP_stat.csv\
-**var.csv**: of size [520*12540], each column is one grid and each row is one time step. 
+**var.csv**: of size [520*12540], each column is one grid and each row is one time step. \
 **var_stat.csv**: contains 4 numbers for lower bound (value of 10% in CONUS), upper bound (value of 90% in CONUS), mean and var. 
 - constant attribute 
-also two files: **const_var.csv** and **const_var_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv
-**const_var.csv**: of size 12540, and each row is one grid. 
-**const_var_stat.csv**: same as forcing. 
+also two files: **const_var.csv** and **const_var_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv\
+**const_var.csv**: of size 12540, and each row is one grid. \
+**const_var_stat.csv**: same as forcing. \
 
 ---
 
