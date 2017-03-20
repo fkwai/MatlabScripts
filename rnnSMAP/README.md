@@ -6,7 +6,7 @@ code in this folder will do:
 4. plot boxplot and map of time series of results. 
 
 main code [script_testRnnSMAP.m](./script_testRnnSMAP.m)
----
+***
 
 # database 
 ## database location
@@ -31,6 +31,7 @@ also two files: **const_var.csv** and **const_var_stat.csv**. For example, const
 subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
 ### code to divide subset:
 divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
+divide subset by NDVI, LULC, divisions: **not updated yet**
 ## construct database
 ### raw data: 
 SMAP and GLDAS matfiles
@@ -38,19 +39,19 @@ SMAP and GLDAS matfiles
 - Y:\SMAP\SMP_L2_q (SMAP)
 - /mnt/sdb1/rnnSMAP/matfile (uploaded to Linux server)
 ### code of raw data to csv
-function: [GLDAS2csv_CONUS.m](./GLDAS2csv_CONUS.m)
-script: [grid2csv_CONUS_script.m](./grid2csv_CONUS_script.m)
----
+- function: [GLDAS2csv_CONUS.m](./GLDAS2csv_CONUS.m)
+- script: [grid2csv_CONUS_script.m](./grid2csv_CONUS_script.m)
+***
 
 # read LSTM prediction
 ## LSTM prediction formate
 ## read prediction
----
+***
 
 # read database and predict SMAP using conventional methods
 ## read database
 ## regress using conventional methods
----
+***
 
 # compute statatics
 ## plot
