@@ -4,7 +4,7 @@ code in this folder will do:
 2. read forcing database and predict SMAP using LR, LRpbp, NN, NNpbp.
 3. compute statatics between observation and predictions using multiple methods
 4. plot boxplot and map of time series of results. 
-main code (script_testRnnSMAP.m)
+main code [script_testRnnSMAP.m](./script_testRnnSMAP.m)
 
 # database 
 ## database location
@@ -25,6 +25,10 @@ each variable is described by two files: **var.csv** and **var_stat.csv**. For e
 also two files: **const_var.csv** and **const_var_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv\
 - **const_var.csv**: of size 12540, and each row is one grid. \
 - **const_var_stat.csv**: same as forcing. 
+## subset of database
+subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
+### code to divide subset:
+divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
 
 # read LSTM prediction
 ## LSTM prediction formate
