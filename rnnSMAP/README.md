@@ -55,13 +55,13 @@ for example Par_CONUS_sub16_epoch500.csv\
 - training error of all epochs (runFile.csv)
 
 ## read prediction
-[readRnnPred.m](./readRnnPred.m)
+function [readRnnPred.m](./readRnnPred.m)
 ***
 
 # regress using conventional methods
 main script [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
 ## read database
-[readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
+function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
 ## regress using conventional methods
 linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
 linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
