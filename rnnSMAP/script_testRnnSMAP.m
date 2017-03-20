@@ -1,120 +1,40 @@
 
-%% CONUS test
-outFolder='E:\Kuai\rnnSMAP\output\CONUS_nosoil\';
+outFolder='E:\Kuai\rnnSMAP\output\test\';
 trainName='CONUS_sub16';
-testName='CONUS_sub16_m';
-epoch=2000;
-%[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch);
+testName='CONUS_sub16';
+epoch=500;
+testRnnSMAP_plot(outFolder,trainName,testName,epoch)
 
+ %% plot map
 shapefile='Y:\Maps\USA.shp';
 stat='nash';% or rmse, rsq, bias
-colorRange=[-1,1];
-opt=1; %0->all; 1->train; 2->test
+colorRange=[-0.8,0.8];
+opt=2; %0->all; 1->train; 2->test
 testRnnSMAP_map(outFolder,trainName,testName,epoch,...
     'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
 
-%% Leave one out
-outFolder='E:\Kuai\rnnSMAP\output\CONUS_div_n\';
-trainName='div_sub4_N1';
-testName='div_sub4_1';
-epoch=500;
-[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch);
+%%
+[outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,testName,epoch);
 
-%% US sub 4 - onecell
-outFolder='Y:\Kuai\rnnSMAP\output\onecell_NA\';
-trainName='indUSsub4';
-testName='indUSsub4';
-epoch=7000;
-shapefile='Y:\Maps\USA.shp';
-stat='nash';% or rmse, rsq, bias
-colorRange=[-1,1];
-opt=1; %0->all; 1->train; 2->test
-testRnnSMAP_map(outFolder,trainName,testName,epoch,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
-
-%% regional
-outFolder='Y:\Kuai\rnnSMAP\output\CONUS_div\';
-epoch=500;
-n=7;
-for i=1:n
-    for j=1:n
-        i
-        j
-        trainName=['div_sub4_',num2str(i)];
-        testName=['div_sub4_',num2str(j)];
-        [statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-    end
+out=outTest;
+statLSTM=statCal(out.yLSTM,out.ySMAP);
+statGLDAS=statCal(out.yGLDAS,out.ySMAP);
+for k=1:length(covMethod)
+    mStr=covMethod{k};
+    yTemp=out.(['y',mStr]);
+    statCov(k)=statCal(yTemp,out.ySMAP);
 end
 
-% combine to leave-one-out test
-for i=1:n
-    trainNameLst={};
-    testNameLst={};
-    for j=1:n
-        if i~=j
-            trainNameLst=[trainNameLst;['div_sub4_',num2str(i)]];
-            testNameLst=[testNameLst;['div_sub4_',num2str(j)]];
-        end
-    end
-    trainNameComb=['div_sub4_',num2str(i)];
-    testNameComb=['div_sub4_N',num2str(i)];
-    combineRegion_SMAP( outFolder,trainNameLst,testNameLst,trainNameComb,testNameComb,epoch,0)
-end
 
-% plot for leave-one-out test
-for k=1:n
-    trainName=['div_sub4_',num2str(k)];
-    testName=['div_sub4_N',num2str(k)];
-    [statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-end
+k=50;
+t=1:244;
+plot(t,out.ySMAP(:,k),'ro');hold on
+plot(t,out.yLSTM(:,k),'-b');hold on
+plot(t,out.yGLDAS(:,k),'-k');hold on
+plot(t,out.yNN(:,k),'-g');hold on
+hold off
 
-% no extropolation
-outFolder='Y:\Kuai\rnnSMAP\output\CONUS_lulc\';
-epoch=500;
-n=9;
-trainNameLst={};
-testNameLst={};
-for k=1:n
-    trainName=['lulc_sub4_',num2str(k)];
-    testName=['lulc_sub4_',num2str(k)];
-    trainNameLst=[trainNameLst;trainName];
-    testNameLst=[testNameLst;testName];        
-    [statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-end
-trainNameComb='lulc_sub4_comb';
-testNameComb='lulc_sub4_comb';
-combineRegion_SMAP( outFolder,trainNameLst,testNameLst,trainNameComb,testNameComb,epoch,0)
-testRnnSMAP_plot(outFolder,trainNameComb,testNameComb,epoch,'doAnorm',1);
-
-
-
-
-outFolder='Y:\Kuai\rnnSMAP\output\CONUS_NDVI\';
-trainName='ndvi_sub4_combo';
-testName='ndvi_sub4_combo';
-epoch=500;
-[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-
-i=5
-stat='nash';% or rmse, rsq, bias
-trainName=['div_sub4_',num2str(i)];
-testName=['div_sub4_',num2str(i)];
-shapefile='Y:\Maps\USA.shp';
-colorRange=[-0.8,0.8];
-testRnnSMAP_map(outFolder,trainName,testName,epoch,'doAnorm',1,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
-
-%% test
-outFolder='Y:\Kuai\rnnSMAP\output\test_CONUS\';
-trainName='indUSsub4';
-testName='indUSsub4';
-epoch=800;
-shapefile='Y:\Maps\USA.shp';
-colorRange=[-0.8,0.8];
-opt=1;
-stat='nash';% or rmse, rsq, bias
-[statLSTM,statGLDAS]=testRnnSMAP_plot(outFolder,trainName,testName,epoch,'doAnorm',1);
-%testRnnSMAP_ts(outFolder,trainName,testName,100);
-testRnnSMAP_map(outFolder,trainName,testName,epoch,'doAnorm',1,...
-    'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
-    opt=1;
+%%
+runfile=[outFolder,'\runFile.csv'];
+err=csvread(runfile);
+plot(err,'b-');

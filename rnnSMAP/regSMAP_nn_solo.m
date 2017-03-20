@@ -1,36 +1,38 @@
-function [yNNnorm] = regSMAP_nn_solo(xDataNorm,yDataNorm,nTrain)
+function [yNNpbp,netLst] = regSMAP_NN_solo(xData,yData,varargin)
 % regress using neural network to predict SMAP
 
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
 % trainName='indUSsub4';
 % [xDataNorm,yDataNorm,xStat,yStat]=readDatabaseSMAP(outFolder,trainName);
 
-%% predefine
-[nt,nGrid,nField]=size(xDataNorm);
-indTrain=1:nTrain;
+%% pre steps
+[nt,ngrid,nField]=size(xData);
+netLst=cell(ngrid,1);
+doTrain=1;
+if ~isempty(varargin)
+    netLst=varargin{1};
+    doTrain=0;
+end
 
-%% regress and forward
-yNNnorm=zeros(size(yDataNorm))*nan;
-for k=1:nGrid
-    xTrainVec=permute(xDataNorm(indTrain,k,:),[1,3,2]);
-    yTrainVec=yDataNorm(indTrain,k);
-    tempMat=[xTrainVec,yTrainVec];
-    ind=find(isnan(sum(tempMat,2)));
-    xTrain=xTrainVec;xTrain(ind,:)=[];
-    yTrain=yTrainVec;yTrain(ind)=[];
-    xTestVec=permute(xDataNorm(:,k,:),[1,3,2]);
-
-    if ~isempty(yTrain)
-        % train NN
+yNNpbp=zeros(size(yData))*nan;
+for k=1:ngrid
+    %% flatten dataset
+    xMat=permute(xData(:,k,:),[1,3,2]);
+    yMat=yData(:,k);
+    
+    %% regress and forward
+    if doTrain
         hiddensize = 100;
         net = fitnet(hiddensize);
         net.divideParam.trainRatio=1;
-        [net,tr] = train(net,xTrain',yTrain');        
-        % test
-        yTestVec = net(xTestVec');
-        yNNnorm(:,k)=yTestVec';
+        [net,tr] = train(net,xMat',yMat');
+        netLst{k}=net;
     end
+    net=netLst{k};
+    yfit = net(xMat');
+    yNNpbp(:,k)=yfit';
 end
+
 
 end
 

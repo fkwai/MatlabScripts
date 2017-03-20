@@ -1,4 +1,4 @@
-function [yNNnorm,net] = regSMAP_nn(xDataNorm,yDataNorm,nTrain,varargin)
+function [yNN,net] = regSMAP_NN(xData,yData,varargin)
 % regress using neural network to predict SMAP
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
 % trainName='indUSsub4';
@@ -6,38 +6,31 @@ function [yNNnorm,net] = regSMAP_nn(xDataNorm,yDataNorm,nTrain,varargin)
 % [xDataNorm,yDataNorm,xStat,yStat]=readDatabaseSMAP(outFolder,trainName);
 
 %% predefine
-[nt,nGrid,nField]=size(xDataNorm);
+[nt,ngrid,nField]=size(xData);
 
 net=[];
+doTrain=1;
 if ~isempty(varargin)
     net=varargin{1};
+    doTrain=0;
 end
 
-%% prepare data
-if isempty(net)
-    indTrain=1:nTrain;
-    xTrainMat=xDataNorm(indTrain,:,:);
-    yTrainMat=yDataNorm(indTrain,:);
-    xTrainVec=reshape(xTrainMat,[nTrain*nGrid,nField]);
-    yTrainVec=reshape(yTrainMat,[nTrain*nGrid,1]);
-    tempVec=[xTrainVec,yTrainVec];
-    ivTrain=find(isnan(sum(tempVec,2)));
-    xTrain=xTrainVec;xTrain(ivTrain,:)=[];
-    yTrain=yTrainVec;yTrain(ivTrain)=[];
-    
+%% flatten dataset
+xMat=reshape(xData,[nt*ngrid,nField]);
+yMat=reshape(yData,[nt*ngrid,1]);
+
+%% train and regression
+if doTrain==1
     hiddensize=100;
     net = fitnet(hiddensize);
     net.divideParam.trainRatio=1;
     disp('NN training')
-    [net,tr] = train(net,xTrain',yTrain');
+    [net,tr] = train(net,xMat',yMat');
 end
 
+yfit = net(xMat');
 
-%% test NN
-xTestVec=reshape(xDataNorm,[nt*nGrid,nField]);
-yTestVec = net(xTestVec');
-yNNnorm=reshape(yTestVec',[nt,nGrid]);
-
+yNN=reshape(yfit,[nt,ngrid]);
 
 end
 

@@ -1,4 +1,4 @@
-function grid2csv_time_const(data,lat,lon,mask,folder)
+function grid2csv_time_const(data,lat,lon,mask,saveFolder,saveName)
 %GRID2CSV_TIME_CONST Summary of this function goes here
 % load('Y:\GLDAS\maskGLDAS_025.mat')
 
@@ -18,11 +18,11 @@ xout=x1d(ind);
 crdIndex=[latout,lonout,yout,xout];
 
 %% write file
-if ~isdir(folder)
-    mkdir(folder)
+if ~isdir(saveFolder)
+    mkdir(saveFolder)
 end
-crdfile=[folder,'crdIndex.csv'];
-dlmwrite(crdfile, crdIndex,'precision',8);
+% crdfile=[folder,'crdIndex.csv'];
+% dlmwrite(crdfile, crdIndex,'precision',8);
 
 dataout=zeros(length(ind),1)-9999;
 statout=zeros(4,1)-9999;
@@ -42,9 +42,9 @@ sigma=std(data80);
 stat=[lb;ub;m;sigma];
 statout=stat;
 
-datafile=[folder,'data.csv'];
+datafile=[saveFolder,'const_',saveName,'.csv'];
 dlmwrite(datafile, dataout,'precision',8);
-statFile=[folder,'stat.csv'];
+statFile=[saveFolder,'const_',saveName,'_stat.csv'];
 dlmwrite(statFile, statout,'precision',8);
 
 end
