@@ -55,28 +55,28 @@ for example Par_CONUS_sub16_epoch500.csv\
 - training error of all epochs (runFile.csv)
 
 ## read prediction
-function [readRnnPred.m](./readRnnPred.m)
+- function [readRnnPred.m](./readRnnPred.m)
 ***
 
 # regress using conventional methods
-main script [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
+- main script [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
 ## read database
-function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
+- function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
 ## regress using conventional methods
-linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
-linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
-NN: [regSMAP_NN.m](./regSMAP_NN.m)
-NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
+- linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
+- linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
+- NN: [regSMAP_NN.m](./regSMAP_NN.m)
+- NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
 ***
 
 # compute statatics
-main script [testRnnSMAP_plot.m](./testRnnSMAP_plot.m)
-function [statCal.m](./statCal.m)
+- main script [testRnnSMAP_plot.m](./testRnnSMAP_plot.m)
+- function [statCal.m](./statCal.m)
 ***
 
 # plot
 ## box plot
-function [statBoxPlot.m](./statBoxPlot.m)
+- function [statBoxPlot.m](./statBoxPlot.m)
 ## map 
-script [testRnnSMAP_map.m](./testRnnSMAP_map.m) **not updated yet**
+- script [testRnnSMAP_map.m](./testRnnSMAP_map.m) **not updated yet**
 
