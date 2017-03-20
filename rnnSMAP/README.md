@@ -4,6 +4,7 @@ code in this folder will do:
 2. read forcing database and predict SMAP using LR, LRpbp, NN, NNpbp.
 3. compute statatics between observation and predictions using multiple methods
 4. plot boxplot and map of time series of results. 
+
 main code [script_testRnnSMAP.m](./script_testRnnSMAP.m)
 
 # database 
