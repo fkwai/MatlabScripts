@@ -26,6 +26,7 @@ for i=1:length(trainFile)
     dataTrain=[dataTrain,M];
 end
 
+ind=0
 for i=1:length(testFile)
     % verify file order
     indtemp=str2num(testFile(i).name(1:6));

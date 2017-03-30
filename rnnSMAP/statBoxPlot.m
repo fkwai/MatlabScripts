@@ -35,13 +35,15 @@ for k=1:4
     boxplot(plotData,'Labels',plotLabel);
     ylim(plotRange);
     title(titleLst{k})
-    suffix = '.eps';
-    fname=[figfolder,'\',stat,'Box',postStr];
-    fixFigure([],[fname,suffix]);    
-    txt = findobj(gca,'Type','text');
-    set(txt(1:end),'FontSize',18,'VerticalAlignment', 'Middle');
-    saveas(gcf, fname);
-    close(f)
+    if ~isempty(figfolder)
+        suffix = '.eps';
+        fname=[figfolder,'\',stat,'Box',postStr];
+        fixFigure([],[fname,suffix]);
+        txt = findobj(gca,'Type','text');
+        set(txt(1:end),'FontSize',18,'VerticalAlignment', 'Middle');
+        saveas(gcf, fname);
+        close(f)
+    end
     
     %     f=figure('Position',figPos);
     %     H=notBoxPlot(plotData,[],'jitter',0.5);

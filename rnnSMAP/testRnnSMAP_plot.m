@@ -31,14 +31,14 @@ elseif length(covMethod)==2
     symMethod={'b.','g.'};
 end
 
-%% Training
+
 for kk=1:2
     if kk==1
         out=outTrain;
     else
         out=outTest;
     end
-    
+%% calculate stat    
     statLSTM=statCal(out.yLSTM,out.ySMAP);
     statGLDAS=statCal(out.yGLDAS,out.ySMAP);
     for k=1:length(covMethod)
@@ -46,7 +46,8 @@ for kk=1:2
         yTemp=out.(['y',mStr]);
         statCov(k)=statCal(yTemp,out.ySMAP);
     end
-    
+
+%% box plot
     if kk==1
         statBoxPlot(statLSTM,statGLDAS,statCov,covMethod,figfolder,'_Train')
     else

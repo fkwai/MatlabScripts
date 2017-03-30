@@ -23,7 +23,9 @@ yMat=reshape(yData,[nt*ngrid,1]);
 if doTrain==1
     hiddensize=100;
     net = fitnet(hiddensize);
-    net.divideParam.trainRatio=1;
+%     net.divideParam.trainRatio=1;    
+%     net.divideParam.valRatio=0;
+%     net.divideParam.testRatio=0;
     disp('NN training')
     [net,tr] = train(net,xMat',yMat');
 end

@@ -15,9 +15,9 @@ lat=crd(:,1);
 lon=crd(:,2);
 
 if opt==1
-    [grid,xx,yy] = data2grid3d( data,lon,lat);
+    [grid,xx,yy] = data2grid3d( data',lon,lat);
 elseif opt==2
-    [grid,xx,yy] = data2grid(data,lon,lat);
+    [grid,xx,yy] = data2grid(data',lon,lat);
     t=1;
 end
 
