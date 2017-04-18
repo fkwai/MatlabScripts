@@ -41,13 +41,15 @@ each variable is described by two files: **xxx.csv** and **xxx_stat.csv**. For e
 also two files: **const_xxx.csv** and **const_xxx_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv
 	- **const_xxx.csv**: of size 12540, and each row is one grid.
 	- **const_xxx_stat.csv**: same as forcing. 
-### 2.3 subset of database
+## 3 subset of database
 subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
-#### code to divide subset:
+### functions
 - divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
 - divide subset by shapefile: [splitSubset_shapefile.m](./splitSubset_shapefile.m)
 - divide subset by given crd: [splitSubset_crd.m](./splitSubset_crd.m)
 - divide subset by NDVI, LULC: **not updated yet**
+### script 
+[splitSubset_script.m](./splitSubset_script.m)
 
 ***
 
