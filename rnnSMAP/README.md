@@ -9,12 +9,10 @@ code in this folder will do both pre-process and post-process of LSTM project
 2. read forcing database and predict SMAP using LR, LRpbp, NN, NNpbp.
 3. compute statatics between observation and predictions using multiple methods
 4. plot boxplot and map of time series of results. 
-
-main script [script_testRnnSMAP.m](./script_testRnnSMAP.m)
 ***
 
 # Pre-process
-## 1. Raw Data
+## 1 Raw Data
 Raw data is saved in wrgroup folder (Y:\ here)
 - **GLDAS**: Y:\GLDAS\Hourly\GLDAS_NOAH_mat\xxx.mat
 - **SMAP**: Y:\SMAP\SMP_L2_q.mat
@@ -22,7 +20,7 @@ Raw data is saved in wrgroup folder (Y:\ here)
 - function: [GLDAS2csv_CONUS.m](./GLDAS2csv_CONUS.m)
 - script: [grid2csv_CONUS_script.m](./grid2csv_CONUS_script.m)
 
-## 2. CONUS Database 
+## 2 CONUS Database 
 ### 2.1 database location
 - In workstation:\
 E:\Kuai\rnnSMAP\Database\Daily\CONUS
@@ -31,8 +29,10 @@ E:\Kuai\rnnSMAP\Database\Daily\CONUS
 ### 2.2 database content
 * **date.csv**\
 dates of all time steps (520) in yyyymmdd
+
 * **crd.csv**\
 coordinate of all grids (12540). Column 1 for latitude and column2 for longitude. Each row refers a grid.
+
 * **forcing**\
 each variable is described by two files: **xxx.csv** and **xxx_stat.csv**. For example, SMAP.csv and SMAP_stat.csv
 	- **xxx.csv**: of size [520*12540], each column is one grid and each row is one time step.
@@ -53,40 +53,52 @@ subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Dat
 
 ***
 
-# read LSTM prediction
-## LSTM prediction format
-example: E:\Kuai\rnnSMAP\output\test \ 
+# Post-process
+Example:  [script_testRnnSMAP.m](./script_testRnnSMAP.m) 
+
+In this script two examples are included:
+* [testRnnSMAP_plot.m](./testRnnSMAP_plot.m) : plot box of all methods of stat matrix.
+* [testRnnSMAP_map.m](./testRnnSMAP_map.m) : plot map and clicking on which will show time series comparison.
+
+Both of those two examples will go through following 4 steps.
+
+## 1 read LSTM prediction
+### 1.1 LSTM prediction format
 LSTM prediction contains three items:
-- folder of predictions (out_trainName_testName_epoch)\
-for example out_CONUS_sub16_CONUS_sub16_500\ 
-prediction of training set and testing set are saved by batch
-- saved model (Par_trainName_epoch.csv) \
-for example Par_CONUS_sub16_epoch500.csv\ 
-- training error of all epochs (runFile.csv)
 
-## read prediction
+* predictions folder\
+named as out_trainName_testName_epoch (eg. out_CONUS_sub16_CONUS_sub16_500)\
+predictions of training set and testing set are saved by batch
+
+* network parameters\
+named as Par_trainName_epoch (eg. Par_CONUS_sub16_epoch500)
+
+* training error of all epochs (runFile.csv)
+
+* options used in this case (opt.txt)
+
+### 1.2 read prediction
 - function [readRnnPred.m](./readRnnPred.m)
-***
 
-# regress using conventional methods
-- main script [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
-## read database
-- function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
-## regress using conventional methods
+
+## 2 regress using conventional methods
+main function: [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
+### 2.1 read database
+function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
+### 2.2 regress using conventional methods
 - linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
 - linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
 - NN: [regSMAP_NN.m](./regSMAP_NN.m)
 - NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
-***
 
-# compute statatics
-- main script [testRnnSMAP_plot.m](./testRnnSMAP_plot.m)
-- function [statCal.m](./statCal.m)
-***
 
-# plot
-## box plot
+## 3 compute statatics
+function [statCal.m](./statCal.m)
+
+
+## 4 plot
+### box plot
 - function [statBoxPlot.m](./statBoxPlot.m)
-## map 
-- script [testRnnSMAP_map.m](./testRnnSMAP_map.m) **not updated yet**
+### map 
+- script [testRnnSMAP_map.m](./testRnnSMAP_map.m) 
 
