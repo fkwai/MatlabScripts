@@ -15,39 +15,40 @@ main script [script_testRnnSMAP.m](./script_testRnnSMAP.m)
 
 # Pre-process
 ## 1. Raw Data
-## 2. CONUS Database 
-### 2.1 database location
-- In workstation:
-⋅⋅⋅E:\Kuai\rnnSMAP\Database\Daily\CONUS
-- In Linux Server:\
-/mnt/sdb1/rnnSMAP/database/CONUS
-### 2.2 database content
-#### date.csv
-dates of all time steps (520) in yyyymmdd
-#### crd.csv
-coordinate of all grids (12540). Column 1 for latitude and column2 for longitude. Each row refers a grid.
-#### forcing 
-each variable is described by two files: **var.csv** and **var_stat.csv**. For example, SMAP.csv and SMAP_stat.csv\
-- **var.csv**: of size [520*12540], each column is one grid and each row is one time step. \
-- **var_stat.csv**: contains 4 numbers for lower bound (value of 10% in CONUS), upper bound (value of 90% in CONUS), mean and var. 
-#### constant attribute 
-also two files: **const_var.csv** and **const_var_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv\
-- **const_var.csv**: of size 12540, and each row is one grid. \
-- **const_var_stat.csv**: same as forcing. 
-## subset of database
-subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
-### code to divide subset:
-- divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
-- divide subset by NDVI, LULC, divisions: **not updated yet**
-## construct database
-### raw data: 
-SMAP and GLDAS matfiles
-- Y:\GLDAS\Hourly\GLDAS_NOAH_mat\ (GLDAS)
-- Y:\SMAP\SMP_L2_q (SMAP)
-- /mnt/sdb1/rnnSMAP/matfile (uploaded to Linux server)
+Raw data is saved in wrgroup folder (Y:\ here)
+- **GLDAS**: Y:\GLDAS\Hourly\GLDAS_NOAH_mat\xxx.mat
+- **SMAP**: Y:\SMAP\SMP_L2_q.mat
 ### code of raw data to csv
 - function: [GLDAS2csv_CONUS.m](./GLDAS2csv_CONUS.m)
 - script: [grid2csv_CONUS_script.m](./grid2csv_CONUS_script.m)
+
+## 2. CONUS Database 
+### 2.1 database location
+- In workstation:\
+E:\Kuai\rnnSMAP\Database\Daily\CONUS
+- In Linux Server:\
+/mnt/sdb1/rnnSMAP/database/CONUS
+### 2.2 database content
+* **date.csv**\
+dates of all time steps (520) in yyyymmdd
+* **crd.csv**\
+coordinate of all grids (12540). Column 1 for latitude and column2 for longitude. Each row refers a grid.
+* **forcing**\
+each variable is described by two files: **xxx.csv** and **xxx_stat.csv**. For example, SMAP.csv and SMAP_stat.csv
+	- **xxx.csv**: of size [520*12540], each column is one grid and each row is one time step.
+	- **xxx_stat.csv**: contains 4 numbers for lower bound (value of 10% in CONUS), upper bound (value of 90% in CONUS), mean and var. 
+* **constant attribute**\
+also two files: **const_xxx.csv** and **const_xxx_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv
+	- **const_xxx.csv**: of size 12540, and each row is one grid.
+	- **const_xxx_stat.csv**: same as forcing. 
+### 2.3 subset of database
+subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
+#### code to divide subset:
+- divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
+- divide subset by shapefile: [splitSubset_shapefile.m](./splitSubset_shapefile.m)
+- divide subset by given crd: [splitSubset_crd.m](./splitSubset_crd.m)
+- divide subset by NDVI, LULC: **not updated yet**
+
 ***
 
 # read LSTM prediction
