@@ -14,18 +14,16 @@ code in this folder will do both pre-process and post-process of LSTM project
 # Pre-process
 ## 1 Raw Data
 Raw data is saved in wrgroup folder (Y:\ here)
-- **GLDAS**: Y:\GLDAS\Hourly\GLDAS_NOAH_mat\xxx.mat
-- **SMAP**: Y:\SMAP\SMP_L2_q.mat
+- **GLDAS**: ```Y:\GLDAS\Hourly\GLDAS_NOAH_mat\xxx.mat```
+- **SMAP**: ```Y:\SMAP\SMP_L2_q.mat```
 ### code of raw data to csv
 - function: [GLDAS2csv_CONUS.m](./GLDAS2csv_CONUS.m)
 - script: [grid2csv_CONUS_script.m](./grid2csv_CONUS_script.m)
 
 ## 2 CONUS Database 
 ### 2.1 database location
-- In workstation:\
-E:\Kuai\rnnSMAP\Database\Daily\CONUS
-- In Linux Server:\
-/mnt/sdb1/rnnSMAP/database/CONUS
+- In workstation: ```E:\Kuai\rnnSMAP\Database\Daily\CONUS```
+- In Linux Server ```/mnt/sdb1/rnnSMAP/database/CONUS```
 ### 2.2 database content
 * **date.csv**\
 dates of all time steps (520) in yyyymmdd
@@ -41,15 +39,17 @@ each variable is described by two files: **xxx.csv** and **xxx_stat.csv**. For e
 also two files: **const_xxx.csv** and **const_xxx_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv
 	- **const_xxx.csv**: of size 12540, and each row is one grid.
 	- **const_xxx_stat.csv**: same as forcing. 
+	
 ## 3 subset of database
 subset of databset is saved in another folder. For example **E:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4**
-### functions
+
+available dividing functions
 - divide subset by interval: [splitSubset_interval.m](./splitSubset_interval.m)
 - divide subset by shapefile: [splitSubset_shapefile.m](./splitSubset_shapefile.m)
 - divide subset by given crd: [splitSubset_crd.m](./splitSubset_crd.m)
 - divide subset by NDVI, LULC: **not updated yet**
-### script 
-[splitSubset_script.m](./splitSubset_script.m)
+
+example script: [splitSubset_script.m](./splitSubset_script.m)
 
 ***
 
