@@ -62,43 +62,16 @@ In this script two examples are included:
 
 Both of those two examples will go through following 4 steps.
 
-## 1 read LSTM prediction
-### 1.1 LSTM prediction format
-LSTM prediction contains three items:
-
-* predictions folder\
-named as out_trainName_testName_epoch (eg. out_CONUS_sub16_CONUS_sub16_500)\
-predictions of training set and testing set are saved by batch
-
-* network parameters\
-named as Par_trainName_epoch (eg. Par_CONUS_sub16_epoch500)
-
-* training error of all epochs (runFile.csv)
-
-* options used in this case (opt.txt)
-
-### 1.2 read prediction
-- function [readRnnPred.m](./readRnnPred.m)
-
-
-## 2 regress using conventional methods
-main function: [testRnnSMAP_readData.m](./testRnnSMAP_readData.m)
-### 2.1 read database
-function [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
-### 2.2 regress using conventional methods
-- linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
-- linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
-- NN: [regSMAP_NN.m](./regSMAP_NN.m)
-- NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
-
-
-## 3 compute statatics
-function [statCal.m](./statCal.m)
-
-
-## 4 plot
-### box plot
-- function [statBoxPlot.m](./statBoxPlot.m)
-### map 
-- script [testRnnSMAP_map.m](./testRnnSMAP_map.m) 
+1. read LSTM prediction: [readRnnPred.m](./readRnnPred.m)
+2. regress using conventional methods, which contains two steps:
+	- read X and Y from database: [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
+    - regress using conventional methods
+    	- linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
+		- linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
+		- NN: [regSMAP_NN.m](./regSMAP_NN.m)
+		- NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
+3. compute statatics matrix: [statCal.m](./statCal.m)
+4. plot
+	* box plot [statBoxPlot.m](./statBoxPlot.m)
+	* map with clicking time series: see [testRnnSMAP_map.m](./testRnnSMAP_map.m) 
 
