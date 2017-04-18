@@ -1,5 +1,10 @@
 # rnnSMAP
-code in this folder will do:
+code in this folder will do both pre-process and post-process of LSTM project
+## pre-process
+1. convert raw GLDAS and SMAP matfiles to csv that included all grid in CONUS
+2. devide subset of CONUS database
+
+## post-process
 1. read SMAP predictions from LSTM code running in linux server
 2. read forcing database and predict SMAP using LR, LRpbp, NN, NNpbp.
 3. compute statatics between observation and predictions using multiple methods
@@ -8,22 +13,24 @@ code in this folder will do:
 main script [script_testRnnSMAP.m](./script_testRnnSMAP.m)
 ***
 
-# database 
-## database location
-- In workstation:\
-E:\Kuai\rnnSMAP\Database\Daily\CONUS
+# Pre-process
+## 1. Raw Data
+## 2. CONUS Database 
+### 2.1 database location
+- In workstation:
+⋅⋅⋅E:\Kuai\rnnSMAP\Database\Daily\CONUS
 - In Linux Server:\
 /mnt/sdb1/rnnSMAP/database/CONUS
-## database content
-### date.csv
+### 2.2 database content
+#### date.csv
 dates of all time steps (520) in yyyymmdd
-### crd.csv
+#### crd.csv
 coordinate of all grids (12540). Column 1 for latitude and column2 for longitude. Each row refers a grid.
-### forcing 
+#### forcing 
 each variable is described by two files: **var.csv** and **var_stat.csv**. For example, SMAP.csv and SMAP_stat.csv\
 - **var.csv**: of size [520*12540], each column is one grid and each row is one time step. \
 - **var_stat.csv**: contains 4 numbers for lower bound (value of 10% in CONUS), upper bound (value of 90% in CONUS), mean and var. 
-### constant attribute 
+#### constant attribute 
 also two files: **const_var.csv** and **const_var_stat.csv**. For example, const_NDVI.csv and const_NDVI_stat.csv\
 - **const_var.csv**: of size 12540, and each row is one grid. \
 - **const_var_stat.csv**: same as forcing. 
