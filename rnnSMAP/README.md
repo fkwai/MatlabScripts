@@ -65,9 +65,8 @@ Both of those two examples will go through following 4 steps.
 1. read LSTM prediction: [readRnnPred.m](./readRnnPred.m)
 2. regress using conventional methods [testRnnSMAP_readData.m](./testRnnSMAP_readData.m), which contains two steps:
 	- read X and Y from database: [readDatabaseSMAP2.m](./readDatabaseSMAP2.m)
-	- regress using conventional methods
-	
-    		- linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
+	- regress using conventional methods	
+		- linear regression: [regSMAP_LR.m](./regSMAP_LR.m)
 		- linear regression pbp: [regSMAP_LR_solo.m](./regSMAP_LR_solo.m)
 		- NN: [regSMAP_NN.m](./regSMAP_NN.m)
 		- NN pbp: [regSMAP_NN_solo.m](./regSMAP_NN_solo.m)
