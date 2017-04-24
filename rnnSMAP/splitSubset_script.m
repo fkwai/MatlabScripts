@@ -39,8 +39,9 @@ for k=1:length(varLst)
 end
 
 %% given coordinates
-saveFolder='E:\Kuai\rnnSMAP\Database\Daily\cell_IL\';
-crdLst=[40.875,-88.125];
+saveFolder='E:\Kuai\rnnSMAP\Database\Daily\cell_20000\';
+%crdLst=[40.875,-88.125];
+crdLst=[42.875,-106.875];
 for k=1:length(varLst)
     k
     tic    

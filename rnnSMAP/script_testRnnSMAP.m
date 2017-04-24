@@ -1,11 +1,15 @@
-
+%% plot bar 
 outFolder='E:\Kuai\rnnSMAP\output\test\';
 trainName='CONUS_sub16';
 testName=trainName;
 epoch=500;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch)
 
- %% plot map
+ %% plot map 
+outFolder='E:\Kuai\rnnSMAP\output\test\';
+trainName='CONUS_sub16';
+testName=trainName;
+epoch=500;
 shapefile='Y:\Maps\USA.shp';
 stat='nash';% or rmse, rsq, bias
 colorRange=[-0.8,0.8];
@@ -13,8 +17,12 @@ opt=2; %0->all; 1->train; 2->test
 testRnnSMAP_map(outFolder,trainName,testName,epoch,...
     'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
 
-%%
-[outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,testName,400);
+%% one cell
+outFolder='E:\Kuai\rnnSMAP\output\cell_IL\';
+trainName='cell_IL';
+epoch=200;
+testName=trainName;
+[outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,testName,epoch);
 
 out=outTest;
 statLSTM=statCal(out.yLSTM,out.ySMAP);
