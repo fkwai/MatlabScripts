@@ -9,14 +9,12 @@ for i=1:length(field)
 end
 
 
-%% NDVI & LULC
-LULCFile='Y:\NLCD\nlcd_2011_landcover_2011_edition_2014_10_10\nlcd_2011_landcover_proj_resample.tif';
+%% NDVI
 NDVIFile='Y:\GIMMS\avg.tif';
 load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat')
 %load('Y:\GLDAS\maskGLDAS_025.mat')
 load('Y:\GLDAS\maskCONUS.mat')
-mask=maskCONUS;
-% NDVI
+
 [gridNDVI,refNDVI]=geotiffread(NDVIFile);
 lonNDVI=refNDVI.LongitudeLimits(1)+refNDVI.CellExtentInLongitude/2:...
     refNDVI.CellExtentInLongitude:...
@@ -27,7 +25,12 @@ latNDVI=[refNDVI.LatitudeLimits(2)-refNDVI.CellExtentInLatitude/2:...
 gridNDVI_int=interp2(lonNDVI,latNDVI,gridNDVI,lon,lat);
 grid2csv_CONUS_const(gridNDVI_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\','NDVI')
 
-% LULC (only CONUS)
+%% LULC (only CONUS)
+LULCFile='Y:\NLCD\nlcd_2011_landcover_2011_edition_2014_10_10\nlcd_2011_landcover_proj_resample.tif';
+load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat')
+%load('Y:\GLDAS\maskGLDAS_025.mat')
+load('Y:\GLDAS\maskCONUS.mat')
+
 [gridLULC,cmapLULC,refLULC]=geotiffread(LULCFile);
 lonLULC=refLULC.LongitudeLimits(1)+refLULC.CellExtentInLongitude/2:...
     refLULC.CellExtentInLongitude:...
