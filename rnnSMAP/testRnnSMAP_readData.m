@@ -11,27 +11,26 @@ if strcmp(testName,trainName)
 else
     sameRegion=0;
 end
-dataLoaded=0;
 covMethod={};
-yCov={};
-nt=520;
-ntrain=276;
+tTrain=1:365;
+tTest=366:520;
+nTrain=length(tTrain);
+nTest=length(tTest);
 
 if readData==1
+    disp('read Database')
+    tic
     if sameRegion
         [xOut,yOut,xStat,yStat] = readDatabaseSMAP2( testName );
-        xTrain=xOut(1:ntrain,:,:);
-        yTrain=yOut(1:ntrain,:);
-        xTest=xOut(ntrain+1:nt,:,:);
-        yTest=yOut(ntrain+1:nt,:);
-        lbSMAP=yStat(1);
-        ubSMAP=yStat(2);
+        xTrain=xOut(tTrain,:,:);
+        yTrain=yOut(tTrain,:);
+        xTest=xOut(tTest,:,:);
+        yTest=yOut(tTest,:);
     else
         [xTrain,yTrain,xStatTrain,yStatTrain]=readDatabaseSMAP2(trainName);
         [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP2(testName);
-        lbSMAP=yStatTest(1);
-        ubSMAP=yStatTest(2);
     end
+    toc
 end
 
 %% read SMAP and GLDAS soilM

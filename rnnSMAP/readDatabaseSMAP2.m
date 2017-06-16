@@ -3,10 +3,16 @@ function [xOut,yOut,xStat,yStat] = readDatabaseSMAP2( dataName )
 
 %dataName='CONUS_sub4';
 
-dataFolder='E:\Kuai\rnnSMAP\Database\Daily\';
+dataFolder='H:\Kuai\rnnSMAP\Database\Daily\';
 
-xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf'};
-xField_const={'DEM','Slope','Sand','Silt','Clay','LULC','NDVI'};
+% xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
+%     'LWdown','SWdown','SWnet','LWnet','Wind'};
+xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
+    'SWnet','LWnet','Wind'};
+% seems that NN only works for <18 fields...
+
+%xField_const={'DEM','Slope','Sand','Silt','Clay','LULC','NDVI'};
+xField_const={'DEM','Sand','Slope','LULC','NDVI','Capa','Irri_sq','Rockdep','Watertable'};
 yField='SMAP';
 nx=length(xField)+length(xField_const);
 
@@ -26,7 +32,7 @@ yData=csvread(yFile);
 yStatData=csvread(yStatFile);
 yData(yData==-9999)=nan;
 %[grid,xx,yy] = data2grid3d( yData,lon,lat);    % testify
-yOut=yData';
+yOut=yData;
 yStat=yStatData;
 [nt,ngrid]=size(yOut);
 
@@ -40,7 +46,7 @@ for kk=1:length(xField)
     xStatFile=[dataFolder,dataName,'\',xField{kk},'_stat.csv'];
     xData=csvread(xFile);
     xStatData=csvread(xStatFile);
-    xOut(:,:,k)=xData';
+    xOut(:,:,k)=xData;
     xStat(:,k)=xStatData;
 end
 for kk=1:length(xField_const)

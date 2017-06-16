@@ -79,7 +79,7 @@ while(~isempty(tsStr))
                 figure(fc)
             end
             ind=~isnan(v);
-            plot(t(ind),v(ind),tsStr(k).symb,'LineWidth',2);hold on            
+            plot(t(ind),v(ind),tsStr(k).symb);hold on            
         end
         datetick('x');
         strtitle=['long=',num2str(x(ix)),'; lat=',num2str(y(iy)),'; '];
