@@ -7,7 +7,7 @@ function splitSubset_shapefile(varName,shape,saveFolder,varargin )
 % varargin{1} -> subset. Pick a grid every varargin{1} grids
 % varargin{2} -> offset
 
-dirData='E:\Kuai\rnnSMAP\Database\Daily\CONUS\';
+dirData='H:\Kuai\rnnSMAP\Database\Daily\CONUS\';
 
 dSub=1;
 offset=1;

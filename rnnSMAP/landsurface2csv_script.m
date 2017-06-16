@@ -10,13 +10,12 @@ end
 
 
 %% NDVI & LULC
-LULCFile='Y:\NLCD\nlcd_2011_landcover_2011_edition_2014_10_10\nlcd_2011_landcover_proj_resample.tif';
 NDVIFile='Y:\GIMMS\avg.tif';
 load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat')
 %load('Y:\GLDAS\maskGLDAS_025.mat')
 load('Y:\GLDAS\maskCONUS.mat')
 mask=maskCONUS;
-% NDVI
+
 [gridNDVI,refNDVI]=geotiffread(NDVIFile);
 lonNDVI=refNDVI.LongitudeLimits(1)+refNDVI.CellExtentInLongitude/2:...
     refNDVI.CellExtentInLongitude:...
@@ -27,7 +26,13 @@ latNDVI=[refNDVI.LatitudeLimits(2)-refNDVI.CellExtentInLatitude/2:...
 gridNDVI_int=interp2(lonNDVI,latNDVI,gridNDVI,lon,lat);
 grid2csv_CONUS_const(gridNDVI_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\','NDVI')
 
-% LULC (only CONUS)
+%% LULC (only CONUS)
+LULCFile='Y:\NLCD\nlcd_2011_landcover_2011_edition_2014_10_10\nlcd_2011_landcover_proj_resample.tif';
+load('Y:\GLDAS\Hourly\GLDAS_NOAH_mat\crdGLDAS025.mat')
+%load('Y:\GLDAS\maskGLDAS_025.mat')
+load('Y:\GLDAS\maskCONUS.mat')
+mask=maskCONUS;
+
 [gridLULC,cmapLULC,refLULC]=geotiffread(LULCFile);
 lonLULC=refLULC.LongitudeLimits(1)+refLULC.CellExtentInLongitude/2:...
     refLULC.CellExtentInLongitude:...
@@ -64,6 +69,33 @@ gridLULC_int=zeros(size(mask));
 gridLULC_int(latIndUS,lonIndUS)=vq;
 grid2csv_CONUS_const(gridLULC_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\','LULC')
 
+%% crop irrigation
+irriFile='H:\Kuai\Data\UScrop\cropIrrigation.tif';
+load('H:\Kuai\Data\GLDAS\crdGLDAS025.mat')
+load('H:\Kuai\Data\GLDAS\maskCONUS.mat')
+
+[gridIrri,refIrri]=geotiffread(irriFile);
+lonIrri=refIrri.LongitudeLimits(1)+refIrri.CellExtentInLongitude/2:...
+    refIrri.CellExtentInLongitude:...
+    refIrri.LongitudeLimits(2)-refIrri.CellExtentInLongitude/2;
+latIrri=[refIrri.LatitudeLimits(2)-refIrri.CellExtentInLatitude/2:...
+    -refIrri.CellExtentInLatitude:...
+    refIrri.LatitudeLimits(1)+refIrri.CellExtentInLatitude/2]';
+gridIrri=double(gridIrri);
+gridIrri(gridIrri<0)=0;
+% construct US grid
+latBoundUS=[25,50];
+lonBoundUS=[-125,-66.5];
+latIndUS=find(lat>=latBoundUS(1)&lat<=latBoundUS(2));
+lonIndUS=find(lon>=lonBoundUS(1)&lon<=lonBoundUS(2));
+maskUS=mask(latIndUS,lonIndUS);
+latUS=lat(latIndUS);
+lonUS=lon(lonIndUS);
+vq=interpGridArea(lonIrri,latIrri,gridIrri,lonUS,latUS,'mean');
+
+grid2csv_CONUS_const(vq,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irrigation')
+
+grid2csv_CONUS_const(vq.^0.5,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irri_sq')
 
 
 

@@ -1,12 +1,12 @@
 %% plot bar 
-outFolder='E:\Kuai\rnnSMAP\output\test\';
+outFolder='H:\Kuai\rnnSMAP\output\CONUS_sub16\';
 trainName='CONUS_sub16';
 testName=trainName;
 epoch=500;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch)
 
  %% plot map 
-outFolder='E:\Kuai\rnnSMAP\output\test\';
+outFolder='H:\Kuai\rnnSMAP\output\CONUS_sub16\';
 trainName='CONUS_sub16';
 testName=trainName;
 epoch=500;

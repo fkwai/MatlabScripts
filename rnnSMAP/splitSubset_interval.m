@@ -6,7 +6,7 @@ function splitSubset_interval(varName,saveFolder,interval,offset)
 % interval=3;
 % offset=1;
 
-dirData='E:\Kuai\rnnSMAP\Database\Daily\CONUS\';
+dirData='H:\Kuai\rnnSMAP\Database\Daily\CONUS\';
 
 if ~isdir(saveFolder)
     mkdir(saveFolder)
@@ -47,7 +47,7 @@ dlmwrite(crdFile, [latSub,lonSub],'precision',8);
 
 %% copy stat and t
 copyfile([dirData,varName,'_stat.csv'],[saveFolder,varName,'_stat.csv'])
-copyfile([dirData,'t.csv'],[saveFolder,'t.csv'])
+copyfile([dirData,'date.csv'],[saveFolder,'date.csv'])
 
 
 end

@@ -67,6 +67,86 @@ gridLULC_int=zeros(size(mask));
 gridLULC_int(latIndUS,lonIndUS)=vq;
 grid2csv_CONUS_const(gridLULC_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\','LULC')
 
+%% crop irrigation
+irriFile='H:\Kuai\Data\UScrop\cropIrrigation.tif';
+load('H:\Kuai\Data\GLDAS\crdGLDAS025.mat')
+load('H:\Kuai\Data\GLDAS\maskCONUS.mat')
+
+[gridIrri,refIrri]=geotiffread(irriFile);
+lonIrri=refIrri.LongitudeLimits(1)+refIrri.CellExtentInLongitude/2:...
+    refIrri.CellExtentInLongitude:...
+    refIrri.LongitudeLimits(2)-refIrri.CellExtentInLongitude/2;
+latIrri=[refIrri.LatitudeLimits(2)-refIrri.CellExtentInLatitude/2:...
+    -refIrri.CellExtentInLatitude:...
+    refIrri.LatitudeLimits(1)+refIrri.CellExtentInLatitude/2]';
+gridIrri=double(gridIrri);
+gridIrri(gridIrri<0)=0;
+% construct US grid
+latBoundUS=[25,50];
+lonBoundUS=[-125,-66.5];
+latIndUS=find(lat>=latBoundUS(1)&lat<=latBoundUS(2));
+lonIndUS=find(lon>=lonBoundUS(1)&lon<=lonBoundUS(2));
+maskUS=mask(latIndUS,lonIndUS);
+latUS=lat(latIndUS);
+lonUS=lon(lonIndUS);
+vq=interpGridArea(lonIrri,latIrri,gridIrri,lonUS,latUS,'mean');
+
+grid2csv_CONUS_const(vq,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irrigation')
+
+grid2csv_CONUS_const(vq.^0.5,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irri_sq')
+
+%% rock depth
+RockdepFile='H:\Kuai\Data\RockDep\average_soil_and_sedimentary-deposit_thickness.tif';
+load('H:\Kuai\Data\GLDAS\crdGLDAS025.mat')
+load('H:\Kuai\Data\GLDAS\maskCONUS.mat')
+
+[gridRockdep,refRockdep]=geotiffread(RockdepFile);
+lonRockdep=refRockdep.LongitudeLimits(1)+refRockdep.CellExtentInLongitude/2:...
+    refRockdep.CellExtentInLongitude:...
+    refRockdep.LongitudeLimits(2)-refRockdep.CellExtentInLongitude/2;
+latRockdep=[refRockdep.LatitudeLimits(2)-refRockdep.CellExtentInLatitude/2:...
+    -refRockdep.CellExtentInLatitude:...
+    refRockdep.LatitudeLimits(1)+refRockdep.CellExtentInLatitude/2]';
+gridRockdep=double(gridRockdep);
+gridRockdep(gridRockdep<0)=nan;
+% construct US grid
+latBoundUS=[25,50];
+lonBoundUS=[-125,-66.5];
+latIndUS=find(lat>=latBoundUS(1)&lat<=latBoundUS(2));
+lonIndUS=find(lon>=lonBoundUS(1)&lon<=lonBoundUS(2));
+latUS=lat(latIndUS);
+lonUS=lon(lonIndUS);
+maskUS=mask(latIndUS,lonIndUS);
+vq=interpGridArea(lonRockdep,latRockdep,gridRockdep,lonUS,latUS,'mean');
+
+grid2csv_CONUS_const(vq,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Rockdep')
+
+%% Water tabel from Fan Ying
+WatertableFile='H:\Kuai\Data\WaterTable\NA_wtd.tif';
+load('H:\Kuai\Data\GLDAS\crdGLDAS025.mat')
+load('H:\Kuai\Data\GLDAS\maskCONUS.mat')
+
+[gridWatertable,refWatertable]=geotiffread(WatertableFile);
+lonWatertable=refWatertable.XWorldLimits(1)+refWatertable.CellExtentInWorldX/2:...
+    refWatertable.CellExtentInWorldX:...
+    refWatertable.XWorldLimits(2)-refWatertable.CellExtentInWorldX/2;
+latWatertable=[refWatertable.YWorldLimits(2)-refWatertable.CellExtentInWorldY/2:...
+    -refWatertable.CellExtentInWorldY:...
+    refWatertable.YWorldLimits(1)+refWatertable.CellExtentInWorldY/2]';
+gridWatertable=double(gridWatertable);
+gridWatertable(abs(gridWatertable)>9000)=nan;
+% construct US grid
+latBoundUS=[25,50];
+lonBoundUS=[-125,-66.5];
+latIndUS=find(lat>=latBoundUS(1)&lat<=latBoundUS(2));
+lonIndUS=find(lon>=lonBoundUS(1)&lon<=lonBoundUS(2));
+latUS=lat(latIndUS);
+lonUS=lon(lonIndUS);
+maskUS=mask(latIndUS,lonIndUS);
+vq=interpGridArea(lonWatertable,latWatertable,gridWatertable,lonUS,latUS,'mean');
+
+grid2csv_CONUS_const(vq,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\Daily\CONUS\','Watertable')
+
 
 
 

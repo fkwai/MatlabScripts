@@ -19,3 +19,4 @@ legLst={'sim6','simNew6'};
 plotGMSts(outFolderLst,nameLst,figFolder,legLst)
 
 
+

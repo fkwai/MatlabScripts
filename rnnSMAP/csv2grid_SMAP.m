@@ -1,6 +1,6 @@
 function [ grid,xx,yy,t ] = csv2grid_SMAP( dirData,varName,opt )
 
-% dirData='E:\Kuai\rnnSMAP\Database\CONUS\';
+% dirData='H:\Kuai\rnnSMAP\Database\Daily\CONUS\';
 % varName='SMAP';
 % opt==1 -> sequence; 2-> constant
 

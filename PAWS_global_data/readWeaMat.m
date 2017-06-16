@@ -29,7 +29,7 @@ for i=1:length(Sta)
     Sta(i).datenums=station(ind).datenums;
     Sta(i).dates=str2num(datestr(station(ind).datenums,'yyyymmdd'));
     Sta(i).prcp=station(ind).prcp;
-    if ~isempty(station(ind).rrad)
+    if isfield(station(ind),'rad') && ~isempty(station(ind).rrad)
         Sta(i).rrad=station(ind).rrad;
     elseif isfield(station(ind),'Rad') && ~isempty(station(ind).Rad)
         Sta(i).rrad=station(ind).Rad;

@@ -3,7 +3,7 @@ function [xOut,yOut,xStat,yStat] = readDatabaseSMAP2( dataName )
 
 %dataName='CONUS_sub4';
 
-dataFolder='E:\Kuai\rnnSMAP\Database\Daily\';
+dataFolder='H:\Kuai\rnnSMAP\Database\Daily\';
 
 % xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
 %     'LWdown','SWdown','SWnet','LWnet','Wind'};
@@ -12,7 +12,7 @@ xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
 % seems that NN only works for <18 fields...
 
 %xField_const={'DEM','Slope','Sand','Silt','Clay','LULC','NDVI'};
-xField_const={'DEM','Sand','Slope','LULC','NDVI'};
+xField_const={'DEM','Sand','Slope','LULC','NDVI','Capa','Irri_sq','Rockdep','Watertable'};
 yField='SMAP';
 nx=length(xField)+length(xField_const);
 
