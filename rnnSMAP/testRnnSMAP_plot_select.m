@@ -1,4 +1,4 @@
-function testRnnSMAP_plot(outFolder,trainName,testName,iter,varargin)
+function testRnnSMAP_plot_select(outFolder,trainName,testName,iter,varargin)
 % First test for trained rnn model. 
 % plot nash/rmse map for given testset and click map to plot timeseries
 % comparison between GLDAS, SMAP and RNN prediction. 
@@ -11,16 +11,12 @@ function testRnnSMAP_plot(outFolder,trainName,testName,iter,varargin)
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'optSMAP','optGLDAS','indSel'};
-dflts={1,1,[]};
-[optSMAP,optGLDAS,indSel]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'optSMAP','optGLDAS'};
+dflts={1,1};
+[optSMAP,optGLDAS]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
-if isempty(indSel)
-    figfolder=[outFolder,'/plot/',trainName,'_',testName,'_',num2str(iter),'/'];
-else
-    figfolder=[outFolder,'/plot/',trainName,'_',testName,'_',num2str(iter),'_sel/'];
-end
+figfolder=[outFolder,'/plot/',trainName,'_',testName,'_',num2str(iter),'/'];
 if ~exist(figfolder,'dir')
     mkdir(figfolder)
 end
@@ -35,11 +31,6 @@ elseif length(covMethod)==2
     symMethod={'b.','g.'};
 end
 
-%% optional - plot only selected index
-if isempty(indSel)
-    indSel=1:size(outTrain.ySMAP,2);
-end
-
 for kk=1:2
     if kk==1
         out=outTrain;
@@ -47,12 +38,12 @@ for kk=1:2
         out=outTest;
     end
 %% calculate stat    
-    statLSTM=statCal(out.yLSTM(:,indSel),out.ySMAP(:,indSel));
-    statGLDAS=statCal(out.yGLDAS(:,indSel),out.ySMAP(:,indSel));
+    statLSTM=statCal(out.yLSTM,out.ySMAP);
+    statGLDAS=statCal(out.yGLDAS,out.ySMAP);
     for k=1:length(covMethod)
         mStr=covMethod{k};
         yTemp=out.(['y',mStr]);
-        statCov(k)=statCal(yTemp(:,indSel),out.ySMAP(:,indSel));
+        statCov(k)=statCal(yTemp,out.ySMAP);
     end
 
 %% box plot
