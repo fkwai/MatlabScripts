@@ -8,13 +8,13 @@ if ~isempty(varargin)
 end
 
 dirMat='/mnt/sdb1/rnnSMAP/matfile/';
-dirDatabase='/mnt/sdb1/rnnSMAP/database/';
+dirDatabase='/mnt/sdb1/rnnSMAP/database/CONUS/';
 
 maskFile=[dirMat,'maskCONUS.mat'];
 crdFile=[dirMat,'crdGLDAS025.mat'];
 
 maskCONUSmat=load(maskFile);
-maskCONUS=maskCONUSmat.maskCONUS;
+maskCONUS=maskCONUSmat.mask;
 crdGLDAS=load(crdFile);
 
 [indY,indX]=find(maskCONUS==1);
@@ -45,8 +45,8 @@ end
 if doAnomaly==0
     dataFile=[dirDatabase,varName,'.csv'];
 else
-    meanOutput=nanmean(output,1);
-    output=output-repmat(meanOutput,[length(tnum),1]);
+    meanOutput=nanmean(output,2);
+    output=output-repmat(meanOutput,[1,length(tnum)]);
     dataFile=[dirDatabase,varName,'_Anomaly.csv'];
 end    
 output(isnan(output))=-9999;
