@@ -6,7 +6,8 @@ function [data,lat,lon,tnum] = readSMAP_L2(t)
 
 tt=datenumMulti(t,1);
 
-folder=['Y:\SMAP\SPL2SMP.003\',datestr(tt,'yyyy.mm.dd'),'\'];
+global kPath
+folder=[kPath.SMAP_L2,datestr(tt,'yyyy.mm.dd'),kPath.s];
 files = dir([folder,'*.h5']);
 nfiles=length(files);
 tnum=zeros(nfiles,1);

@@ -8,7 +8,9 @@ function [ data,lat,lon,tnum ] = readGLDAS_NOAH( t,fieldind )
 % data: all swath contains in that day
 % lat,lon,tnum: 1d vector for lat, lon and time (hour, min, second)
 
-GLDASdir='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\';
+global kPath
+GLDASdir=kPath.GLDAS;
+% default to put parameter table inside GLDAS root folder
 ParamTable='Y:\GLDAS\gribtab_GLDAS_NOAH.txt';
 
 dn=datenumMulti(t,1);
