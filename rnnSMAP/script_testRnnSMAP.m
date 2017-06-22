@@ -1,9 +1,20 @@
-%% plot bar 
-outFolder='H:\Kuai\rnnSMAP\output\CONUS_sub16\';
-trainName='CONUS_sub16';
+%% plot box
+outFolder='H:\Kuai\rnnSMAP\output\OK_sub2\';
+trainName='OK_sub2';
 testName=trainName;
 epoch=500;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch)
+
+%% plot selected index
+outFolder='H:\Kuai\rnnSMAP\output\OK_sub2\';
+trainName='OK_sub2';
+testName=trainName;
+epoch=500;
+xFile=['H:\Kuai\rnnSMAP\Database\Daily\',trainName,'\const_Irri_sq.csv'];
+xData=csvread(xFile);
+ind=find(xData>2);
+testRnnSMAP_plot(outFolder,trainName,testName,epoch,'indSel',ind)
+
 
  %% plot map 
 outFolder='H:\Kuai\rnnSMAP\output\CONUS_sub16\';
