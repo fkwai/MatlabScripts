@@ -22,7 +22,6 @@ data=H5D.read (data_id,'H5T_NATIVE_DOUBLE', 'H5S_ALL', 'H5S_ALL', 'H5P_DEFAULT')
 ATTRIBUTE = '_FillValue';
 attr_id = H5A.open_name (data_id, ATTRIBUTE);
 fillvalue=H5A.read (attr_id, 'H5T_NATIVE_DOUBLE');
-disp(fillvalue)
 
 % Close and release resources.
 H5A.close (attr_id)
@@ -32,12 +31,28 @@ H5F.close (file_id);
 % Replace the fill value with NaN.
 data(data==fillvalue) = NaN;
 
-% rotate to normal position
-if length(size(data))==2
-	data=data';
-elseif length(size(data))==3
-	data=permute(data,[3,2,1]);
+switch fieldName
+    case 'retrieval_qual_flag'
+        nBit=4;
+        dataBit=reshape(de2bi(data,nBit),[size(data),nBit]);
+        data=permute(dataBit,[3,1,2]);       
+    case 'surface_flag'
+        nBit=16;
+        dataBit=reshape(de2bi(data,nBit),[size(data),nBit]);
+        data=permute(dataBit,[3,1,2]);   
+    case 'landcover_class'
+        data(data==99)=nan;
 end
+
+if length(size(data))==2
+    data=data';
+elseif length(size(data))==3
+    data=permute(data,[3,2,1]);
+end
+
+
+% rotate to normal position
+
 
 end
 

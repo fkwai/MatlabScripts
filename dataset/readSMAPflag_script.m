@@ -1,13 +1,46 @@
 
+%% read all smap flag data
+global kPath
+sd=20150331;
+ed=20170614;
+sdn=datenumMulti(sd,1);
+edn=datenumMulti(ed,1);
+tLst=sdn:edn;
+
+saveFolder=[kPath.SMAP,'SMAP_L3_flag',kPath.s];
+mkdir(saveFolder)    
+flagTab=readtable([kPath.SMAP,'SMAP_L3_flag.csv']);
+
+for k=1:height(flagTab)
+    fieldName=flagTab.Flag{k};
+    saveName=[saveFolder,flagTab.Filename{k},'.mat'];
+    layer=flagTab.Bit(k)+1;
+    
+    dataSMAP=zeros(406,964,length(tLst))*nan;
+    for iT=1:length(tLst)
+        t=tLst(iT);
+        disp([fieldName,' ',datestr(t)])
+        folder=[kPath.SMAP_L3,datestr(t,'yyyy.mm.dd'),kPath.s];
+        files = dir([folder,'*.h5']);
+		if length(files)~=0
+			fileName=[folder,files(1).name];       
+			dataTemp=readSMAPflag(fileName,fieldName,'AM');        
+			if layer~=0
+				dataSMAP(:,:,iT)=dataTemp(:,:,layer);
+			else
+				dataSMAP(:,:,iT)=dataTemp;
+			end
+		end
+    end
+    data=dataSMAP;
+    tnum=tLst;
+    save(saveName,'data','tnum','lat','lon','-v7.3')
+end
 
 
-fileName='/mnt/sdb1/Database/SMAP/SPL3SMP.004/2015.06.01/SMAP_L3_SM_P_20150601_R14010_001.h5';
-fileName2='/mnt/sdb1/Database/SMAP/SPL3SMP.004/2015.06.02/SMAP_L3_SM_P_20150602_R14010_001.h5';
 
-fieldName='landcover_class';
 
-data=readSMAPflag(fileName,fieldName,'AM');
-data2=readSMAPflag(fileName2,fieldName,'AM');
+
 
 
 
