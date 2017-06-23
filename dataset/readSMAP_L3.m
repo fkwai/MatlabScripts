@@ -13,9 +13,7 @@ files = dir([folder,'*.h5']);
 nfiles=length(files);
 
 if nfiles~=0
-    tt=datenumMulti(t,1);
     filename=[folder,files(1).name];
-    
     [data,lat,lon]=readSMAP(filename,'AM');
 else
     data=[];

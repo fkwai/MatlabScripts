@@ -7,6 +7,7 @@ sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;
 
+load([kPath.SMAP,'SMAP_L3.mat'],'lat','lon')
 saveFolder=[kPath.SMAP,'SMAP_L3_flag',kPath.s];
 mkdir(saveFolder)    
 flagTab=readtable([kPath.SMAP,'SMAP_L3_flag.csv']);
