@@ -1,26 +1,25 @@
 function grid2csv_CONUS( fileName,varName ,varargin)
-% convert raw matfile form GLDAS and SMAP (interpolated) to csv file that
+% convert raw matfile form NLDAS (interpolated) and SMAP to csv file that
 % contains all data in CONUS
+
+% input file (fileName) are supposed to have exact same grid as SMAP. 
 
 doAnomaly=0;
 if ~isempty(varargin)
     doAnomaly=varargin{1};
 end
 
-dirMat='/mnt/sdb1/rnnSMAP/matfile/';
+global kPath
 dirDatabase='/mnt/sdb1/rnnSMAP/database/CONUS/';
 
-maskFile=[dirMat,'maskCONUS.mat'];
-crdFile=[dirMat,'crdGLDAS025.mat'];
+maskFile=[kPath.SMAP,'maskSMAP_CONUS.mat'];
 
-maskCONUSmat=load(maskFile);
-maskCONUS=maskCONUSmat.mask;
-crdGLDAS=load(crdFile);
+maskMat=load(maskFile);
+mask=maskMat.mask;
+lat=maskMat.lat;
+lon=maskMat.lon;
 
-[indY,indX]=find(maskCONUS==1);
-ind=find(maskCONUS==1);
-lat=crdGLDAS.lat(indY);
-lon=crdGLDAS.lon(indX);
+ind=find(mask==1);
 
 sd=20150401;
 ed=20160901;

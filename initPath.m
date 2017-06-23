@@ -23,6 +23,7 @@ if strcmp(pcStr,'server')
 	kPath.GLDAS_NOAH='/mnt/sdb1/Database/GLDAS/GLDAS_NOAH025_3H.2.1/';
 	kPath.NLDAS='/mnt/sdb1/Database/NLDAS/';
 	kPath.NLDAS_mat='/mnt/sdb1/Database/NLDAS/MatFile/';
+    kPath.databaseSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily';
 
 	% add path of nctoolbox
 	% addpath('/home/kxf227/install/nctoolbox-1.1.1/')
@@ -32,9 +33,11 @@ end
 
 if strcmp(pcStr,'workstation')
 	kPath.s='\';
-	kPath.SMAP_L2='Y:\SMAP\SPL3SMP.004\';
-	kPath.SMAP_L3='Y:\SMAP\SPL3SMP.004\';
+    kPath.SMAP='I:\Group\SMAP\';
+	kPath.SMAP_L2='I:\Group\SMAP\SPL3SMP.004\';
+	kPath.SMAP_L3='I:\Group\SMAP\SPL3SMP.004\';
 	kPath.GLDAS='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\';
+    kPath.databaseSMAP_L3='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\';
 end
 
 disp(['Initialized kPath on ',pcStr])
