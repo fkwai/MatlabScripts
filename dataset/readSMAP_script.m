@@ -16,6 +16,8 @@ for t=sdn:edn
     dataSMAP=cat(3,dataSMAP,data);
     tnumSMAP=cat(1,tnumSMAP,tnum);
 end
+lat=nanmean(lat,2);
+lon=nanmean(lon,1);
 data=dataSMAP;
 tnum=tnumSMAP;
 save([kPath.SMAP,'SMAP_L2'],'data','lat','lon','tnum','-v7.3')
@@ -35,6 +37,8 @@ for t=sdn:edn
     dataSMAP=cat(3,dataSMAP,data);
     tnumSMAP=cat(1,tnumSMAP,t);
 end
+lat=nanmean(lat,2);
+lon=nanmean(lon,1);
 data=dataSMAP;
 tnum=tnumSMAP;
 save([kPath.SMAP,'SMAP_L3'],'data','lat','lon','tnum','-v7.3')
