@@ -3,7 +3,7 @@ function splitSubset_interval_All(interval,offset)
 
 global kPath
 varFile=[kPath.DBSMAP_L3_CONUS,'varLst.csv'];
-varConstFile=[kPath.DBSMAP_L3_CONUS,'varLst.csv'];
+varConstFile=[kPath.DBSMAP_L3_CONUS,'varConstLst.csv'];
 varLst=textread(varFile,'%s');
 varConstLst=textread(varConstFile,'%s');
 
