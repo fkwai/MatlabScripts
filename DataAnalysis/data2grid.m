@@ -8,33 +8,21 @@ function [grid,xx,yy] = data2grid( data,x,y)
 %   cellsize: grace is 1, nldas/gldas is 0.125
 %   -9999 stands for nan values. 
 
-ncell=length(data);
-xx=sort(unique(x))';
-yy=sort(unique(y),'descend');
-dx=xx(2:end)-xx(1:end-1);
-dy=yy(1:end-1)-yy(2:end);
-if length(unique(dx))>1 || length(unique(dy))>1 
-    disp('Worning!! X or Y are not continuous');
+nc=length(data);
+xx=VectorDim(sort(unique(x)),1);
+yy=VectorDim(sort(unique(y),'descend'),1);
+nx=length(xx);
+ny=length(yy);
+data(data==-9999)=nan;
+
+grid=ones(ny,nx,nt).*nan;
+
+for i=1:nc
+	iy=find(y(i)==yy);
+	ix=find(x(i)==xx);
+	grid(iy,ix,:)=data(i,:);
 end
 
-cellsize=min([min(dx),min(dy)]);
-
-minX=min(x);
-maxX=max(x);
-minY=min(y);
-maxY=max(y);
-ny=(maxY-minY)/cellsize;
-nx=(maxX-minX)/cellsize;
-
-grid=ones(ny,nx).*nan;
-
-for i=1:ncell
-    if ~isnan(data(i))
-        iy=int64((maxY-y(i))/cellsize+1);
-        ix=int64((x(i)-minX)/cellsize+1);
-        grid(iy,ix)=data(i);
-    end
-end
 
 end
 

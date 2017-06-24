@@ -16,12 +16,16 @@ lon=SMAP_L3.lon(indX);
 [lonMesh,latMesh]=meshgrid(lon,lat);
 
 %% find valid cells and assign index
-mask=double(~isnan(nanmean(data,3)));
-gridInd=zeros(size(mask));
-gridInd(mask==1)=1:sum(mask(:));
+matNan=double(~isnan(data));
+matDecision=sum(matNan,3)./size(matNan,3);
 
-save([kPath.SMAP,'gridSMAP_CONUS.mat'],'mask','gridInd','lat','lon','latMesh','lonMesh')
-%save([kPath.SMAP,'SMAP_L3_CONUS.mat'],'data','gridInd','lat','lon','latMesh','lonMesh','tnum')
+mask=double(matDecision>0.3);
+maskInd=zeros(size(mask));
+maskInd(mask==1)=1:sum(mask(:));
+lat1D=latMesh(mask==1);
+lon1D=lonMesh(mask==1);
+
+save([kPath.SMAP,'maskSMAP_CONUS.mat'],'mask','maskInd','lat','lon','latMesh','lonMesh','lat1D','lon1D')
 
 
 

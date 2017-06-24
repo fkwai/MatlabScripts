@@ -16,6 +16,7 @@ end
 
 if strcmp(pcStr,'server')
 	kPath.s='/';
+
 	kPath.SMAP='/mnt/sdb1/Database/SMAP/';
 	kPath.SMAP_L2='/mnt/sdb1/Database/SMAP/SPL2SMP.004/';
 	kPath.SMAP_L3='/mnt/sdb1/Database/SMAP/SPL3SMP.004/';
@@ -23,7 +24,10 @@ if strcmp(pcStr,'server')
 	kPath.GLDAS_NOAH='/mnt/sdb1/Database/GLDAS/GLDAS_NOAH025_3H.2.1/';
 	kPath.NLDAS='/mnt/sdb1/Database/NLDAS/';
 	kPath.NLDAS_mat='/mnt/sdb1/Database/NLDAS/MatFile/';
-    kPath.databaseSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily';
+    kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/';
+    kPath.DBSMAP_L3_CONUS='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
+
+    kPath.maskSMAP_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS.mat';
 
 	% add path of nctoolbox
 	% addpath('/home/kxf227/install/nctoolbox-1.1.1/')

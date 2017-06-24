@@ -1,4 +1,4 @@
-function grid2csv_CONUS( fileName,varName ,varargin)
+function grid2csv_SMAP( fileName,varName ,varargin)
 % convert raw matfile form GLDAS and SMAP (interpolated) to csv file that
 % contains all data in CONUS
 

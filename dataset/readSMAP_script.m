@@ -29,20 +29,22 @@ sd=20150331;
 ed=20170614;
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
-dataSMAP=[];
-tnumSMAP=[];
+tLst=[sdn:edn]'
 dataSMAP=zeros(406,964,length(tLst))*nan;
-for t=sdn:edn
+for k=1:length(tLst)
+	t=tLst(k);
     disp(datestr(t))
+	tic
     [data,lat,lon] = readSMAP_L3(t);
 	if ~isempty(data)
-		dataSMAP(:,:,iT)=dataTemp(:,:,layer);
+		dataSMAP(:,:,k)=data;
 	end
+	toc
 end
 lat=nanmean(lat,2);
 lon=nanmean(lon,1);
 data=dataSMAP;
-tnum=[sdn:edn]';
+tnum=tLst';
 save([kPath.SMAP,'SMAP_L3'],'data','lat','lon','tnum','-v7.3')
 
 
