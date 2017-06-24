@@ -13,7 +13,7 @@ function grid2csv_SMAP(data,tIn,tOut,varName,varargin)
 % varargin{2} - if ==1, it is a zero/one flag
 
 doAnomaly=0;
-doStat=0;
+doStat=1;
 if ~isempty(varargin)
     doAnomaly=varargin{1};
 	if length(varargin)>1
@@ -70,7 +70,7 @@ if doStat==1
 	sigma=std(data80);
 	stat=[lb;ub;m;sigma];
 else
-	stat=[0,1,0.5,0.5];
+	stat=[-1;1;0;0];
 end
 if doAnomaly==0
     statFile=[dirDatabase,varName,'_stat.csv'];

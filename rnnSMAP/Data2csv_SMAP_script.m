@@ -23,7 +23,6 @@ tnum=[sdn:edn]';
 dlmwrite(timeFile,tnum,'precision',12);
 
 %% write SMAP
-%{
 disp('SMAP')
 tic
 SMAPFile=[kPath.SMAP,'SMAP_L3.mat'];
@@ -36,10 +35,8 @@ tIn=SMAPmat.tnum;
 grid2csv_SMAP(data,tIn,tnum,'SMAP')
 grid2csv_SMAP(data,tIn,tnum,'SMAP',1)
 toc
-%}
 
 %% SMAP flags - see readSMAPflag_script.m
-%{
 flagTab=readtable([kPath.SMAP,'SMAP_L3_flag.csv']);
 for k=1:height(flagTab)
     fieldName=flagTab.Filename{k};
@@ -57,7 +54,6 @@ for k=1:height(flagTab)
 	grid2csv_SMAP(data,tIn,tnum,fieldName,0,doStat)
 	toc
 end
-%}
 
 %% NLDAS - see script_NLDAS2SMAP_CONUS
 dataLst={'FORA','FORB','NOAH'};

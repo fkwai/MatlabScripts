@@ -17,19 +17,28 @@ varConstFileNew=[dataFolder,'varConstLst.csv'];
 copyfile(varFile,varFileNew);
 copyfile(varConstFile,varConstFileNew);
 
+% time series variable
 for k=1:length(varLst)
-    varLst{k}
+    disp([num2str(interval),' ',num2str(offset),' ',varLst{k}])
     tic
     splitSubset_interval(varLst{k},dataName,interval,offset)
     toc
 end
+
+% time series variable
 for k=1:length(varConstLst)
-    varConstLst{k}
+    disp([num2str(interval),' ',num2str(offset),' ',varLst{k}])
     tic
     splitSubset_interval(varConstLst{k},dataName,interval,offset)
     toc
 end
 
+% SMAP
+disp([num2str(interval),' ',num2str(offset),' ','SMAP'])
+tic
+splitSubset_interval('SMAP',dataName,interval,offset)
+splitSubset_interval('SMAP_Anomaly',dataName,interval,offset)
+toc
 
 
 

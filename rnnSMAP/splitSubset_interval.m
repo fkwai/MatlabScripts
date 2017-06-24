@@ -17,6 +17,7 @@ end
 
 % transfer to grid and fill to CONUS mask
 [gridRaw,x,y,t]=csv2grid_SMAP(dirData,varName);
+gridRaw(isnan(gridRaw))=-9999;
 xx=maskMat.lon;
 yy=maskMat.lat;
 xx=str2num(num2str(xx,8));
@@ -35,8 +36,7 @@ yySub=yy(offset:interval:end);
 dataSub=reshape(gridSub,[length(xxSub)*length(yySub),length(t)]);
 ind=find(isnan(nanmean(dataSub,2)));
 if isempty(strfind(varName,'const_'))
-    dataSub=dataSub';
-    dataSub(:,ind)=[];
+    dataSub(ind,:)=[];
 else
     dataSub(ind)=[];
 end
