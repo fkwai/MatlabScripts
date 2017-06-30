@@ -26,6 +26,7 @@ if strcmp(pcStr,'server')
 	kPath.NLDAS_mat='/mnt/sdb1/Database/NLDAS/MatFile/';
     kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/';
     kPath.DBSMAP_L3_CONUS='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
+    kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
 
     kPath.maskSMAP_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS.mat';
 

@@ -1,33 +1,36 @@
 function [xOut,yOut,xStat,yStat] = readDatabaseSMAP2( dataName )
 %read new SMAP database where each variable is saved in one file. 
 
-%dataName='CONUS_sub4';
-
-dataFolder='H:\Kuai\rnnSMAP\Database\Daily\';
-
-% xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
-%     'LWdown','SWdown','SWnet','LWnet','Wind'};
-xField={'SoilM','Evap','Rainf','Tair','Wind','PSurf','Canopint','Snowf',...
-    'SWnet','LWnet','Wind'};
-% seems that NN only works for <18 fields...
-
-%xField_const={'DEM','Slope','Sand','Silt','Clay','LULC','NDVI'};
-xField_const={'DEM','Sand','Slope','LULC','NDVI','Capa','Irri_sq','Rockdep','Watertable'};
-yField='SMAP';
-nx=length(xField)+length(xField_const);
+global kPath
+dataFolder=kPath.DBSMAP_L3;
 
 %% read t and crd
-dirData=[dataFolder,dataName,'\'];
+dirData=[dataFolder,dataName,kPath.s];
 fileCrd=[dirData,'crd.csv'];
-fileDate=[dirData,'date.csv'];
+fileDate=[dirData,'time.csv'];
+varFile=[dirData,'varLst.csv'];
+varConstFile=[dirData,'varConstLst.csv'];
 crd=csvread(fileCrd);
 t=csvread(fileDate);
 lat=crd(:,1);
 lon=crd(:,2);
 
+%% read varLst.csv and varConstLst.csv to xField and xField_const
+yField='SMAP';
+fid=fopen(varFile);
+C=textscan(fid,'%s');
+xField=C{1};
+fclose(fid);
+fid=fopen(varConstFile);
+C=textscan(fid,'%s');
+xField_const=C{1};
+fclose(fid);
+nx=length(xField)+length(xField_const);
+
+
 %% read Y
-yFile=[dataFolder,dataName,'\',yField,'.csv'];
-yStatFile=[dataFolder,dataName,'\',yField,'_stat.csv'];
+yFile=[dataFolder,dataName,kPath.s,yField,'.csv'];
+yStatFile=[dataFolder,dataName,kPath.s,yField,'_stat.csv'];
 yData=csvread(yFile);
 yStatData=csvread(yStatFile);
 yData(yData==-9999)=nan;
@@ -42,8 +45,8 @@ xStat=zeros([4,nx]);
 
 for kk=1:length(xField)
     k=kk;
-    xFile=[dataFolder,dataName,'\',xField{kk},'.csv'];
-    xStatFile=[dataFolder,dataName,'\',xField{kk},'_stat.csv'];
+    xFile=[dataFolder,dataName,kPath.s,xField{kk},'.csv'];
+    xStatFile=[dataFolder,dataName,kPath.s,xField{kk},'_stat.csv'];
     xData=csvread(xFile);
     xStatData=csvread(xStatFile);
     xOut(:,:,k)=xData;
@@ -51,8 +54,8 @@ for kk=1:length(xField)
 end
 for kk=1:length(xField_const)
     k=kk+length(xField);
-    xFile=[dataFolder,dataName,'\const_',xField_const{kk},'.csv'];
-    xStatFile=[dataFolder,dataName,'\const_',xField_const{kk},'_stat.csv'];
+    xFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'.csv'];
+    xStatFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'_stat.csv'];
     xData=csvread(xFile);
     xStatData=csvread(xStatFile);
     xOut(:,:,k)=repmat(xData',[nt,1]);
