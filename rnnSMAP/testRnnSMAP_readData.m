@@ -12,8 +12,8 @@ else
     sameRegion=0;
 end
 covMethod={};
-tTrain=1:365;
-tTest=366:520;
+tTrain=1:366;
+tTest=366:732;
 nTrain=length(tTrain);
 nTest=length(tTest);
 
@@ -44,12 +44,17 @@ if exist(SMAPmatFile,'file')
     outTest.ySMAP=SMAPmat.ySMAP_test;
     lbSMAP=SMAPmat.lbSMAP;
     ubSMAP=SMAPmat.ubSMAP;
+    meanSMAP=SMAPmat.meanSMAP;
+    stdSMAP=SMAPmat.stdSMAP;
 else
     ySMAP_train=yTrain;
     ySMAP_test=yTest;
     outTrain.ySMAP=ySMAP_train;
     outTest.ySMAP=ySMAP_test;
-    lbSMAP=yStat(1);ubSMAP=yStat(2);
+    lbSMAP=yStat(1);
+	ubSMAP=yStat(2);
+    meanSMAP=yStat(3);
+	stdSMAP=yStat(4);
     save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP')
 end
 
@@ -78,8 +83,10 @@ if exist(LSTMmatFile,'file')
     outTest.yLSTM=LSTMmat.yLSTM_test;    
 else
     [dataTrain,dataTest]=readRnnPred(outFolder,trainName,testName,iter);
-    yLSTM_train=(dataTrain+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
-    yLSTM_test=(dataTest+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
+    %yLSTM_train=(dataTrain+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
+    %yLSTM_test=(dataTest+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
+    yLSTM_train=(dataTrain).*stdSMAP+meanSMAP;
+    yLSTM_test=(dataTest).*stdSMAP+meanSMAP;
     outTrain.yLSTM=yLSTM_train;
     outTest.yLSTM=yLSTM_test;
     save(LSTMmatFile,'yLSTM_train','yLSTM_test')

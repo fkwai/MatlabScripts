@@ -35,7 +35,7 @@ yData=csvread(yFile);
 yStatData=csvread(yStatFile);
 yData(yData==-9999)=nan;
 %[grid,xx,yy] = data2grid3d( yData,lon,lat);    % testify
-yOut=yData;
+yOut=yData';
 yStat=yStatData;
 [nt,ngrid]=size(yOut);
 
@@ -49,7 +49,7 @@ for kk=1:length(xField)
     xStatFile=[dataFolder,dataName,kPath.s,xField{kk},'_stat.csv'];
     xData=csvread(xFile);
     xStatData=csvread(xStatFile);
-    xOut(:,:,k)=xData;
+    xOut(:,:,k)=xData';
     xStat(:,k)=xStatData;
 end
 for kk=1:length(xField_const)
