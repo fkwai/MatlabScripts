@@ -1,8 +1,8 @@
 %% plot box
-outFolder='H:\Kuai\rnnSMAP\output\OK_sub2\';
-trainName='OK_sub2';
+outFolder=[kPath.OutSMAP_L3,'CONUSs16f1',kPath.s];
+trainName='CONUSs16f1';
 testName=trainName;
-epoch=500;
+epoch=200;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch)
 
 %% plot selected index
@@ -17,11 +17,12 @@ testRnnSMAP_plot(outFolder,trainName,testName,epoch,'indSel',ind)
 
 
  %% plot map 
-outFolder='H:\Kuai\rnnSMAP\output\CONUS_sub16\';
-trainName='CONUS_sub16';
+outFolder=[kPath.OutSMAP_L3,'CONUSs16f1',kPath.s];
+trainName='CONUSs16f1';
 testName=trainName;
 epoch=500;
-shapefile='Y:\Maps\USA.shp';
+%shapefile='Y:\Maps\USA.shp';
+shapefile=[];
 stat='nash';% or rmse, rsq, bias
 colorRange=[-0.8,0.8];
 opt=2; %0->all; 1->train; 2->test

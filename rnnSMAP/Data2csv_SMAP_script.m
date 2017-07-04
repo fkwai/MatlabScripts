@@ -23,6 +23,7 @@ tnum=[sdn:edn]';
 dlmwrite(timeFile,tnum,'precision',12);
 
 %% write SMAP
+%{
 disp('SMAP')
 tic
 SMAPFile=[kPath.SMAP,'SMAP_L3.mat'];
@@ -35,6 +36,7 @@ tIn=SMAPmat.tnum;
 grid2csv_SMAP(data,tIn,tnum,'SMAP')
 grid2csv_SMAP(data,tIn,tnum,'SMAP',1)
 toc
+%}
 
 %% SMAP flags - see readSMAPflag_script.m
 flagTab=readtable([kPath.SMAP,'SMAP_L3_flag.csv']);
@@ -44,7 +46,7 @@ for k=1:height(flagTab)
 	tic
 	nBit=flagTab.Bit(k);
     flagFile=[kPath.SMAP,'SMAP_L3_flag',kPath.s,fieldName,'.mat'];
-	flagMat=load(SMAPFile);
+	flagMat=load(flagFile);
 	% shrink global to CONUS
 	[C,indTemp,indY]=intersect(maskMat.lat,flagMat.lat,'stable');
 	[C,indTemp,indX]=intersect(maskMat.lon,flagMat.lon,'stable');
@@ -56,6 +58,7 @@ for k=1:height(flagTab)
 end
 
 %% NLDAS - see script_NLDAS2SMAP_CONUS
+%{
 dataLst={'FORA','FORB','NOAH'};
 for k=1:length(dataLst)
 	dataFolder=[kPath.NLDAS,'NLDAS_gridSMAP_CONUS_Daily',kPath.s,'NLDAS_',dataLst{k},'_Daily',kPath.s];
@@ -70,7 +73,7 @@ for k=1:length(dataLst)
 		toc
 	end
 end
-
+%}
 
 
 

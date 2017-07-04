@@ -70,7 +70,7 @@ if doStat==1
 	sigma=std(data80);
 	stat=[lb;ub;m;sigma];
 else
-	stat=[-1;1;0;0];
+	stat=[-1;1;0;1];
 end
 if doAnomaly==0
     statFile=[dirDatabase,varName,'_stat.csv'];

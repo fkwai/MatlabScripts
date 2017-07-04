@@ -9,7 +9,7 @@ function [grid,xx,yy] = data2grid( data,x,y)
 %   -9999 stands for nan values. 
 
 nc=length(data);
-xx=VectorDim(sort(unique(x)),1);
+xx=VectorDim(sort(unique(x)),2);
 yy=VectorDim(sort(unique(y),'descend'),1);
 nx=length(xx);
 ny=length(yy);

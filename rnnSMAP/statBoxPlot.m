@@ -36,12 +36,12 @@ for k=1:4
     ylim(plotRange);
     title(titleLst{k})
     if ~isempty(figfolder)
-        suffix = '.eps';
+        suffix = '.bmp';
         fname=[figfolder,'\',stat,'Box',postStr];
-        fixFigure([],[fname,suffix]);
-        txt = findobj(gca,'Type','text');
-        set(txt(1:end),'FontSize',18,'VerticalAlignment', 'Middle');
-        saveas(gcf, fname);
+%         fixFigure([],[fname,suffix]);
+%         txt = findobj(gca,'Type','text');
+%         set(txt(1:end),'FontSize',18,'VerticalAlignment', 'Middle');
+        saveas(gcf, [fname,'.bmp']);
         close(f)
     end
     

@@ -13,7 +13,7 @@ else
 end
 covMethod={};
 tTrain=1:366;
-tTest=366:732;
+tTest=367:732;
 nTrain=length(tTrain);
 nTest=length(tTest);
 
@@ -55,7 +55,7 @@ else
 	ubSMAP=yStat(2);
     meanSMAP=yStat(3);
 	stdSMAP=yStat(4);
-    save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP')
+    save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP','meanSMAP','stdSMAP')
 end
 
 % GLDAS
@@ -65,8 +65,9 @@ if exist(GLDASmatFile,'file')
     outTrain.yGLDAS=GLDASmat.yGLDAS_train;
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
-    yGLDAS_train=xTrain(:,:,1)/100;
-    yGLDAS_test=xTest(:,:,1)/100;
+    indGLDAS_soilM=41;
+    yGLDAS_train=xTrain(:,:,indGLDAS_soilM)/100;
+    yGLDAS_test=xTest(:,:,indGLDAS_soilM)/100;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')

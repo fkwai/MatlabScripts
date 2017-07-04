@@ -11,14 +11,22 @@ for k=1:length(fileLst)
 	varName=fileLst(k).name(1:end-4);
 	if ~strcmp(varName,'crd') && ...
 		~strcmp(varName,'time') && ...
-		~strcmp(varName,'varConstLst') && ...
-		~strcmp(varName,'varLst') && ...
+		~startsWith(varName,'var') && ...
 		~endsWith(varName,'_stat') && ...
 		~startsWith(varName,'SMAP')
 		if startsWith(varName,'const_')
 			varConstLst=[varConstLst;varName];
 		else
 			varLst=[varLst;varName];
+			%{
+			statFile=[dirDB,varName,'_stat.csv'];
+			stat=csvread(statFile);
+			if stat(4)==0
+				disp(varName)
+				stat(4)=1;
+				dlmwrite(statFile, stat,'precision',8);
+			end
+			%}
 		end
 	end
 end

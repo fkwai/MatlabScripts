@@ -1,5 +1,6 @@
 function splitSubset_interval_All(interval,offset)
-% do split of subset of gridSMAP, L3, Daily, CONUS
+% do split of subset of gridSMAP, L3, Daily, CONUS of all datset from
+% reading varLst and varConstLst and SMAP. 
 
 global kPath
 varFile=[kPath.DBSMAP_L3_CONUS,'varLst.csv'];
@@ -25,7 +26,7 @@ for k=1:length(varLst)
     toc
 end
 
-% time series variable
+% constant variable
 for k=1:length(varConstLst)
     disp([num2str(interval),' ',num2str(offset),' ',varLst{k}])
     tic

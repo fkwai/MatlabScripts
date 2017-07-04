@@ -7,7 +7,8 @@ function [dataTrain,dataTest]= readRnnPred( outFolder,trainName,testName,iter)
 % testName='PA';
 % iter=2000;
 
-testFolder=[outFolder,'\out_',trainName,'_',testName,'_',num2str(iter),'\'];
+global kPath
+testFolder=[outFolder,kPath.s,'out_',trainName,'_',testName,'_',num2str(iter),kPath.s];
 
 trainFile=dir([testFolder,'*_train.csv']);
 testFile=dir([testFolder,'*_test.csv']);
