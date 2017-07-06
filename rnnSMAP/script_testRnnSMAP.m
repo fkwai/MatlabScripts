@@ -1,8 +1,8 @@
 %% plot box
-outFolder=[kPath.OutSMAP_L3,'CONUSs16f1',kPath.s];
-trainName='CONUSs16f1';
-testName=trainName;
-epoch=200;
+outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
+trainName='CONUSs4f1';
+testName='CONUSs4f1';
+epoch=500;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch)
 
 %% plot selected index

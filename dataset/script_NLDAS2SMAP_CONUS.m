@@ -3,8 +3,10 @@
 global kPath
 sd=20150101;
 ed=20170611;
-dataLst={'FORA','FORB','NOAH'};
-indLst=[{1:11};{1:10};{[1:19,25,26,29:52]}];
+% dataLst={'FORA','FORB','NOAH'};
+% indLst=[{1:11};{1:10};{[1:19,26,30:52]}];
+dataLst={'NOAH'};
+indLst=[{26}];
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;

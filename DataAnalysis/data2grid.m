@@ -15,12 +15,12 @@ nx=length(xx);
 ny=length(yy);
 data(data==-9999)=nan;
 
-grid=ones(ny,nx,nt).*nan;
+grid=ones(ny,nx).*nan;
 
 for i=1:nc
 	iy=find(y(i)==yy);
 	ix=find(x(i)==xx);
-	grid(iy,ix,:)=data(i,:);
+	grid(iy,ix)=data(i);
 end
 
 

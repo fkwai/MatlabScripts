@@ -17,15 +17,18 @@ pnames={'shapefile','stat','opt','colorRange','optSMAP','optGLDAS'};
 dflts={[],'nash',1,[],1,1};
 [shapefile,stat,opt,colorRange,optSMAP,optGLDAS]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
-dirData='E:\Kuai\rnnSMAP\Database\Daily\';
+
+global kPath
+dataFolder=kPath.DBSMAP_L3;
+dirData=[dataFolder,trainName,kPath.s];
+fileCrd=[dirData,'crd.csv'];
+fileDate=[dirData,'time.csv'];
 
 %% predefine
 tTrain=1:365;
 tTest=366:520;
-crdFile=[dirData,testName,'\crd.csv'];
-crd=csvread(crdFile);
-tFile=[dirData,testName,'\date.csv'];
-t=csvread(tFile);
+crd=csvread(fileCrd);
+t=csvread(fileDate);
 if strcmp(testName,trainName)
     tnum=datenumMulti(t(tTest),1);
 else

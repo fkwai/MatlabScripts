@@ -2,8 +2,10 @@
 % read all NLDAS data
 sd=20150101;
 ed=20170611;
-dataLst={'FORA','FORB','NOAH'};
-indLst=[{1:11};{1:10};{[1:19,25,26,29:52]}];
+% dataLst={'FORA','FORB','NOAH'};
+% indLst=[{1:11};{1:10};{[1:19,26,30:52]}];
+dataLst={'NOAH'};
+indLst=[{26}];
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;
@@ -14,7 +16,7 @@ for iData=1:length(dataLst)
 	dataName=dataLst{iData};
 	dataIndLst=indLst{iData};
 %try
-	parfor iField=1:length(dataIndLst)
+	for iField=1:length(dataIndLst)
 		indField=dataIndLst(iField);
 		saveFolder=[kPath.NLDAS_mat,'NLDAS_',dataName,'_Hourly',kPath.s];
 		%mkdir(saveFolder)

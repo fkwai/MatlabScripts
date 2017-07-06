@@ -35,10 +35,6 @@ elseif length(covMethod)==2
     symMethod={'b.','g.'};
 end
 
-%% optional - plot only selected index
-if isempty(indSel)
-    indSel=1:size(outTrain.ySMAP,2);
-end
 
 for kk=1:2
     if kk==1
@@ -46,6 +42,9 @@ for kk=1:2
     else
         out=outTest;
     end
+    
+    indSel=1:size(out.ySMAP,2);
+    
 %% calculate stat    
     statLSTM=statCal(out.yLSTM(:,indSel),out.ySMAP(:,indSel));
     statGLDAS=statCal(out.yGLDAS(:,indSel),out.ySMAP(:,indSel));

@@ -27,8 +27,8 @@ if readData==1
         xTest=xOut(tTest,:,:);
         yTest=yOut(tTest,:);
     else
-        [xTrain,yTrain,xStatTrain,yStatTrain]=readDatabaseSMAP2(trainName);
-        [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP2(testName);
+        [xTrain,yTrain,xStatTrain,yStat]=readDatabaseSMAP2(trainName);
+        [xTest,yTest,xStatTest,yStat]=readDatabaseSMAP2(testName);
     end
     toc
 end
@@ -65,9 +65,9 @@ if exist(GLDASmatFile,'file')
     outTrain.yGLDAS=GLDASmat.yGLDAS_train;
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
-    indGLDAS_soilM=41;
-    yGLDAS_train=xTrain(:,:,indGLDAS_soilM)/100;
-    yGLDAS_test=xTest(:,:,indGLDAS_soilM)/100;
+    indSoilM=41;
+    yGLDAS_train=xTrain(:,:,indSoilM)./100;
+    yGLDAS_test=xTest(:,:,indSoilM)./100;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')

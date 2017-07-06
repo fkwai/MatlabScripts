@@ -1,11 +1,6 @@
 function splitSubset_interval(varName,dataName,interval,offset)
 %split dataset to sub_xx
 
-% varName='SMAP';
-% saveFolder='E:\Kuai\rnnSMAP\Database\CONUS_sub4\';
-% interval=3;
-% offset=1;
-
 global kPath
 dirData=kPath.DBSMAP_L3_CONUS;
 saveFolder=[kPath.DBSMAP_L3,dataName,kPath.s];

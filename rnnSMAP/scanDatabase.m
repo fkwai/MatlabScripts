@@ -18,7 +18,8 @@ for k=1:length(fileLst)
 			varConstLst=[varConstLst;varName];
 		else
 			varLst=[varLst;varName];
-			%{
+
+			% fix 0 std
 			statFile=[dirDB,varName,'_stat.csv'];
 			stat=csvread(statFile);
 			if stat(4)==0
@@ -26,7 +27,7 @@ for k=1:length(fileLst)
 				stat(4)=1;
 				dlmwrite(statFile, stat,'precision',8);
 			end
-			%}
+
 		end
 	end
 end
