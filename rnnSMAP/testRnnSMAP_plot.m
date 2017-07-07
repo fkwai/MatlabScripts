@@ -11,8 +11,8 @@ function testRnnSMAP_plot(outFolder,trainName,testName,iter,varargin)
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'optSMAP','optGLDAS','indSel'};
-dflts={1,1,[]};
+pnames={'optSMAP','optGLDAS','indSel','testTime'};
+dflts={1,1,[],1};
 [optSMAP,optGLDAS,indSel]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
@@ -27,7 +27,7 @@ end
 
 %% read data
 [outTrain,outTest,covMethod]=testRnnSMAP_readData(...
-    outFolder,trainName,testName,iter);
+    outFolder,trainName,testName,iter,'testTime',testTime);
 
 if length(covMethod)==4
     symMethod={'b.','bo','g.','go'};    
