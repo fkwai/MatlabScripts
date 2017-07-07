@@ -2,9 +2,9 @@ function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,t
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'readCov','readData'};
-dflts={1,1};
-[readCov,readData]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'readCov','readData','testTime'};
+dflts={1,1,1};
+[readCov,readData,testTime]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 if strcmp(testName,trainName)
     sameRegion=1;
@@ -12,10 +12,14 @@ else
     sameRegion=0;
 end
 covMethod={};
-tTrain=1:366;
-tTest=367:732;
-nTrain=length(tTrain);
-nTest=length(tTest);
+
+if testTime==1
+    tTrain=1:366;
+    tTest=367:732;
+else
+    tTrain=1:732;
+    tTest=1:732;
+end
 
 if readData==1
     disp('read Database')

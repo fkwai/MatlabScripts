@@ -32,6 +32,7 @@ copyfile([dirData,varName,'_stat.csv'],statFile);
 if ~exist(crdFile,'file')
 	dlmwrite(crdFile,crdSub,'precision',8);
 end
+
 if ~exist(timeFile,'file')
 	copyfile([dirData,'time.csv'],[saveFolder,'time.csv']);
 end

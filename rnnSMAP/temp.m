@@ -1,17 +1,17 @@
 global kPath
-outFolder=[kPath.OutSMAP_L3,'CONUSs16f1_CONUSs16f9',kPath.s];
-trainName='CONUSs16f1';
-testName='CONUSs16f9';
+outFolder=[kPath.OutSMAP_L3,'CONUSs4f1_CONUSs4f3',kPath.s];
+trainName='CONUSs4f1';
+testName='CONUSs4f3';
 epoch=500;
-testRnnSMAP_plot(outFolder,trainName,testName,epoch)
+testRnnSMAP_plot(outFolder,trainName,testName,epoch,'testTime',0)
 
 outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
 trainName='CONUSs4f1';
 testName='CONUSs4f1';
 shapefile=[];
-stat='nash';% or rmse, rsq, bias
-colorRange=[-0.8,0.8];
-opt=2; %0->all; 1->train; 2->test
+stat='rmse';% or rmse, rsq, bias
+colorRange=[0,0.1];
+opt=1; %0->all; 1->train; 2->test
 epoch=500;
 testRnnSMAP_map(outFolder,trainName,testName,epoch,...
     'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);

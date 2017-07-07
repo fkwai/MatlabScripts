@@ -5,10 +5,10 @@ function h=showMap(grid,y,x,varargin)
 % tsStr.grid: a 3D grid with t in 3rd dimension
 % tsStr.symb: symbol of this ts
 
-pnames={'title','shapefile','colorRange','lonLim','latLim','newFig','tsStr'};
-dflts={[],[],[],[],[],1,[]};
+pnames={'title','shapefile','colorRange','lonLim','latLim','newFig','nLevel','tsStr'};
+dflts={[],[],[],[],[],1,10,[]};
 
-[strTitle,shapefile,colorRange,lonLim,latLim,newFig,tsStr]=...
+[strTitle,shapefile,colorRange,lonLim,latLim,newFig,nLevel,tsStr]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -20,15 +20,27 @@ if isempty(lonLim)
 end
 
 if newFig==1
-    h=figure;
+    h=figure('Position',[1,1,1200,800]);
 end
-colorbar()
 axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
       'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
-      'MapLatlimit', latLim, 'MapLonLimit', lonLim)
+      'MapLatlimit', latLim, 'MapLonLimit', lonLim,...
+      'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50])
 tightmap
 % geoshow(latmesh,lonmesh,grid,'DisplayType','surface');
-geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
+%geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
+
+levels = linspace(colorRange(1),colorRange(2), nLevel+1);
+cmap = jet(length(levels) + 1);
+cmap(1, :,:) = [1 1 1];
+colormap(cmap)
+Z = grid;
+Z(Z < levels(1)) = 1;
+Z(Z > levels(end)) = length(levels);
+for k = 1:length(levels) - 1
+    Z(grid >= levels(k) & grid <= levels(k+1)) = double(k) ;
+end
+geoshow(latmesh,lonmesh, uint8(Z), cmap, 'd', 'image');
 
 if isempty(shapefile)
     landareas=shaperead('landareas.shp', 'UseGeo', true);
@@ -43,7 +55,12 @@ if ~isempty(strTitle)
     title(strTitle)
 end
 if ~isempty(colorRange)
-    caxis(colorRange)
+    caxis auto
+    clevels =  cellstr(num2str(levels'));
+    clevels = ['None'; clevels]';
+    cb = lcolorbar(clevels);
+    set(cb,'position',[0.87 0.25 0.05 0.53])
+
 end
 
 

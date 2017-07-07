@@ -18,8 +18,8 @@ data(data==-9999)=nan;
 grid=ones(ny,nx).*nan;
 
 for i=1:nc
-	iy=find(y(i)==yy);
-	ix=find(x(i)==xx);
+	iy= y(i)==yy;
+	ix= x(i)==xx;
 	grid(iy,ix)=data(i);
 end
 

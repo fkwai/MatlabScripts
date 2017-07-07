@@ -1,57 +1,37 @@
-%%
-outFolder='E:\Kuai\rnnSMAP\output\case3\';
-trainName='CONUS_sub4';
-testName='CONUS_sub4';
-epoch=1000;
-optSMAP=1;
-optGLDAS=1;
+global kPath
+outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
+trainName='CONUSs4f1';
+testName='CONUSs4f1';
+epoch=500;
 
-[ySMAP,yLSTM,yGLDAS,yCov,covMethod]=testRnnSMAP_readData(...
-    outFolder,trainName,testName,epoch,...
-    'optSMAP',optSMAP,'optGLDAS',optGLDAS,'readCov',0);
-testFile=[outFolder,'\',testName,'.csv'];
-testInd=csvread(testFile);
-ntrain=276;
-nt=520;
-t1=1:ntrain-1;
-t2=ntrain:nt;
-dirSMAP='Y:\Kuai\rnnSMAP\Database\tDB_SMPq\';
-crdFile=[dirSMAP,'crdIndex.csv'];
-crdAll=csvread(crdFile);
-crdTest=crdAll(testInd,:);
-xSort=sort(unique(crdTest(:,1)));
-cellsize=xSort(2)-xSort(1); %!!!may modify later
-
-% stat='nash';
-% statStr='Nash';
-% colorRange=[-1,0.75];
+opt=1;
 stat='rmse';
-statStr='Rmse';
+unitStr='[-]';
+figName='RMSE_train_time';
 colorRange=[0,0.1];
+titleStr='RMSE Between SMAP and LSTM Predictions';
 
-%% plot figure
-figFolder='E:\Kuai\rnnSMAP\paper\';
-shapefile='Y:\Maps\USA.shp';
-statLSTM=statCal(yLSTM(t2,:,:),ySMAP(t2,:));
-[gridStat,xx,yy] = data2grid(statLSTM.(stat),crdTest(:,2),crdTest(:,1),cellsize);
-figure('Position',[0,0,1600,600])
-titleStr=[statStr,' between SMAP and LSTM prediction'];
-showGrid( gridStat,xx,yy,cellsize,'colorRange',colorRange,'shapefile',shapefile,...
-    'titleStr',titleStr,'newFig',0)
-addDegreeAxis()
+dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
+fileCrd=[dirData,'crd.csv'];
+crd=csvread(fileCrd);
+shapefile='H:\Kuai\map\USA.shp';
+figFolder='H:\Kuai\rnnSMAP\paper\';
+% [outTrain,outTest,covMethod]=testRnnSMAP_readData(...
+%     outFolder,trainName,testName,epoch);
+
+
+statLSTM{1}=statCal(outTrain.yLSTM,outTrain.ySMAP);
+statLSTM{2}=statCal(outTest.yLSTM,outTest.ySMAP);
+[gridStatLSTM,xx,yy] = data2grid( statLSTM{opt}.(stat),crd(:,2),crd(:,1));
+[lon,lat]=meshgrid(xx,yy);
+data=gridStatLSTM;
+
+h=showMap(data,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr)
+
 suffix = '.eps';
-fname=[figFolder,stat,'MapLSTM'];
+fname=[figFolder,figName];
 fixFigure([],[fname,suffix]);
 saveas(gcf, fname);
 
-statGLDAS=statCal(yGLDAS(t2,:,:),ySMAP(t2,:));
-[gridStat,xx,yy] = data2grid(statGLDAS.(stat),crdTest(:,2),crdTest(:,1),cellsize);
-figure('Position',[0,0,1600,600])
-titleStr=[statStr,' between SMAP and GLDAS simulation'];
-showGrid( gridStat,xx,yy,cellsize,'colorRange',colorRange,'shapefile',shapefile,...
-    'titleStr',titleStr,'newFig',0)
-addDegreeAxis()
-suffix = '.eps';
-fname=[figFolder,stat,'MapGLDAS'];
-fixFigure([],[fname,suffix]);
-saveas(gcf, fname);
+
+
