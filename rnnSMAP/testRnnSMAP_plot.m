@@ -13,7 +13,7 @@ function testRnnSMAP_plot(outFolder,trainName,testName,iter,varargin)
 
 pnames={'optSMAP','optGLDAS','indSel','testTime'};
 dflts={1,1,[],1};
-[optSMAP,optGLDAS,indSel]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+[optSMAP,optGLDAS,indSel,testTime]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
 if isempty(indSel)
