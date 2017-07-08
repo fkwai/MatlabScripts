@@ -1,4 +1,4 @@
-function testRnnSMAP_plot(outFolder,trainName,testName,iter,varargin)
+function testRnnSMAP_plot(outName,trainName,testName,iter,varargin)
 % First test for trained rnn model. 
 % plot nash/rmse map for given testset and click map to plot timeseries
 % comparison between GLDAS, SMAP and RNN prediction. 
@@ -16,6 +16,8 @@ dflts={1,1,[],1};
 [optSMAP,optGLDAS,indSel,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
+global kPath
+outFolder=[kPath.OutSMAP_L3,outName,kPath.s];
 if isempty(indSel)
     figfolder=[outFolder,'/plot/',trainName,'_',testName,'_',num2str(iter),'/'];
 else
@@ -27,7 +29,7 @@ end
 
 %% read data
 [outTrain,outTest,covMethod]=testRnnSMAP_readData(...
-    outFolder,trainName,testName,iter,'timeOpt',timeOpt);
+    outName,trainName,testName,iter,'timeOpt',timeOpt);
 
 if length(covMethod)==4
     symMethod={'b.','bo','g.','go'};    

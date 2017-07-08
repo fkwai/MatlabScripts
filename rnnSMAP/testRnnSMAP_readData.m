@@ -1,10 +1,13 @@
-function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,testName,iter,varargin)
+function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,testName,iter,varargin)
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
 pnames={'readCov','readData','timeOpt'};
 dflts={1,1,1};
 [readCov,readData,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+
+global kPath
+outFolder=[kPath.OutSMAP_L3,outName,kPath.s];
 
 if strcmp(testName,trainName)
     sameRegion=1;
@@ -34,8 +37,8 @@ if readData==1
         xTest=xOut(tTest,:,:);
         yTest=yOut(tTest,:);
     else
-        [xTrain,yTrain,xStatTrain,yStat]=readDatabaseSMAP2(trainName);
-        [xTest,yTest,xStatTest,yStat]=readDatabaseSMAP2(testName);
+        [xTrain,yTrain,xStat,yStat]=readDatabaseSMAP2(trainName);
+        [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP2(testName);
     end
     toc
 end
@@ -73,8 +76,11 @@ if exist(GLDASmatFile,'file')
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
     indSoilM=41;
-    yGLDAS_train=xTrain(:,:,indSoilM)./100;
-    yGLDAS_test=xTest(:,:,indSoilM)./100;
+    yGLDAS_train=xTrain(:,:,indSoilM);
+    yGLDAS_test=xTest(:,:,indSoilM);
+	statGLDAS=xStat(:,indSoilM);
+	yGLDAS_train=(yGLDAS_train*statGLDAS(4)+statGLDAS(3))/100;
+	yGLDAS_test=(yGLDAS_test*statGLDAS(4)+statGLDAS(3))/100;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')
