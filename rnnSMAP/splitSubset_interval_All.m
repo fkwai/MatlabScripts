@@ -22,15 +22,15 @@ copyfile(varConstFile,varConstFileNew);
 for k=1:length(varLst)
     disp([num2str(interval),' ',num2str(offset),' ',varLst{k}])
     tic
-    splitSubset_interval(varLst{k},dataName,interval,offset)
+    splitSubset_interval(varLst{k},dataName,interval,offset);
     toc
 end
 
 % constant variable
 for k=1:length(varConstLst)
-    disp([num2str(interval),' ',num2str(offset),' ',varLst{k}])
+    disp([num2str(interval),' ',num2str(offset),' ',varConstLst{k}])
     tic
-    splitSubset_interval(varConstLst{k},dataName,interval,offset)
+    splitSubset_interval(['const_',varConstLst{k}],dataName,interval,offset);
     toc
 end
 

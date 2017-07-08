@@ -7,25 +7,12 @@ varLst={'AvgSurfT','Canopint','Evap','LWdown','LWnet','PSurf',...
     'SMAP_Anomaly','SoilM_Anomaly'}
 
 %% interval
-interval=4;
-offset=1;
-saveFolder='H:\Kuai\rnnSMAP\Database\Daily\CONUS_sub4\';
-for k=1:length(varLst)
-    k
-    tic
-    splitSubset_interval(varLst{k},saveFolder,interval,offset)
-    toc
-end
-
-interval=16;
-offset=1;
-saveFolder='H:\Kuai\rnnSMAP\Database\Daily\CONUS_sub16\';
-for k=1:length(varLst)
-    k
-    tic
-    splitSubset_interval(varLst{k},saveFolder,interval,offset)
-    toc
-end
+splitSubset_interval_All(2,1)
+splitSubset_interval_All(2,2)
+splitSubset_interval_All(4,1)
+splitSubset_interval_All(4,3)
+splitSubset_interval_All(16,1)
+splitSubset_interval_All(16,9)
 
 %% shapefile
 shape=shaperead('Y:\Maps\State\OK.shp');

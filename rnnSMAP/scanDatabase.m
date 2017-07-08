@@ -16,20 +16,19 @@ for k=1:length(fileLst)
 		~startsWith(varName,'SMAP')
 		if startsWith(varName,'const_')
 			varConstLst=[varConstLst;varName(7:end)];
-		else
-			varLst=[varLst;varName];
-
-			% fix 0 std
-			statFile=[dirDB,varName,'_stat.csv'];
-			stat=csvread(statFile);
-			if stat(4)<0.01
-				disp(varName)
-				stat(4)=1;
-				dlmwrite(statFile, stat,'precision',8);
-			end
-
-		end
-	end
+        else
+            varLst=[varLst;varName];
+        end
+        
+        % fix 0 std
+        statFile=[dirDB,varName,'_stat.csv'];
+        stat=csvread(statFile);
+        if stat(4)==0
+            disp(varName)
+            stat(4)=1;
+            dlmwrite(statFile, stat,'precision',8);
+        end        
+    end
 end
 
 fid=fopen([dirDB,'varLst.csv'],'w');

@@ -50,8 +50,8 @@ for kk=1:length(xField)
     xData=csvread(xFile);
 	xData(xData==-9999)=nan;
     xStatData=csvread(xStatFile);
-	xDataNorm=(xData-xStatData(3))./xStatData(4);
-    xOut(:,:,k)=xDataNorm';
+	%xDataNorm=(xData-xStatData(3))./xStatData(4);
+    xOut(:,:,k)=xData';
     xStat(:,k)=xStatData;
 end
 for kk=1:length(xField_const)
@@ -61,8 +61,8 @@ for kk=1:length(xField_const)
     xData=csvread(xFile);
 	xData(xData==-9999)=nan;
     xStatData=csvread(xStatFile);
-	xDataNorm=(xData-xStatData(3))./xStatData(4);
-    xOut(:,:,k)=repmat(xDataNorm',[nt,1]);
+	%xDataNorm=(xData-xStatData(3))./xStatData(4);
+    xOut(:,:,k)=repmat(xData',[nt,1]);
     xStat(:,k)=xStatData;
     %[grid,xx,yy] = data2grid( xData,lon,lat);  
 end

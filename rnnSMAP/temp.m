@@ -6,11 +6,11 @@ epoch=500;
 testRnnSMAP_plot(outFolder,trainName,testName,epoch,'timeOpt',3)
 
 global kPath
-outFolder=[kPath.OutSMAP_L3,'CONUSs16f1',kPath.s];
-trainName='CONUSs16f1';
-testName='CONUSs16f1';
+outName='CONUSs4f1';
+trainName='CONUSs4f1';
+testName='CONUSs4f1';
 epoch=500;
-testRnnSMAP_plot(outFolder,trainName,testName,epoch,'timeOpt',1)
+testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',1)
 
 outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
 trainName='CONUSs4f1';
@@ -25,6 +25,7 @@ testRnnSMAP_map(outFolder,trainName,testName,epoch,...
 
 
 %% rescan dataset
+scanDatabase('CONUS');
 sLst=[2,2,4,4,16,16];
 fLst=[1,2,1,3,1,9];
 for k=1:length(sLst)
@@ -33,7 +34,6 @@ for k=1:length(sLst)
     dbName=['CONUSs',num2str(ss),'f',num2str(ff)];
     scanDatabase(dbName);
 end
-scanDatabase('CONUS');
 
 %%
 k=1;
