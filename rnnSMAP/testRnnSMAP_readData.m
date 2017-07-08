@@ -2,9 +2,9 @@ function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outFolder,trainName,t
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'readCov','readData','testTime'};
+pnames={'readCov','readData','timeOpt'};
 dflts={1,1,1};
-[readCov,readData,testTime]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+[readCov,readData,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 if strcmp(testName,trainName)
     sameRegion=1;
@@ -13,12 +13,15 @@ else
 end
 covMethod={};
 
-if testTime==1
+if timeOpt==1
     tTrain=1:366;
     tTest=367:732;
-else
+elseif timeOpt==2
     tTrain=1:732;
     tTest=1:732;
+elseif timeOpt==3
+    tTrain=1:366;
+    tTest=1:366;
 end
 
 if readData==1
@@ -141,6 +144,7 @@ if readCov==1
     disp('calculate/load NN')
     tic
     NNFile=[outFolder,'outNN_',trainName,'_',testName,'.mat'];
+    netFile=[outFolder,'net_',trainName,'_',testName,'.mat'];
     if exist(NNFile,'file')
         NNmat=load(NNFile);
         outTrain.yNN=NNmat.yNN_train;
@@ -151,6 +155,7 @@ if readCov==1
         outTrain.yNN=yNN_train;
         outTest.yNN=yNN_test;
         save(NNFile,'yNN_train','yNN_test');        
+        save(netFile,'net');    
     end
     covMethod=[covMethod,'NN'];
     toc

@@ -15,14 +15,14 @@ for k=1:length(fileLst)
 		~endsWith(varName,'_stat') && ...
 		~startsWith(varName,'SMAP')
 		if startsWith(varName,'const_')
-			varConstLst=[varConstLst;varName];
+			varConstLst=[varConstLst;varName(7:end)];
 		else
 			varLst=[varLst;varName];
 
 			% fix 0 std
 			statFile=[dirDB,varName,'_stat.csv'];
 			stat=csvread(statFile);
-			if stat(4)==0
+			if stat(4)<0.01
 				disp(varName)
 				stat(4)=1;
 				dlmwrite(statFile, stat,'precision',8);
@@ -39,4 +39,17 @@ fclose(fid);
 fid=fopen([dirDB,'varConstLst.csv'],'w');
 fprintf(fid,'%s\n',varConstLst{:});
 fclose(fid);
+end
+
+function b = startsWith(s, pat)
+sl = length(s);
+pl = length(pat);
+b = (sl >= pl && strcmp(s(1:pl), pat)) || isempty(pat);
+end
+
+function b = endsWith(s, pat)
+sl = length(s);
+pl = length(pat);
+b = (sl >= pl && strcmp(s(end-pl+1:end), pat)) || isempty(pat);
+end
 

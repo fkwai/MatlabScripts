@@ -1,4 +1,11 @@
-% %% Elevation
+%% preDefine
+sd=20150401;
+ed=20170401;
+sdn=datenumMulti(sd,1);
+edn=datenumMulti(ed,1);
+tnum=[sdn:edn]';
+
+%% Elevation
 load('Y:\SRTM\SRTM025.mat')
 load('Y:\SoilGlobal\wise5by5min_v1b\soilMap025.mat')
 load('Y:\GLDAS\maskCONUS.mat')
@@ -70,11 +77,11 @@ gridLULC_int(latIndUS,lonIndUS)=vq;
 grid2csv_CONUS_const(gridLULC_int,lat,lon,mask,'E:\Kuai\rnnSMAP\Database\','LULC')
 
 %% crop irrigation
+global kPath
 irriFile='H:\Kuai\Data\UScrop\cropIrrigation.tif';
-load('H:\Kuai\Data\GLDAS\crdGLDAS025.mat')
-load('H:\Kuai\Data\GLDAS\maskCONUS.mat')
-
+maskMat=load(kPath.maskSMAP_CONUS);
 [gridIrri,refIrri]=geotiffread(irriFile);
+
 lonIrri=refIrri.LongitudeLimits(1)+refIrri.CellExtentInLongitude/2:...
     refIrri.CellExtentInLongitude:...
     refIrri.LongitudeLimits(2)-refIrri.CellExtentInLongitude/2;
@@ -83,19 +90,21 @@ latIrri=[refIrri.LatitudeLimits(2)-refIrri.CellExtentInLatitude/2:...
     refIrri.LatitudeLimits(1)+refIrri.CellExtentInLatitude/2]';
 gridIrri=double(gridIrri);
 gridIrri(gridIrri<0)=0;
+
 % construct US grid
-latBoundUS=[25,50];
-lonBoundUS=[-125,-66.5];
-latIndUS=find(lat>=latBoundUS(1)&lat<=latBoundUS(2));
-lonIndUS=find(lon>=lonBoundUS(1)&lon<=lonBoundUS(2));
-maskUS=mask(latIndUS,lonIndUS);
-latUS=lat(latIndUS);
-lonUS=lon(lonIndUS);
-vq=interpGridArea(lonIrri,latIrri,gridIrri,lonUS,latUS,'mean');
+vq=interpGridArea(lonIrri,latIrri,gridIrri,maskMat.lon,maskMat.lat,'mean');
+gridConst2csv_SMAP(vq,'Irri')
+gridConst2csv_SMAP(vq.^0.5,'IrriSq')
 
-grid2csv_CONUS_const(vq,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irrigation')
-
-grid2csv_CONUS_const(vq.^0.5,lat,lon,maskUS,'H:\Kuai\rnnSMAP\Database\','Irri_sq')
+% splitSubset
+sLst=[4,4,16,16];
+fLst=[1,3,1,9];
+for k=1:length(sLst)
+    ss=sLst(k);
+    ff=fLst(k);
+    splitSubset_interval('const_Irri',['CONUSs',num2str(ss),'f',num2str(ff)],ss,ff)
+    splitSubset_interval('const_IrriSq',['CONUSs',num2str(ss),'f',num2str(ff)],ss,ff)
+end
 
 
 

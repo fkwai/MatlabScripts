@@ -44,14 +44,12 @@ Colorbar_reset(range)
 %fixColorAxis([],range,11)
 %addDegreeAxis()
 
-if isempty(shapefile)
-    landareas=shaperead('landareas.shp', 'UseGeo', true);
-else
+if ~isempty(shapefile)    
     landareas=shaperead(shapefile, 'UseGeo', true);
+    shape.lat = [landareas.Lat];
+    shape.long = [landareas.Lon];
+    geoshow(shape.lat, shape.long, 'Color', 'k','LineWidth',2)
 end
-shape.lat = [landareas.Lat];
-shape.long = [landareas.Lon];
-geoshow(shape.lat, shape.long, 'Color', 'k','LineWidth',2)
 
 %% click to show TS
 while(~isempty(tsStr))
