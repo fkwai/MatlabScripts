@@ -28,7 +28,7 @@ if doTrain==1
 %     net.divideParam.testRatio=0;
     disp('NN training')
 	net.trainParam.epochs=500;
-	net.trainParam.showWindow = false;
+	net.trainParam.showWindow = true;
 	net.trainParam.showCommandLine = true; 
     [net,tr] = train(net,xMat',yMat','showResources','yes');
 end

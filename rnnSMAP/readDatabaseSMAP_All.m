@@ -1,4 +1,4 @@
-function [xOut,yOut,xStat,yStat] = readDatabaseSMAP2( dataName )
+function [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All( dataName )
 %read new SMAP database where each variable is saved in one file. 
 
 global kPath
@@ -48,7 +48,7 @@ for kk=1:length(xField)
     xFile=[dataFolder,dataName,kPath.s,xField{kk},'.csv'];
     xStatFile=[dataFolder,dataName,kPath.s,xField{kk},'_stat.csv'];
     xData=csvread(xFile);
-	xData(xData==-9999)=nan;
+	%xData(xData==-9999)=0;
     xStatData=csvread(xStatFile);
 	%xDataNorm=(xData-xStatData(3))./xStatData(4);
     xOut(:,:,k)=xData';
@@ -59,7 +59,7 @@ for kk=1:length(xField_const)
     xFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'.csv'];
     xStatFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'_stat.csv'];
     xData=csvread(xFile);
-	xData(xData==-9999)=nan;
+	%xData(xData==-9999)=0;
     xStatData=csvread(xStatFile);
 	%xDataNorm=(xData-xStatData(3))./xStatData(4);
     xOut(:,:,k)=repmat(xData',[nt,1]);

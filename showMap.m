@@ -1,4 +1,4 @@
-function h=showMap(grid,y,x,varargin)
+function [h,cmap]=showMap(grid,y,x,varargin)
 % a extend function use geoshow in matlab
 % tsStr: contains 
 % tsStr.t: tnum of ts
@@ -40,7 +40,7 @@ Z(Z > levels(end)) = length(levels);
 for k = 1:length(levels) - 1
     Z(grid >= levels(k) & grid <= levels(k+1)) = double(k) ;
 end
-geoshow(latmesh,lonmesh, uint8(Z), cmap, 'd', 'image');
+geoshow(latmesh,lonmesh,uint8(Z),cmap);
 
 if isempty(shapefile)
     landareas=shaperead('landareas.shp', 'UseGeo', true);

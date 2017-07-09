@@ -1,10 +1,10 @@
-function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,testName,iter,varargin)
+function [outTrain,outTest,covMethod]=testRnnSMAP_tNN(outName,trainName,testName,varargin)
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'readCov','readData','timeOpt'};
-dflts={1,1,1};
-[readCov,readData,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'timeOpt'};
+dflts={1};
+[timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
 outFolder=[kPath.OutSMAP_L3,outName,kPath.s];
