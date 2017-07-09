@@ -20,7 +20,7 @@ ntTest=length(tTest);
 
 xTrainLag=zeros([ntTrain-lag,ngrid,nVar*lag])*nan;
 xTestLag=zeros([ntTest,ngrid,nVar*lag])*nan;
-yTrainLag=yOut(tTrain+lag-1,:);
+yTrainLag=yOut(tTrain(1:end-lag),:);
 yTestLag=yOut(tTest,:);
 
 for k=1:lag
