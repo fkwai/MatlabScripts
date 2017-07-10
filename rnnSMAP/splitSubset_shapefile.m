@@ -1,67 +1,89 @@
-function splitSubset_shapefile(varName,shape,saveFolder,varargin )
+function splitSubset_shapefile(varName,dataName,shapefileLst,varargin )
 % split dataset by shapefile
 
 % example: 
-% shape=shaperead('Y:\Maps\State\OK.shp');
+% shapefileLst={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';...
+%     'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
+%     'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
 % varName='SMAP';
-% varargin{1} -> subset. Pick a grid every varargin{1} grids
-% varargin{2} -> offset
+% dataName='regionACDs2';
 
-dirData='H:\Kuai\rnnSMAP\Database\Daily\CONUS\';
+%%%% Disabled interval and offset!!!
+pnames={'interval','offset'};
+dflts={1,1};
+[interval,offset]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
-dSub=1;
-offset=1;
-if ~isempty(varargin)
-    dSub=varargin{1};    
-end
-if length(varargin)>1
-    offset=varargin{2};    
-end
+global kPath
+dirData=kPath.DBSMAP_L3_CONUS;
+saveFolder=[kPath.DBSMAP_L3,dataName,kPath.s];
+maskMat=load(kPath.maskSMAP_CONUS); 
 
 if ~isdir(saveFolder)
     mkdir(saveFolder)
 end
 
+
 %% find intersection of shape
-if isempty(strfind(varName,'const_'))
-    [grid,xx,yy,t]=csv2grid_SMAP(dirData,varName,1);
-else
-    [grid,xx,yy,t]=csv2grid_SMAP(dirData,varName,2);
-end
-maskShape = GridinShp(shape, xx,yy,0.25,1 );    % hard code to 0.25 for CONUS database
+dataFileCONUS=[dirData,varName,'.csv'];
+crdFileCONUS=[dirData,'crd.csv'];
+data=csvread(dataFileCONUS);
+crd=csvread(crdFileCONUS);
+px=crd(:,2);
+py=crd(:,1);
 
-%% pick by intervel
-maskSub=zeros(size(maskShape));
-maskSub(offset:dSub:end,offset:dSub:end)=1;
-mask=maskSub.*maskShape;
-
-%% grid to data table
-data=reshape(grid,[length(xx)*length(yy),length(t)]);
-maskTab=reshape(mask,[length(xx)*length(yy),1]);
-ind=find(maskTab);
-if isempty(strfind(varName,'const_'))
-    data=data';
-    dataSub=data(:,ind);
-else
-    dataSub=data(ind);
+bPick=zeros(size(px));
+for k=1:length(shapefileLst)
+    shapefile=shapefileLst{k};
+    maskShape = shaperead(shapefile);
+    X=maskShape.X(1:end-1);
+    Y=maskShape.Y(1:end-1);
+    
+    inout = int32(zeros(size(px)));
+    pnpoly(X,Y,px,py,inout);
+    inout=double(inout);
+    inout(inout~=1)=0;
+    bPick(inout==1)=1;
 end
 
-%% crd
-[lonMesh,latMesh]=meshgrid(xx,yy);
-lonVec=lonMesh(:);
-latVec=latMesh(:);
-lonSub=lonVec(ind);
-latSub=latVec(ind);
+%% interval and offset
+maskIndSub=maskMat.maskInd(offset:interval:end,offset:interval:end);
+indSub=maskIndSub(:);
+indSub(indSub==0)=[];
+bSub=zeros(size(px));
+bSub(indSub)=1;
+
+%% pick data
+indOut=find(bPick==1&bSub==1);
+dataSub=data(indOut,:);
+crdSub=crd(indOut,:);
+
+% % verify
+% plot(px,py,'b.');hold on
+% plot(px(indOut),py(indOut),'ro');hold on
+% for k=1:length(shapefileLst)
+%     shapefile=shapefileLst{k};
+%     maskShape = shaperead(shapefile);
+%     X=maskShape.X(1:end-1);
+%     Y=maskShape.Y(1:end-1);
+%     plot(X,Y,'k-');hold on
+% end
+% hold off
 
 %% save data
 saveFile=[saveFolder,varName,'.csv'];
 crdFile=[saveFolder,'crd.csv'];
-dlmwrite(saveFile, dataSub,'precision',8);
-dlmwrite(crdFile, [latSub,lonSub],'precision',8);
+statFile=[saveFolder,varName,'_stat.csv'];
+timeFile=[saveFolder,'time.csv'];
 
-%% copy stat and t
-copyfile([dirData,varName,'_stat.csv'],[saveFolder,varName,'_stat.csv'])
-copyfile([dirData,'date.csv'],[saveFolder,'date.csv'])
+dlmwrite(saveFile, dataSub,'precision',8);
+copyfile([dirData,varName,'_stat.csv'],statFile);
+if ~exist(crdFile,'file')
+	dlmwrite(crdFile,crdSub,'precision',8);
+end
+
+if ~exist(timeFile,'file')
+	copyfile([dirData,'time.csv'],[saveFolder,'time.csv']);
+end
 
 end
 

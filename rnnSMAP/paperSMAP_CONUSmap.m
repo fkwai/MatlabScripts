@@ -7,7 +7,7 @@ testName='CONUSs4f1';
 epoch=500;
 
 figFolder='H:\Kuai\rnnSMAP\paper\';
-opt=1;
+opt=2;
 stat='rmse';
 unitStr='[-]';
 colorRange=[0,0.1];

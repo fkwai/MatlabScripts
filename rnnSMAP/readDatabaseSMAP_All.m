@@ -1,6 +1,10 @@
 function [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All( dataName )
 %read new SMAP database where each variable is saved in one file. 
 
+pnames={'varLstName','varConstLstName'};
+dflts={'varLst','varConstLst'};
+[varLstName,varConstLstName]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+
 global kPath
 dataFolder=kPath.DBSMAP_L3;
 
@@ -8,8 +12,8 @@ dataFolder=kPath.DBSMAP_L3;
 dirData=[dataFolder,dataName,kPath.s];
 fileCrd=[dirData,'crd.csv'];
 fileDate=[dirData,'time.csv'];
-varFile=[dirData,'varLst.csv'];
-varConstFile=[dirData,'varConstLst.csv'];
+varFile=[dirData,varLstName,'.csv'];
+varConstFile=[dirData,varConstLstName,'.csv'];
 crd=csvread(fileCrd);
 t=csvread(fileDate);
 lat=crd(:,1);

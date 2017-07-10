@@ -2,9 +2,10 @@ function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,tes
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'readCov','readData','timeOpt'};
-dflts={1,1,1};
-[readCov,readData,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'readCov','readData','timeOpt','varLstName','varConstLstName'};
+dflts={1,1,1,'varLst','varConstLst'};
+[readCov,readData,timeOpt,varLstName,varConstLstName]=...
+    internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
 outFolder=[kPath.OutSMAP_L3,outName,kPath.s];
@@ -31,14 +32,17 @@ if readData==1
     disp('read Database')
     tic
     if sameRegion
-        [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All( testName );
+        [xOut,yOut,xStat,yStat]=readDatabaseSMAP_All(testName,...
+            'varLstName',varLstName,'varConstLstName',varConstLstName);
         xTrain=xOut(tTrain,:,:);
         yTrain=yOut(tTrain,:);
         xTest=xOut(tTest,:,:);
         yTest=yOut(tTest,:);
     else
-        [xTrain,yTrain,xStat,yStat]=readDatabaseSMAP_All(trainName);
-        [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP_All(testName);
+        [xTrain,yTrain,xStat,yStat]=readDatabaseSMAP_All(trainName,...
+            'varLstName',varLstName,'varConstLstName',varConstLstName);
+        [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP_All(testName,...
+            'varLstName',varLstName,'varConstLstName',varConstLstName);
     end
     toc
 end
@@ -62,9 +66,9 @@ else
     outTrain.ySMAP=ySMAP_train;
     outTest.ySMAP=ySMAP_test;
     lbSMAP=yStat(1);
-	ubSMAP=yStat(2);
+    ubSMAP=yStat(2);
     meanSMAP=yStat(3);
-	stdSMAP=yStat(4);
+    stdSMAP=yStat(4);
     save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP','meanSMAP','stdSMAP')
 end
 
@@ -77,7 +81,7 @@ if exist(GLDASmatFile,'file')
 else
     indSoilM=41;
     yGLDAS_train=xTrain(:,:,indSoilM)/100;
-    yGLDAS_test=xTest(:,:,indSoilM)/100;	
+    yGLDAS_test=xTest(:,:,indSoilM)/100;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')
@@ -91,7 +95,7 @@ LSTMmatFile=[outFolder,'outLSTM_',trainName,'_',testName,'_',num2str(iter),'.mat
 if exist(LSTMmatFile,'file')
     LSTMmat=load(LSTMmatFile);
     outTrain.yLSTM=LSTMmat.yLSTM_train;
-    outTest.yLSTM=LSTMmat.yLSTM_test;    
+    outTest.yLSTM=LSTMmat.yLSTM_test;
 else
     [dataTrain,dataTest]=readRnnPred(outFolder,trainName,testName,iter);
     %yLSTM_train=(dataTrain+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
@@ -112,10 +116,10 @@ if readCov==1
     if exist(LRFile,'file')
         LRmat=load(LRFile);
         outTrain.yLR=LRmat.yLR_train;
-        outTest.yLR=LRmat.yLR_test;  
+        outTest.yLR=LRmat.yLR_test;
     else
         [yLR_train,b] = regSMAP_LR(xTrain,yTrain);
-        [yLR_test,b2] = regSMAP_LR(xTest,yTest,b);        
+        [yLR_test,b2] = regSMAP_LR(xTest,yTest,b);
         outTrain.yLR=yLR_train;
         outTest.yLR=yLR_test;
         save(LRFile,'yLR_train','yLR_test');
@@ -151,14 +155,14 @@ if readCov==1
     if exist(NNFile,'file')
         NNmat=load(NNFile);
         outTrain.yNN=NNmat.yNN_train;
-        outTest.yNN=NNmat.yNN_test;  
+        outTest.yNN=NNmat.yNN_test;
     else
         [yNN_train,net] = regSMAP_NN(xTrain,yTrain);
-        [yNN_test,net2] = regSMAP_NN(xTest,yTest,net);        
+        [yNN_test,net2] = regSMAP_NN(xTest,yTest,net);
         outTrain.yNN=yNN_train;
         outTest.yNN=yNN_test;
-        save(NNFile,'yNN_train','yNN_test');        
-        save(netFile,'net');    
+        save(NNFile,'yNN_train','yNN_test');
+        save(netFile,'net');
     end
     covMethod=[covMethod,'NN'];
     toc
@@ -171,15 +175,15 @@ if readCov==1
         if exist(NNpbpFile,'file')
             NNpbpmat=load(NNpbpFile);
             outTrain.yNNpbp=NNpbpmat.yNNpbp_train;
-            outTest.yNNpbp=NNpbpmat.yNNpbp_test;  
-        else            
+            outTest.yNNpbp=NNpbpmat.yNNpbp_test;
+        else
             [yNNpbp_train,netLst] = regSMAP_NN_solo(xTrain,yTrain);
             [yNNpbp_test,netLst2] = regSMAP_NN_solo(xTest,yTest,netLst);
             outTrain.yNNpbp=yNNpbp_train;
             outTest.yNNpbp=yNNpbp_test;
             save(NNpbpFile,'yNNpbp_train','yNNpbp_test');
         end
-        covMethod=[covMethod,'NNpbp'];        
+        covMethod=[covMethod,'NNpbp'];
         toc
     end
 end

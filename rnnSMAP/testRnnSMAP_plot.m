@@ -11,9 +11,9 @@ function testRnnSMAP_plot(outName,trainName,testName,iter,varargin)
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'optSMAP','optGLDAS','indSel','timeOpt'};
-dflts={1,1,[],1};
-[optSMAP,optGLDAS,indSel,timeOpt]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'optSMAP','optGLDAS','indSel','timeOpt','readCov'};
+dflts={1,1,[],1,1};
+[optSMAP,optGLDAS,indSel,timeOpt,readCov]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% predefine
 global kPath
@@ -29,7 +29,7 @@ end
 
 %% read data
 [outTrain,outTest,covMethod]=testRnnSMAP_readData(...
-    outName,trainName,testName,iter,'timeOpt',timeOpt);
+    outName,trainName,testName,iter,'timeOpt',timeOpt,'readCov',readCov);
 
 if length(covMethod)==4
     symMethod={'b.','bo','g.','go'};    
@@ -50,6 +50,7 @@ for kk=1:2
 %% calculate stat    
     statLSTM=statCal(out.yLSTM(:,indSel),out.ySMAP(:,indSel));
     statGLDAS=statCal(out.yGLDAS(:,indSel),out.ySMAP(:,indSel));
+    statCov=[];
     for k=1:length(covMethod)
         mStr=covMethod{k};
         yTemp=out.(['y',mStr]);
