@@ -1,4 +1,4 @@
-function [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All( dataName )
+function [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All(dataName,varargin)
 %read new SMAP database where each variable is saved in one file. 
 
 pnames={'varLstName','varConstLstName'};
