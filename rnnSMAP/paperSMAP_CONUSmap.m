@@ -10,7 +10,6 @@ figFolder='H:\Kuai\rnnSMAP\paper\';
 opt=2;
 stat='rmse';
 unitStr='[-]';
-colorRange=[0,0.1];
 
 %% read Data
 dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
@@ -25,12 +24,12 @@ statLSTM{2}=statCal(outTest.yLSTM,outTest.ySMAP);
 statNLDAS{1}=statCal(outTrain.yGLDAS,outTrain.ySMAP);
 statNLDAS{2}=statCal(outTest.yGLDAS,outTest.ySMAP);
 
-
-%% LSTM map
-[gridStatLSTM,xx,yy] = data2grid( statLSTM{opt}.(stat),crd(:,2),crd(:,1));
+%% LSTM map - rmse
+[gridStatLSTM,xx,yy] = data2grid( statLSTM{opt}.rmse,crd(:,2),crd(:,1));
 [lon,lat]=meshgrid(xx,yy);
 data=gridStatLSTM;
 titleStr='RMSE Between SMAP and LSTM Predictions';
+colorRange=[0,0.1];
 [h,cmap]=showMap(data,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
 suffix = '.jpg';
@@ -38,16 +37,15 @@ fname=[figFolder,'fig_rmseMap_LSTM'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
-
-
-%% NLDAS map
-[gridStatNLDAS,xx,yy] = data2grid( statNLDAS{opt}.(stat),crd(:,2),crd(:,1));
+%% NLDAS map - bias
+[gridStatNLDAS,xx,yy] = data2grid( statNLDAS{opt}.bias,crd(:,2),crd(:,1));
 [lon,lat]=meshgrid(xx,yy);
 data=gridStatNLDAS;
-titleStr='RMSE Between SMAP and NLDAS Predictions';
+colorRange=[-0.2,0.2];
+titleStr='Bias Between SMAP and NLDAS Predictions';
 [h,cmap]=showMap(data,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
 suffix = '.jpg';
-fname=[figFolder,'fig_rmseMap_NLDAS'];
+fname=[figFolder,'fig_biasMap_NLDAS'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, fname);

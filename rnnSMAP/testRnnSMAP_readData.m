@@ -83,8 +83,8 @@ else
     [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(trainName,'SOILM');
     stdSoilm=xSoilmStatTrain(3);
     meanSoilm=xSoilmStatTrain(4);
-    yGLDAS_train=xSoilmTrain(tTrain,:)/400;
-    yGLDAS_test=xSoilmTest(tTest,:)/400;
+    yGLDAS_train=xSoilmTrain(tTrain,:)/100;
+    yGLDAS_test=xSoilmTest(tTest,:)/100;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')

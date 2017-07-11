@@ -87,7 +87,8 @@ if length(xSize)==1 && length(ySize)==1
                     [m2Mesh,n2Mesh]=meshgrid(m2Lst,n2Lst);
                     areaMat=(m2Mesh-m1Mesh).*(n1Mesh-n2Mesh);
                     nanMat=~isnan(temp);
-                    tempArea=(temp.*areaMat)./sum(sum(areaMat.*nanMat));
+                    areaMean=sum(sum(areaMat.*nanMat))/sum(sum(nanMat));
+                    tempArea=(temp.*areaMat)./areaMean;
                     
 %                     [m1Vec,n1Vec]=meshgrid(m1(ix),n1(iy));
 %                     m1Vec=m1Vec(:);n1Vec=n1Vec(:);

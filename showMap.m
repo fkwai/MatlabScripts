@@ -1,4 +1,4 @@
-function [h,cmap]=showMap(grid,y,x,varargin)
+function [f,cmap]=showMap(grid,y,x,varargin)
 % a extend function use geoshow in matlab
 % tsStr: contains 
 % tsStr.t: tnum of ts

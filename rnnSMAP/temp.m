@@ -1,9 +1,10 @@
 global kPath
-outFolder=[kPath.OutSMAP_L3,'CONUSs4f1_CONUSs4f3',kPath.s];
-trainName='CONUSs4f1';
-testName='CONUSs4f3';
+outFolder='regionCase1_noModel';
+trainName='regionACDs2';
+testName='regionBs2';
 epoch=500;
-testRnnSMAP_plot(outFolder,trainName,testName,epoch,'timeOpt',3)
+testRnnSMAP_plot(outFolder,trainName,testName,epoch,'timeOpt',2)
+
 
 global kPath
 outName='CONUSs4f1';
@@ -11,6 +12,13 @@ trainName='CONUSs4f1';
 testName='CONUSs4f1';
 epoch=500;
 testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',1)
+
+global kPath
+outName='CONUSs2f1';
+trainName='CONUSs2f1';
+testName='CONUSs2f1';
+epoch=300;
+testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',1,'readCov',0)
 
 outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
 trainName='CONUSs4f1';
@@ -36,6 +44,16 @@ for k=1:length(sLst)
 end
 
 %%
-k=1;
-plot(outTrain.yLSTM(:,k),'-b');hold on
-plot(outTrain.ySMAP(:,k),'-r');hold on
+sLstACD={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';...
+    'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
+    'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
+sLstBCD={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';...
+    'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
+    'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
+sLstA={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';};
+sLstB={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';};
+
+splitSubset('regionACD','shape',sLstACD)
+splitSubset('regionBCD','shape',sLstBCD)
+splitSubset('regionA','shape',sLstA)
+splitSubset('regionB','shape',sLstB)
