@@ -6,7 +6,7 @@ function [h,cmap]=showMap(grid,y,x,varargin)
 % tsStr.symb: symbol of this ts
 
 pnames={'title','shapefile','colorRange','lonLim','latLim','newFig','nLevel','tsStr'};
-dflts={[],[],[],[],[],1,10,[]};
+dflts={[],[],[0,1],[],[],1,10,[]};
 
 [strTitle,shapefile,colorRange,lonLim,latLim,newFig,nLevel,tsStr]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
@@ -20,7 +20,7 @@ if isempty(lonLim)
 end
 
 if newFig==1
-    h=figure('Position',[1,1,1200,800]);
+    f=figure('Position',[1,1,1200,800]);
 end
 axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
       'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
@@ -58,9 +58,8 @@ if ~isempty(colorRange)
     caxis auto
     clevels =  cellstr(num2str(levels'));
     clevels = ['None'; clevels]';
-    cb = lcolorbar(clevels);
-    set(cb,'position',[0.87 0.25 0.05 0.53])
-
+    cb = lcolorbar(clevels,'Location','Horizontal');
+    %set(cb,'position',[0.87 0.25 0.05 0.53])
 end
 
 

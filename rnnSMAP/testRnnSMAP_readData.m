@@ -47,7 +47,7 @@ if readData==1
     toc
 end
 
-%% read SMAP and GLDAS soilM
+%% read SMAP
 disp('read SMAP and GLDAS')
 tic
 % SMAP
@@ -72,16 +72,19 @@ else
     save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP','meanSMAP','stdSMAP')
 end
 
-% GLDAS
+%% read GLDAS soilM
 GLDASmatFile=[outFolder,'outGLDAS_',trainName,'_',testName,'.mat'];
 if exist(GLDASmatFile,'file')
     GLDASmat=load(GLDASmatFile);
     outTrain.yGLDAS=GLDASmat.yGLDAS_train;
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
-    indSoilM=41;
-    yGLDAS_train=xTrain(:,:,indSoilM)/100;
-    yGLDAS_test=xTest(:,:,indSoilM)/100;
+    [xSoilmTrain,xSoilmStatTrain] = readDatabaseSMAP(trainName,'SOILM');
+    [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(trainName,'SOILM');
+    stdSoilm=xSoilmStatTrain(3);
+    meanSoilm=xSoilmStatTrain(4);
+    yGLDAS_train=xSoilmTrain(tTrain,:)/400;
+    yGLDAS_test=xSoilmTest(tTest,:)/400;
     outTrain.yGLDAS=yGLDAS_train;
     outTest.yGLDAS=yGLDAS_test;
     save(GLDASmatFile,'yGLDAS_train','yGLDAS_test')

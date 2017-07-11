@@ -54,7 +54,8 @@ for kk=1:2
     for k=1:length(covMethod)
         mStr=covMethod{k};
         yTemp=out.(['y',mStr]);
-        statCov(k)=statCal(yTemp(:,indSel),out.ySMAP(:,indSel));
+        statTemp=statCal(yTemp(:,indSel),out.ySMAP(:,indSel));
+        statCov=[statCov,statTemp];
     end
 
 %% box plot

@@ -1,4 +1,4 @@
-function tout = datenumMulti( t,opt )
+function tout = datenumMulti( t,varargin )
 % Automaticlly find out format of input datenum and transfer as define
 % only support datenum, yyyymmdd, yyyymm.
 
@@ -8,6 +8,10 @@ function tout = datenumMulti( t,opt )
 
 % just for normal case (about year 1500 - 2700)
 
+opt=1;
+if ~isempty(varargin)
+    opt=varargin{1};
+end
 t=VectorDim(t,1);
 
 if t(1)>10000000 %yyyymmdd

@@ -1,4 +1,4 @@
-function showGrid( grid,x,y,cellsize,varargin)
+function showGrid( grid,y,x,cellsize,varargin)
 %SHOWGRID Summary of this function goes here
 %   Detailed explanation goes here
 

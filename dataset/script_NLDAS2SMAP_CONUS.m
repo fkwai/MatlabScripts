@@ -10,9 +10,9 @@ indLst=[{26}];
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;
-gridSMAP=load([kPath.SMAP,'gridSMAP_CONUS.mat']);
-ny=length(gridSMAP.lat);
-nx=length(gridSMAP.lon);
+maskSMAP=load([kPath.SMAP,'maskSMAP_CONUS.mat']);
+ny=length(maskSMAP.lat);
+nx=length(maskSMAP.lon);
 
 global kPath
 
@@ -36,7 +36,7 @@ for iData=1:length(dataLst)
 			dataDaily=nanmean(dataTemp,3);
 
 			% intecept to SMAP grid
-    		dataNLDAS(:,:,iT)=interpGridArea(lon,lat,dataDaily,gridSMAP.lon,gridSMAP.lat);
+    		dataNLDAS(:,:,iT)=interpGridArea(lon,lat,dataDaily,maskSMAP.lon,maskSMAP.lat);
 			toc
 
 		end

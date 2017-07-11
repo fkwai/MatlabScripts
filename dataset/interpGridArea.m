@@ -77,15 +77,33 @@ if length(xSize)==1 && length(ySize)==1
             iy=find((n2<yy1)&(n1>yy2));
             if ~isempty(ix) && ~isempty(iy)
                 temp=v(iy,ix);
-                vRatio=length(find(isnan(temp(:))))/length(temp(:));
+                vRatio=length(find(isnan(temp(:))))/length(temp(:));                
                 if vRatio<=the
+                    m1Lst=m1(ix);m1Lst(1)=max(xx1,m1(1));
+                    m2Lst=m2(ix);m2Lst(end)=min(xx2,m2(end));
+                    n1Lst=n1(iy);n1Lst(1)=min(yy1,n1(1));
+                    n2Lst=n2(iy);n2Lst(end)=max(yy2,n2(end));
+                    [m1Mesh,n1Mesh]=meshgrid(m1Lst,n1Lst);                    
+                    [m2Mesh,n2Mesh]=meshgrid(m2Lst,n2Lst);
+                    areaMat=(m2Mesh-m1Mesh).*(n1Mesh-n2Mesh);
+                    nanMat=~isnan(temp);
+                    tempArea=(temp.*areaMat)./sum(sum(areaMat.*nanMat));
+                    
+%                     [m1Vec,n1Vec]=meshgrid(m1(ix),n1(iy));
+%                     m1Vec=m1Vec(:);n1Vec=n1Vec(:);
+%                     [m2Vec,n2Vec]=meshgrid(m2(ix),n2(iy));
+%                     m2Vec=m2Vec(:);n2Vec=n2Vec(:);                    
+%                     plot(m1Vec,n1Vec,'b*');hold on
+%                     plot(m2Vec,n2Vec,'ro');hold on
+%                     plot([xx1,xx1,xx2,xx2],[yy1,yy2,yy1,yy2],'kx');hold off
+                    
                     switch oper
                         case 'mean'
-                            vq(j,i)=nanmean(temp(:));
+                            vq(j,i)=nanmean(tempArea(:));
                         case 'max'
-                            vq(j,i)=nanmax(temp(:));
+                            vq(j,i)=nanmax(tempArea(:));
                         case 'mode'
-                            vq(j,i)=mode(temp(:));
+                            vq(j,i)=mode(tempArea(:));
                     end
                 end
             end
