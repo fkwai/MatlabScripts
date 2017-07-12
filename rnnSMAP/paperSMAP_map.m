@@ -8,7 +8,6 @@ epoch=500;
 
 figFolder='H:\Kuai\rnnSMAP\paper\';
 opt=2;
-stat='rmse';
 unitStr='[-]';
 suffix = '.jpg';
 

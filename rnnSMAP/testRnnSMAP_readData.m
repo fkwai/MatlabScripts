@@ -83,8 +83,8 @@ if exist(GLDASmatFile,'file')
     outTrain.yGLDAS=GLDASmat.yGLDAS_train;
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
-    [xSoilmTrain,xSoilmStatTrain] = readDatabaseSMAP(trainName,'SOILM');
-    [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(trainName,'SOILM');
+    [xSoilmTrain,xSoilmStatTrain] = readDatabaseSMAP(trainName,'LSOIL');
+    [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(testName,'LSOIL');
     stdSoilm=xSoilmStatTrain(3);
     meanSoilm=xSoilmStatTrain(4);
     yGLDAS_train=xSoilmTrain(tTrain,:)/100;

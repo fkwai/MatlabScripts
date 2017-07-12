@@ -45,16 +45,19 @@ for kk=1:2
         out=outTest;
     end
     
-    indSel=1:size(out.ySMAP,2);
+%     indSel=1:size(out.ySMAP,2);
     
 %% calculate stat    
-    statLSTM=statCal(out.yLSTM(:,indSel),out.ySMAP(:,indSel));
-    statGLDAS=statCal(out.yGLDAS(:,indSel),out.ySMAP(:,indSel));
+%     statLSTM=statCal(out.yLSTM(:,indSel),out.ySMAP(:,indSel));
+%     statGLDAS=statCal(out.yGLDAS(:,indSel),out.ySMAP(:,indSel));
+    statLSTM=statCal(out.yLSTM,out.ySMAP);
+    statGLDAS=statCal(out.yGLDAS,out.ySMAP);
     statCov=[];
     for k=1:length(covMethod)
         mStr=covMethod{k};
         yTemp=out.(['y',mStr]);
-        statTemp=statCal(yTemp(:,indSel),out.ySMAP(:,indSel));
+%         statTemp=statCal(yTemp(:,indSel),out.ySMAP(:,indSel));
+        statTemp=statCal(yTemp,out.ySMAP);
         statCov=[statCov,statTemp];
     end
 
