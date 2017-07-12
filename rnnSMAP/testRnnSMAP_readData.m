@@ -41,8 +41,12 @@ if readData==1
     else
         [xTrain,yTrain,xStat,yStat]=readDatabaseSMAP_All(trainName,...
             'varLstName',varLstName,'varConstLstName',varConstLstName);
+        xTrain=xTrain(tTrain,:,:);
+        yTrain=yTrain(tTrain,:);
         [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP_All(testName,...
             'varLstName',varLstName,'varConstLstName',varConstLstName);
+        xTest=xTest(tTest,:,:);
+        yTest=yTest(tTest,:);
     end
     toc
 end
@@ -154,13 +158,18 @@ if readCov==1
     disp('calculate/load NN')
     tic
     NNFile=[outFolder,'outNN_',trainName,'_',testName,'.mat'];
-    netFile=[outFolder,'net_',trainName,'_',testName,'.mat'];
+    netFile=[outFolder,'net_',trainName,'.mat'];
     if exist(NNFile,'file')
         NNmat=load(NNFile);
         outTrain.yNN=NNmat.yNN_train;
         outTest.yNN=NNmat.yNN_test;
     else
-        [yNN_train,net] = regSMAP_NN(xTrain,yTrain);
+        if exist(netFile,'file')
+            load(netFile);
+            [yNN_train,net] = regSMAP_NN(xTrain,yTrain,net);
+        else
+            [yNN_train,net] = regSMAP_NN(xTrain,yTrain);
+        end
         [yNN_test,net2] = regSMAP_NN(xTest,yTest,net);
         outTrain.yNN=yNN_train;
         outTest.yNN=yNN_test;

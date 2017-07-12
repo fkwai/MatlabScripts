@@ -39,7 +39,7 @@ end
 
 if strcmp(pcStr,'workstation')
 	kPath.s='\';
-    %kPath.SMAP='Y:\SMAP\';
+    kPath.SMAP='H:\Kuai\Data\SMAP\';
 	%kPath.SMAP_L2='Y:\SMAP\SPL3SMP.004\';
 	%kPath.SMAP_L3='Y:\SMAP\SPL3SMP.004\';
 	%kPath.GLDAS='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\';  

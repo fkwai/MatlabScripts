@@ -20,12 +20,12 @@ if isempty(lonLim)
 end
 
 if newFig==1
-    f=figure('Position',[1,1,1200,800]);
+    f=figure('Position',[1,1,1200,650]);
 end
 axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
       'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
       'MapLatlimit', latLim, 'MapLonLimit', lonLim,...
-      'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50])
+      'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50],'FontSize',16)
 tightmap
 % geoshow(latmesh,lonmesh,grid,'DisplayType','surface');
 %geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
@@ -34,9 +34,9 @@ levels = linspace(colorRange(1),colorRange(2), nLevel+1);
 cmap = jet(length(levels) + 1);
 cmap(1, :,:) = [1 1 1];
 colormap(cmap)
-Z = grid;
-Z(Z < levels(1)) = 1;
-Z(Z > levels(end)) = length(levels);
+Z = zeros(size(grid));
+Z(grid < levels(1)) = 1;
+Z(grid > levels(end)) = length(levels);
 for k = 1:length(levels) - 1
     Z(grid >= levels(k) & grid <= levels(k+1)) = double(k) ;
 end

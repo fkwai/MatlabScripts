@@ -9,9 +9,9 @@ testRnnSMAP_plot(outFolder,trainName,testName,epoch,'timeOpt',2)
 global kPath
 outName='CONUSs4f1';
 trainName='CONUSs4f1';
-testName='CONUSs4f1';
+testName='CONUSs4f3';
 epoch=500;
-testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',1)
+testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',3)
 
 global kPath
 outName='CONUSs2f1';
@@ -20,15 +20,15 @@ testName='CONUSs2f1';
 epoch=300;
 testRnnSMAP_plot(outName,trainName,testName,epoch,'timeOpt',1,'readCov',0)
 
-outFolder=[kPath.OutSMAP_L3,'CONUSs4f1',kPath.s];
+outName='CONUSs4f1';
 trainName='CONUSs4f1';
 testName='CONUSs4f1';
 shapefile=[];
 stat='rmse';% or rmse, rsq, bias
 colorRange=[0,0.1];
-opt=1; %0->all; 1->train; 2->test
+opt=2; %0->all; 1->train; 2->test
 epoch=500;
-testRnnSMAP_map(outFolder,trainName,testName,epoch,...
+testRnnSMAP_map(outName,trainName,testName,epoch,...
     'shapefile',shapefile,'stat',stat,'opt',opt,'colorRange',colorRange);
 
 
