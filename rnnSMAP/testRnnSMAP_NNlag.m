@@ -13,7 +13,7 @@ tTest=367:732;
 [xOut,yOut,xStat,yStat] = readDatabaseSMAP_All( testName );
 
 %% x to xLag
-lag=5;
+lag=3;
 [nt,ngrid,nVar]=size(xOut);
 ntTrain=length(tTrain);
 ntTest=length(tTest);
@@ -39,12 +39,12 @@ if exist(NNlagFile,'file')
     outTrain.yNNlag=NNlagmat.yNNlag_train;
     outTest.yNNlag=NNlagmat.yNNlag_test;
 else
-    [yNN_train,net] = regSMAP_NN(xTrainLag,yTrainLag);
-    [yNN_test,net2] = regSMAP_NN(xTestLag,yTestLag,net);
-    outTrain.yNN=yNN_train;
-    outTest.yNN=yNN_test;
-    save(NNlagFile,'yNNlag_train','yNNlag_test');
+    [yNNlag_train,net] = regSMAP_NN(xTrainLag,yTrainLag);
+    [yNNlag_test,net2] = regSMAP_NN(xTestLag,yTestLag,net);
+    outTrain.yNNlag=yNNlag_train;
+    outTest.yNNlag=yNNlag_test;
     save(netlagFile,'net');
+    save(NNlagFile,'yNNlag_train','yNNlag_test');
 end
 toc
 

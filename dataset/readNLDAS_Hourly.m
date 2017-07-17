@@ -21,6 +21,12 @@ switch productName
 	case 'NOAH'
 		NLDASdir=[kPath.NLDAS,'NLDAS_NOAH0125_H.002',kPath.s];
 		ParamTable=[kPath.NLDAS,'gribtab_NLDAS_NOAH.002.txt'];
+	case 'VIC'
+		NLDASdir=[kPath.NLDAS,'NLDAS_VIC0125_H.002',kPath.s];
+		ParamTable=[kPath.NLDAS,'gribtab_NLDAS_VIC.002.txt'];
+	case 'MOS'
+		NLDASdir=[kPath.NLDAS,'NLDAS_MOS0125_H.002',kPath.s];
+		ParamTable=[kPath.NLDAS,'gribtab_NLDAS_MOS.002.txt'];
 end
 
 dn=datenumMulti(t,1);
