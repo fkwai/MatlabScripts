@@ -1,4 +1,4 @@
-function [gridStat,xx,yy,cellsize]=testRnnSMAP_map(outFolder,trainName,testName,iter,varargin)
+function testRnnSMAP_map(outName,trainName,testName,epoch,varargin)
 % First test for trained rnn model. 
 % plot nash/rmse map for given testset and click map to plot timeseries
 % comparison between GLDAS, SMAP and RNN prediction. 
@@ -13,9 +13,9 @@ function [gridStat,xx,yy,cellsize]=testRnnSMAP_map(outFolder,trainName,testName,
 % shapefile -> shapefile plot in map
 % doAnorm -> if the result is anormaly then doAnorm=1
 
-pnames={'shapefile','stat','opt','colorRange','optSMAP','optGLDAS'};
-dflts={[],'nash',1,[],1,1};
-[shapefile,stat,opt,colorRange,optSMAP,optGLDAS]=...
+pnames={'shapefile','stat','opt','colorRange','optSMAP','optGLDAS','timeOpt'};
+dflts={[],'rmse',1,[0,0.1],1,1,1};
+[shapefile,stat,opt,colorRange,optSMAP,optGLDAS,timeOpt]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
@@ -25,8 +25,17 @@ fileCrd=[dirData,'crd.csv'];
 fileDate=[dirData,'time.csv'];
 
 %% predefine
-tTrain=1:365;
-tTest=366:520;
+if timeOpt==1
+    tTrain=1:366;
+    tTest=367:732;
+elseif timeOpt==2
+    tTrain=1:732;
+    tTest=1:732;
+elseif timeOpt==3
+    tTrain=1:366;
+    tTest=1:366;
+end
+
 crd=csvread(fileCrd);
 t=csvread(fileDate);
 if strcmp(testName,trainName)
@@ -36,7 +45,7 @@ else
 end
 %% read data
 [outTrain,outTest,covMethod]=testRnnSMAP_readData(...
-    outFolder,trainName,testName,iter);
+    outName,trainName,testName,epoch,'timeOpt',timeOpt);
 
 %% calculate stat
 if opt==1
@@ -77,13 +86,13 @@ tsStr(3).legendStr='GLDAS';
 [gridGLDAS,xx,yy] = data2grid3d(out.yLR',crd(:,2),crd(:,1));
 tsStr(4).grid=gridGLDAS;
 tsStr(4).t=tnum;
-tsStr(4).symb='-y';
+tsStr(4).symb='*y';
 tsStr(4).legendStr='LR';
 
 [gridGLDAS,xx,yy] = data2grid3d(out.yNN',crd(:,2),crd(:,1));
 tsStr(5).grid=gridGLDAS;
 tsStr(5).t=tnum;
-tsStr(5).symb='-g';
+tsStr(5).symb='*g';
 tsStr(5).legendStr='NN';
 
 % if length(covMethod)==4
@@ -100,7 +109,10 @@ tsStr(5).legendStr='NN';
 %     tsStr=[tsStr,tsStrTemp];
 % end
 
-cellsize=xx(2)-xx(1);
-showGrid( gridStatLSTM,xx,yy,cellsize,'colorRange',colorRange,'tsStr',tsStr,'shapefile',shapefile)
+yIn=[length(yy):-1:1]';
+xIn=1:length(xx);
+
+showGrid( gridStatLSTM,yIn,xIn,1,'colorRange',colorRange,'tsStr',tsStr,...
+    'shapefile',shapefile,'yRange',[0,0.5])
 end
 

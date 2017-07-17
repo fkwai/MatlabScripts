@@ -1,7 +1,7 @@
 
 %% arguments
 global kPath
-outName='CONUSs4f1';
+outName='CONUSs4f1_new';
 trainName='CONUSs4f1';
 testName='CONUSs4f1';
 epoch=500;
@@ -24,6 +24,9 @@ statLSTM{2}=statCal(outTest.yLSTM,outTest.ySMAP);
 statNLDAS{1}=statCal(outTrain.yGLDAS,outTrain.ySMAP);
 statNLDAS{2}=statCal(outTest.yGLDAS,outTest.ySMAP);
 
+statNN{1}=statCal(outTrain.yNN,outTrain.ySMAP);
+statNN{2}=statCal(outTest.yNN,outTest.ySMAP);
+
 %% Bias LSTM -> 1a
 plotData=statLSTM{opt}.bias;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
@@ -38,7 +41,7 @@ saveas(gcf, fname);
 %% Bias LSTM - NLDAS -> 1b
 plotData=abs(statLSTM{opt}.bias)-abs(statNLDAS{opt}.bias);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='Bias of LSTM - Bias of NOAH';
+titleStr='Bias(LSTM) minus Bias(Noah)';
 colorRange=[-0.3,0.1];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
@@ -60,7 +63,7 @@ saveas(gcf, fname);
 %% Rsq LSTM - NLDAS -> 1d
 plotData=abs(statLSTM{opt}.rsq)-abs(statNLDAS{opt}.rsq);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='R^2 of LSTM - R^2 of NOAH';
+titleStr='R^2(LSTM) minus R^2(Noah)';
 colorRange=[-0.5,0.5];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
@@ -79,14 +82,14 @@ fname=[figFolder,'fig_rmseMap_LSTM'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
-%% rmse LSTM - NLDAS -> 1f
-plotData=abs(statLSTM{opt}.rmse)-abs(statNLDAS{opt}.rmse);
+%% rmse LSTM - NN -> 1f
+plotData=abs(statLSTM{opt}.rmse)-abs(statNN{opt}.rmse);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='RMSE of LSTM - RMSE of NOAH';
-colorRange=[-0.3,0.1];
+titleStr='RMSE(LSTM) minus RMSE(NN)';
+colorRange=[-0.05,0.05];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
-fname=[figFolder,'fig_rmseMap_LSTM_NLDAS'];
+fname=[figFolder,'fig_rmseMap_LSTM_NN'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 

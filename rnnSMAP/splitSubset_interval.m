@@ -1,4 +1,4 @@
-function splitSubset_interval(varName,dataName,interval,offset)
+function indSub=splitSubset_interval(varName,dataName,interval,offset)
 %split dataset to sub_xx
 
 global kPath

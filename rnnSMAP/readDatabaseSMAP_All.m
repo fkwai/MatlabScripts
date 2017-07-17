@@ -52,10 +52,10 @@ for kk=1:length(xField)
     xFile=[dataFolder,dataName,kPath.s,xField{kk},'.csv'];
     xStatFile=[dataFolder,dataName,kPath.s,xField{kk},'_stat.csv'];
     xData=csvread(xFile);
-	%xData(xData==-9999)=0;
     xStatData=csvread(xStatFile);
-	%xDataNorm=(xData-xStatData(3))./xStatData(4);
-    xOut(:,:,k)=xData';
+	xDataNorm=(xData-xStatData(3))./xStatData(4);
+    xDataNorm(xData==-9999)=0;
+    xOut(:,:,k)=xDataNorm';
     xStat(:,k)=xStatData;
 end
 for kk=1:length(xField_const)
@@ -63,10 +63,10 @@ for kk=1:length(xField_const)
     xFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'.csv'];
     xStatFile=[dataFolder,dataName,kPath.s,'const_',xField_const{kk},'_stat.csv'];
     xData=csvread(xFile);
-	%xData(xData==-9999)=0;
     xStatData=csvread(xStatFile);
-	%xDataNorm=(xData-xStatData(3))./xStatData(4);
-    xOut(:,:,k)=repmat(xData',[nt,1]);
+	xDataNorm=(xData-xStatData(3))./xStatData(4);
+    xDataNorm(xData==-9999)=0;
+    xOut(:,:,k)=repmat(xDataNorm',[nt,1]);
     xStat(:,k)=xStatData;
     %[grid,xx,yy] = data2grid( xData,lon,lat);  
 end

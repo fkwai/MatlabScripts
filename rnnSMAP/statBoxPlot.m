@@ -36,7 +36,7 @@ for k=1:4
     ylim(plotRange);
     title(titleLst{k})
     if ~isempty(figfolder)
-        suffix = '.eps';
+        suffix = '.jpg';
         fname=[figfolder,'\',stat,'Box',postStr];
         fixFigure([],[fname,suffix]);
         txt = findobj(gca,'Type','text');

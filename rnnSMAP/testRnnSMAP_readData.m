@@ -65,14 +65,17 @@ if exist(SMAPmatFile,'file')
     meanSMAP=SMAPmat.meanSMAP;
     stdSMAP=SMAPmat.stdSMAP;
 else
-    ySMAP_train=yTrain;
-    ySMAP_test=yTest;
+    [yTrainSMAP,yTrainSMAPStat] = readDatabaseSMAP(trainName,'SMAP');
+    [yTestSMAP,yTestSMAPStat] = readDatabaseSMAP(testName,'SMAP');
+    
+    ySMAP_train=yTrainSMAP(tTrain,:);
+    ySMAP_test=yTestSMAP(tTest,:);
     outTrain.ySMAP=ySMAP_train;
     outTest.ySMAP=ySMAP_test;
-    lbSMAP=yStat(1);
-    ubSMAP=yStat(2);
-    meanSMAP=yStat(3);
-    stdSMAP=yStat(4);
+    lbSMAP=yTrainSMAPStat(1);
+    ubSMAP=yTrainSMAPStat(2);
+    meanSMAP=yTrainSMAPStat(3);
+    stdSMAP=yTrainSMAPStat(4);
     save(SMAPmatFile,'ySMAP_train','ySMAP_test','lbSMAP','ubSMAP','meanSMAP','stdSMAP')
 end
 

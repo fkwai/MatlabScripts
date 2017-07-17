@@ -2,14 +2,15 @@ Data2csv_SMAP_script
 
 scanDatabase('CONUS');
 
-splitSubset_interval_All(4,1)
+splitSubset_interval_All(4,2)
 
 scanDatabase('CONUSs4f1');
 
 
+
 %% subset for LSOIL
-sLst=[2,2,4,4,16,16];
-fLst=[1,2,1,3,1,9];
+sLst=[4];
+fLst=[2];
 for k=1:length(sLst)
     ss=sLst(k);
     ff=fLst(k);
@@ -28,9 +29,25 @@ sLstBCD={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';...
 sLstA={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';};
 sLstB={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';};
 
-splitSubset_shapefile('LSOIL','regionACDs2',sLstACD,'interval',2,'offset',1)
-splitSubset_shapefile('LSOIL','regionBCD',sLstBCD,'interval',2,'offset',1)
-splitSubset_shapefile('LSOIL','regionAs2',sLstA,'interval',2,'offset',1)
-splitSubset_shapefile('LSOIL','regionBs2',sLstB,'interval',2,'offset',1)
+fieldLst={'SOILM_MOS','SOILM_VIC','LOIL_VIC'}
+for k=1:length(fieldLst)
+    fieldName=fieldLst{k}
+    splitSubset_shapefile(fieldName,'regionACDs2',sLstACD,'interval',2,'offset',1)
+    splitSubset_shapefile(fieldName,'regionBCDs2',sLstBCD,'interval',2,'offset',1)
+    splitSubset_shapefile(fieldName,'regionAs2',sLstA,'interval',2,'offset',1)
+    splitSubset_shapefile(fieldName,'regionBs2',sLstB,'interval',2,'offset',1)
+end
 
+
+%%
+sLst={'H:\Kuai\map\State\GA.shp';...
+    'H:\Kuai\map\State\SC.shp';...
+    'H:\Kuai\map\State\NC.shp';};
+splitSubset('GA-SC-NC','shape',2,1,sLst)
+
+sLst={'H:\Kuai\map\State\AZ.shp';};
+splitSubset('AZ','shape',2,1,sLst)
+
+sLst={'H:\Kuai\map\State\NE.shp';};
+splitSubset('NE','shape',2,1,sLst)
 
