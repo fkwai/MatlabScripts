@@ -22,6 +22,8 @@ if strcmp(pcStr,'server')
 	kPath.SMAP_L3='/mnt/sdb1/Database/SMAP/SPL3SMP.004/';
 	kPath.GLDAS='/mnt/sdb1/Database/GLDAS/';
 	kPath.GLDAS_NOAH='/mnt/sdb1/Database/GLDAS/GLDAS_NOAH025_3H.2.1/';
+	kPath.GLDAS_MOS='/mnt/sdb1/Database/GLDAS/GLDAS_MOS025_3H.2.1/';
+	kPath.GLDAS_VIC='/mnt/sdb1/Database/GLDAS/GLDAS_VIC025_3H.2.1/';
 	kPath.NLDAS='/mnt/sdb1/Database/NLDAS/';
 	kPath.NLDAS_SMAP_Mat='/mnt/sdb1/Database/NLDAS/NLDAS_gridSMAP_CONUS_Daily/';
     
