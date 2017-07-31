@@ -9,7 +9,7 @@ epoch=500;
 figFolder='H:\Kuai\rnnSMAP\paper\';
 opt=2;
 unitStr='[-]';
-suffix = '.jpg';
+suffix = '.png';
 
 %% read Data
 dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
@@ -38,16 +38,18 @@ fname=[figFolder,'fig_biasMap_LSTM'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
+
 %% Bias LSTM - NLDAS -> 1b
 plotData=abs(statLSTM{opt}.bias)-abs(statNLDAS{opt}.bias);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='Bias(LSTM) minus Bias(Noah)';
+titleStr='| Bias(LSTM) minus Bias(Noah) |';
 colorRange=[-0.3,0.1];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
 fname=[figFolder,'fig_biasMap_LSTM_NLDAS'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
+
 
 %% Rsq LSTM -> 1c
 plotData=statLSTM{opt}.rsq;
@@ -60,6 +62,7 @@ fname=[figFolder,'fig_RsqMap_LSTM'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
+
 %% Rsq LSTM - NLDAS -> 1d
 plotData=abs(statLSTM{opt}.rsq)-abs(statNLDAS{opt}.rsq);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
@@ -70,6 +73,7 @@ colormap(cmap)
 fname=[figFolder,'fig_RsqMap_LSTM_NLDAS'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
+
 
 %% rmse LSTM -> 1e
 plotData=statLSTM{opt}.rmse;
@@ -82,15 +86,17 @@ fname=[figFolder,'fig_rmseMap_LSTM'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
+
 %% rmse LSTM - NN -> 1f
 plotData=abs(statLSTM{opt}.rmse)-abs(statNN{opt}.rmse);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
 titleStr='RMSE(LSTM) minus RMSE(NN)';
-colorRange=[-0.05,0.05];
+colorRange=[-0.025,0.025];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
 fname=[figFolder,'fig_rmseMap_LSTM_NN'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
+
 
 

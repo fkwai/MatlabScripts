@@ -1,41 +1,46 @@
+outName='CONUSs4f1_new';
+trainName='CONUSs4f1';
+testName='CONUSs4f1';
+epoch=500;
 
-data1=csvread([kPath.DBSMAP_L3_CONUS,'\SMAP.csv']);
-data2=csvread([kPath.DBSMAP_L3_CONUS,'\SOILM.csv']);
-data1(data1==-9999)=nan;
-data2(data2==-9999)=nan;
-data2=data2/100;
+dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
+fileCrd=[dirData,'crd.csv'];
+crd=csvread(fileCrd);
+tTest=367:732;
+shapefile='H:\Kuai\map\USA.shp';
+
+outFolder=[kPath.OutSMAP_L3,outName,kPath.s];
+[yLSTM_train,yLSTM_test]=readRnnPred(outFolder,trainName,testName,epoch);
+[ySMAP_All,ySMAP_stat] = readDatabaseSMAP(trainName,'SMAP');
+[yNOAH_All,yNOAH_stat] = readDatabaseSMAP(trainName,'LSOIL');
+
+ySMAP=ySMAP_All(tTest,:);
+meanSMAP=ySMAP_stat(3);
+stdSMAP=ySMAP_stat(4);
+yLSTM=(yLSTM_test).*stdSMAP+meanSMAP;
+yNOAH=yNOAH_All(tTest,:)./100;
+statLSTM=statCal(yLSTM,ySMAP);
+statNOAH=statCal(yNOAH,ySMAP);
 
 
-crd=csvread([kPath.DBSMAP_L3_CONUS,'\crd.csv']);
-[grid1,xx,yy] = data2grid3d( data1,crd(:,2),crd(:,1));
-[grid2,xx,yy] = data2grid3d( data2,crd(:,2),crd(:,1));
+[gridSMAP,xx,yy] = data2grid3d( ySMAP',crd(:,2),crd(:,1));
+[gridLSTM,xx,yy] = data2grid3d( yLSTM',crd(:,2),crd(:,1));
+[gridNOAH,xx,yy] = data2grid3d( yNOAH',crd(:,2),crd(:,1));
 
 
-
-tsStr(1).grid=grid1;
-tsStr(1).t=1:size(grid1,3);
-tsStr(1).symb='-r';
+tsStr(1).grid=gridSMAP;
+tsStr(1).t=1:size(gridSMAP,3);
+tsStr(1).symb='xk';
 tsStr(1).legendStr='SMAP';
 
+tsStr(2).grid=gridLSTM;
+tsStr(2).t=1:size(gridLSTM,3);
+tsStr(2).symb='-r';
+tsStr(2).legendStr='LSTM';
 
-tsStr(2).grid=grid2;
-tsStr(2).t=1:size(grid2,3);
-tsStr(2).symb='-b';
-tsStr(2).legendStr='NLDAS';
+tsStr(3).grid=gridNOAH;
+tsStr(3).t=1:size(gridNOAH,3);
+tsStr(3).symb='-b';
+tsStr(3).legendStr='NOAH';
 
-
-showGrid( nanmean(grid2,3),[1:length(xx)],[length(yy):-1:1]',1,'tsStr',tsStr)
-
-
-%%
-[xOut,yOut,xStat,yStat] = readDatabaseSMAP2('CONUSs4f1');
-x=zeros(size(xOut))*nan;
-xOut(xOut==-9999)=nan;
-for k=1:size(xOut,3)
-    x(:,:,k)=(xOut(:,:,k)-xStat(3,k))./xStat(4,k);
-end
-
-ind=find(x>1000);
-[jj,ii,kk]=ind2sub(size(x),ind);
-unique(kk)
-
+showGrid(nanmean(gridLSTM,3),[length(yy):-1:1]',[1:length(xx)],1,'tsStr',tsStr,'yRange',[0,0.35])

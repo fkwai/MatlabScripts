@@ -5,10 +5,10 @@ function [f,cmap]=showMap(grid,y,x,varargin)
 % tsStr.grid: a 3D grid with t in 3rd dimension
 % tsStr.symb: symbol of this ts
 
-pnames={'title','shapefile','colorRange','lonLim','latLim','newFig','nLevel','tsStr'};
-dflts={[],[],[0,1],[],[],1,10,[]};
+pnames={'title','shapefile','colorRange','Position','cbTitle','lonLim','latLim','newFig','nLevel','tsStr'};
+dflts={[],[],[0,1],[1,1,800,500],'[-]',[],[],1,10,[]};
 
-[strTitle,shapefile,colorRange,lonLim,latLim,newFig,nLevel,tsStr]=...
+[strTitle,shapefile,colorRange,Position,cbTitle,lonLim,latLim,newFig,nLevel,tsStr]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -20,11 +20,11 @@ if isempty(lonLim)
 end
 
 if newFig==1
-    f=figure('Position',[1,1,1200,650]);
+    f=figure('Position',Position);
 end
 axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
       'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
-      'MapLatlimit', latLim, 'MapLonLimit', lonLim,...
+      'MapLatlimit', latLim, 'MapLonLimit', lonLim,'LabelFormat','none',...
       'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50],'FontSize',16)
 tightmap
 % geoshow(latmesh,lonmesh,grid,'DisplayType','surface');
@@ -57,9 +57,10 @@ end
 if ~isempty(colorRange)
     caxis auto
     clevels =  cellstr(num2str(levels'));
-    clevels = ['None'; clevels]';
-    cb = lcolorbar(clevels,'Location','Horizontal');
-    %set(cb,'position',[0.87 0.25 0.05 0.53])
+    clevels(2:2:end)={''};
+    clevels = [' '; clevels]';
+    cb = lcolorbar(clevels,'Location','Horizontal');  
+    %cb = lcolorbar(clevels,'TitleString',cbTitle);  
 end
 
 

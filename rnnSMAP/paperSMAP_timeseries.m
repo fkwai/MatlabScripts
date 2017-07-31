@@ -1,25 +1,25 @@
 
-% figFolder='H:\Kuai\rnnSMAP\paper\';
-% unitStr='[-]';
-% suffix = '.jpg';
-% 
-% %% pick points
-% global kPath
-% outName='CONUSs4f1_new';
-% trainName='CONUSs4f1';
-% testName='CONUSs4f1';
-% epoch=500;
-% 
-% [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,testName,epoch);
-% statTrain_LSTM=statCal(outTrain.yLSTM,outTrain.ySMAP);
-% statTest_LSTM=statCal(outTest.yLSTM,outTest.ySMAP);
-% statTrain_NLDAS=statCal(outTrain.yGLDAS,outTrain.ySMAP);
-% statTest_NLDAS=statCal(outTest.yGLDAS,outTest.ySMAP);
-% 
-% crd=csvread([kPath.DBSMAP_L3,testName,'\crd.csv']);
-% [rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
-% indSelOrd=[40,100,200,300,362];
-% textStr={'%10','%25','%50','%75','%90'};
+figFolder='H:\Kuai\rnnSMAP\paper\';
+unitStr='[-]';
+suffix = '.eps';
+
+%% pick points
+global kPath
+outName='CONUSs4f1_new';
+trainName='CONUSs4f1';
+testName='CONUSs4f1';
+epoch=500;
+
+[outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,testName,epoch);
+statTrain_LSTM=statCal(outTrain.yLSTM,outTrain.ySMAP);
+statTest_LSTM=statCal(outTest.yLSTM,outTest.ySMAP);
+statTrain_NLDAS=statCal(outTrain.yGLDAS,outTrain.ySMAP);
+statTest_NLDAS=statCal(outTest.yGLDAS,outTest.ySMAP);
+
+crd=csvread([kPath.DBSMAP_L3,testName,'\crd.csv']);
+[rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
+indSelOrd=[40,100,200,300,362];
+textStr={'%10','%25','%50','%75','%90'};
 
 %% plot
 f=figure('Position',[1,1,1600,800]);

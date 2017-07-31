@@ -3,10 +3,10 @@ function showGrid( grid,y,x,cellsize,varargin)
 %   Detailed explanation goes here
 
 %% varargin
-pnames={'titleStr','shapefile','colorRange','lonLim','latLim','newFig','tsStr'};
-dflts={[],[],[],[],[],1,[]};
+pnames={'titleStr','shapefile','colorRange','lonLim','latLim','newFig','tsStr','yRange'};
+dflts={[],[],[],[],[],1,[],[]};
 
-[titleStr,shapefile,colorRange,lonLim,latLim,newFig,tsStr]=...
+[titleStr,shapefile,colorRange,lonLim,latLim,newFig,tsStr,yRange]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -79,6 +79,7 @@ while(~isempty(tsStr))
             ind=~isnan(v);
             plot(t(ind),v(ind),tsStr(k).symb);hold on            
         end
+        ylim(yRange);
         datetick('x');
         strtitle=['long=',num2str(x(ix)),'; lat=',num2str(y(iy)),'; '];
         title(strtitle);

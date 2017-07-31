@@ -2,46 +2,27 @@
 %% plot
 global kPath
 Alphabet=char('A'+(1:26)-1)';
-trainName='hucABHKs4';
-outName1=trainName;
-outName2=[trainName,'_oneModel'];
-outName3=[trainName,'_noModel'];
-epoch=500;
-doPlot=0;
 
-stat='bias';
-switch stat
-    case 'rmse'
-        yRange=[0,0.1];
-        yRangeModel=[0,0.2];
-        yLabelStr='RMSE';
-    case 'bias'
-        yRange=[-0.05,0.05];
-        yRangeModel=[-0.2,0.2];
-        yLabelStr='Bias';
-end
+%caseLst={'ABFL','ABGI','ABGL','ABHK','ACGK','ADFL','BKHL','GHIJ'};
+caseLst={'ABFL','ABGL','BKHL','GHIJ'};
+nCase=length(caseLst);
 
-%%
-nHUC=12;
-for k=1:nHUC+1
+epoch=100;
+for kCase=1:nCase
+    hucLst=caseLst{kCase};
+
+    hucIndLst=double(hucLst)-64;
+    trainName=['huc',hucLst,'s4'];
+    disp(hucLst)
+    nHUC=12;
+    for k=1:nHUC
+        outName1=trainName;
+        outName2=[trainName,'_oneModel'];
+        outName3=[trainName,'_noModel'];
         testName=['huc',Alphabet(k),'s2'];
         
-        [outTrain1,out1,covMethod]=testRnnSMAP_readData(outName1,trainName,testName,epoch);
-        [outTrain2,out2,covMethod]=testRnnSMAP_readData(outName1,trainName,testName,epoch);
-        [outTrain3,out3,covMethod]=testRnnSMAP_readData(outName1,trainName,testName,epoch);
-          
+        [outTrain1,out1,covMethod1]=testRnnSMAP_readData(outName1,trainName,testName,epoch,'timeOpt',3);
+        [outTrain2,out2,covMethod2]=testRnnSMAP_readData(outName2,trainName,testName,epoch,'varLst','varLst_oneModel','timeOpt',3);
+        [outTrain3,out3,covMethod3]=testRnnSMAP_readData(outName3,trainName,testName,epoch,'varLst','varLst_noModel','timeOpt',3);
+    end
 end
-%% Sample Scripts - splitsubset shapefile
-% sLstACD={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';...
-%     'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
-%     'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
-% sLstBCD={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';...
-%     'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
-%     'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
-% sLstA={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';};
-% sLstB={'H:\Kuai\map\physio_shp\rnnSMAP\regionB.shp';};
-% splitSubset('regionACDs2','shape',2,1,sLstACD)
-% splitSubset('regionBCDs2','shape',2,1,sLstBCD)
-% splitSubset('regionAs2','shape',2,1,sLstA)
-% splitSubset('regionBs2','shape',2,1,sLstB)
-%

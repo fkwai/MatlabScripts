@@ -8,12 +8,12 @@ sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;
 
-tab = readtable('H:\Kuai\Data\SoilMoisture\SCAN\nwcc_inventory.csv');
+tab = readtable([kPath.SCAN,kPath.s,'nwcc_inventory_CONUS.csv']);
 latNLDAS=[52.9375:-0.125:25.0625]';
 lonNLDAS=[-124.9375:0.125:-67.0625];
 % remove AK and HI sites
-latLst=tab.lat([18:68,77:end]);
-lonLst=tab.lon([18:68,77:end]);
+latLst=tab.lat;
+lonLst=tab.lon;
 nS=length(latLst);
 iyLst=zeros(nS,1);
 ixLst=zeros(nS,1);
@@ -28,7 +28,7 @@ for k=1:nS
     ixLst(k)=ix;
 end
 
-
+%% read Data
 for iData=1:length(dataLst)
     dataName=dataLst{iData};
     saveFolder=[kPath.NLDAS,'NLDAS_SCAN_Daily',kPath.s,'NLDAS_',dataName,'_Daily',kPath.s];

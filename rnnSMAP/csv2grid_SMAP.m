@@ -3,9 +3,8 @@ function [ grid,xx,yy,t ] = csv2grid_SMAP(dirData,varName)
 % read directory are hard coded as kPath.DBSMAP_L3 
 % mask are hard coded to kPath.maskSMAP_CONUS 
 
-% dirData='H:\Kuai\rnnSMAP\Database\Daily\CONUS\';
+% dirData='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\CONUS';
 % varName='SMAP';
-% maskMat - contains maskMat.mask, maskMat.maskInd. Example: '\SMAP\maskSMAP_CONUS.mat'
 
 fileData=[dirData,varName,'.csv'];
 fileCrd=[dirData,'crd.csv'];
@@ -22,6 +21,20 @@ if ~startsWith(varName,'const_')
 else
     [grid,xx,yy] = data2grid(data,lon,lat);
     t=1;
+end
+
+end
+
+function b = startsWith(s, pat)
+sl = length(s);
+pl = length(pat);
+b = (sl >= pl && strcmp(s(1:pl), pat)) || isempty(pat);
+end
+
+function b = endsWith(s, pat)
+sl = length(s);
+pl = length(pat);
+b = (sl >= pl && strcmp(s(end-pl+1:end), pat)) || isempty(pat);
 end
 
 

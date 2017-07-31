@@ -1,10 +1,19 @@
 
 
 figFolder='H:\Kuai\rnnSMAP\paper\';
-stat='rmse';
-yRange=[0,0.1];
-yLabelStr='RMSE';
-suffix = '.jpg';
+stat='bias';
+switch stat
+    case 'rmse'
+        yRangeT=[0,0.1];
+        yRangeS=[0,0.1];
+        yLabelStr='RMSE';
+    case 'bias'
+        yRangeT=[-0.05,0.05];
+        yRangeS=[-0.05,0.05];
+        yLabelStr='Bias';
+end
+
+suffix = '.eps';
 
 %% temporal test
 global kPath
@@ -14,27 +23,31 @@ testNameT='CONUSs4f1';
 epoch=500;
 
 [outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch);
-statTrain_LSTM=statCal(outTrainT.yLSTM,outTrainT.ySMAP);
-statT_LSTM=statCal(outT.yLSTM,outT.ySMAP);
-statTrain_NLDAS=statCal(outTrainT.yGLDAS,outTrainT.ySMAP);
-statT_NLDAS=statCal(outT.yGLDAS,outT.ySMAP);
-statTrain_LR=statCal(outTrainT.yLR,outTrainT.ySMAP);
-statT_LR=statCal(outT.yLR,outT.ySMAP);
-statTrain_NN=statCal(outTrainT.yNN,outTrainT.ySMAP);
-statT_NN=statCal(outT.yNN,outT.ySMAP);
-statTrain_LRpbp=statCal(outTrainT.yLRpbp,outTrainT.ySMAP);
-statT_LRpbp=statCal(outT.yLRpbp,outT.ySMAP);
-statTrain_NNpbp=statCal(outTrainT.yNNpbp,outTrainT.ySMAP);
-statT_NNpbp=statCal(outT.yNNpbp,outT.ySMAP);
+statSel=statCal(outT.yLSTM,outT.ySMAP);
+ind=find(statSel.rmse<0.1);
+
+statTrain_LSTM=statCal(outTrainT.yLSTM(:,ind),outTrainT.ySMAP(:,ind));
+statT_LSTM=statCal(outT.yLSTM(:,ind),outT.ySMAP(:,ind));
+statTrain_NLDAS=statCal(outTrainT.yGLDAS(:,ind),outTrainT.ySMAP(:,ind));
+statT_NLDAS=statCal(outT.yGLDAS(:,ind),outT.ySMAP(:,ind));
+statTrain_LR=statCal(outTrainT.yLR(:,ind),outTrainT.ySMAP(:,ind));
+statT_LR=statCal(outT.yLR(:,ind),outT.ySMAP(:,ind));
+statTrain_NN=statCal(outTrainT.yNN(:,ind),outTrainT.ySMAP(:,ind));
+statT_NN=statCal(outT.yNN(:,ind),outT.ySMAP(:,ind));
+statTrain_LRpbp=statCal(outTrainT.yLRpbp(:,ind),outTrainT.ySMAP(:,ind));
+statT_LRpbp=statCal(outT.yLRpbp(:,ind),outT.ySMAP(:,ind));
+statTrain_NNpbp=statCal(outTrainT.yNNpbp(:,ind),outTrainT.ySMAP(:,ind));
+statT_NNpbp=statCal(outT.yNNpbp(:,ind),outT.ySMAP(:,ind));
 
 nTrain=length(statTrain_LSTM.(stat));
 nT=length(statT_LSTM.(stat));
 dataLst=[statTrain_LSTM.(stat);statT_LSTM.(stat);...
-    statTrain_NLDAS.(stat);statT_NLDAS.(stat);...
-    statTrain_LR.(stat);statT_LR.(stat);...
-    statTrain_LRpbp.(stat);statT_LRpbp.(stat);...
     statTrain_NN.(stat);statT_NN.(stat);...
-    statTrain_NNpbp.(stat);statT_NNpbp.(stat);];
+    statTrain_LR.(stat);statT_LR.(stat);...
+    statTrain_NNpbp.(stat);statT_NNpbp.(stat);...
+    statTrain_LRpbp.(stat);statT_LRpbp.(stat);...
+    statTrain_NLDAS.(stat);statT_NLDAS.(stat);];
+
 labelLst1=[repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
@@ -42,20 +55,26 @@ labelLst1=[repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);];
 labelLst2=[repmat({'LSTM'},nTrain+nT,1);...
-    repmat({'NOAH'},nTrain+nT,1);...
-    repmat({'LR'},nTrain+nT,1);...
-    repmat({'LRp'},nTrain+nT,1);...
     repmat({'NN'},nTrain+nT,1);...
-    repmat({'NNp'},nTrain+nT,1);];
+    repmat({'LR'},nTrain+nT,1);...
+    repmat({'NNp'},nTrain+nT,1);...
+    repmat({'LRp'},nTrain+nT,1);...
+    repmat({'Noah'},nTrain+nT,1);];
 
 figure('Position',[1,1,800,600])
 bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
     'factorgap',9,'factorseparator',1,'color','rk','Symbol','+','Widths',0.75);
 ylabel(yLabelStr);
-ylim(yRange)
+ylim(yRangeT)
 set(gca,'xtick',1.5:3:19.5)
-set(gca,'xticklabel',{'LSTM','NOAH','LR','LRp','NN','NNp'})
+set(gca,'xticklabel',{'LSTM','NN','LR','NNp','LRp','Noah'})
 set(bh,'LineWidth',2)
+box_vars = findall(gca,'Tag','Box');
+hLegend = legend(box_vars([2,1]), {'Train','Test'},'location','northwest');
+if strcmp(stat,'bias')
+    hline=refline([0,0]);
+    set(hline,'color',[0.2 0.2 0.2],'LineWidth',1.5,'LineStyle','-.')
+end
 
 fname=[figFolder,'\','boxplot_',stat,'_Temporal'];
 fixFigure([],[fname,suffix]);
@@ -69,46 +88,56 @@ testNameS='CONUSs4f2';
 epoch=500;
 
 [outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3);
-statTrain_LSTM=statCal(outTrainS.yLSTM,outTrainS.ySMAP);
-statS_LSTM=statCal(outS.yLSTM,outS.ySMAP);
-statTrain_NLDAS=statCal(outTrainS.yGLDAS,outTrainS.ySMAP);
-statS_NLDAS=statCal(outS.yGLDAS,outS.ySMAP);
-statTrain_LR=statCal(outTrainS.yLR,outTrainS.ySMAP);
-statS_LR=statCal(outS.yLR,outS.ySMAP);
-statTrain_NN=statCal(outTrainS.yNN,outTrainS.ySMAP);
-statS_NN=statCal(outS.yNN,outS.ySMAP);
+statSel=statCal(outS.yLSTM,outS.ySMAP);
+ind=find(statSel.rmse<0.1);
+
+statTrain_LSTM=statCal(outTrainS.yLSTM(:,ind),outTrainS.ySMAP(:,ind));
+statS_LSTM=statCal(outS.yLSTM(:,ind),outS.ySMAP(:,ind));
+statTrain_NLDAS=statCal(outTrainS.yGLDAS(:,ind),outTrainS.ySMAP(:,ind));
+statS_NLDAS=statCal(outS.yGLDAS(:,ind),outS.ySMAP(:,ind));
+statTrain_LR=statCal(outTrainS.yLR(:,ind),outTrainS.ySMAP(:,ind));
+statS_LR=statCal(outS.yLR(:,ind),outS.ySMAP(:,ind));
+statTrain_NN=statCal(outTrainS.yNN(:,ind),outTrainS.ySMAP(:,ind));
+statS_NN=statCal(outS.yNN(:,ind),outS.ySMAP(:,ind));
 
 nTrain=length(statTrain_LSTM.(stat));
 nT=length(statT_LSTM.(stat));
 nS=length(statS_LSTM.(stat));
 
 dataLst=[statTrain_LSTM.(stat);statS_LSTM.(stat);...
-    statTrain_NLDAS.(stat);statS_NLDAS.(stat);...
-    statTrain_LR.(stat);statS_LR.(stat);...    
-    statTrain_NN.(stat);statS_NN.(stat);];
+    statTrain_NN.(stat);statS_NN.(stat);...
+    statTrain_LR.(stat);statS_LR.(stat);...
+    statTrain_NLDAS.(stat);statS_NLDAS.(stat);];
+
 labelLst1=[repmat({'Train'},nTrain,1);repmat({'Test'},nS,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nS,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nS,1);...
     repmat({'Train'},nTrain,1);repmat({'Test'},nS,1);];
 labelLst2=[repmat({'LSTM'},nTrain+nS,1);...
-    repmat({'NOAH'},nTrain+nS,1);...
+    repmat({'NN'},nTrain+nS,1);...
     repmat({'LR'},nTrain+nS,1);...
-    repmat({'NN'},nTrain+nS,1);];
+    repmat({'Noah'},nTrain+nS,1);];
 
 figure('Position',[1,1,800,600])
 bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
     'factorgap',9,'factorseparator',1,'color','rk','Symbol','+','Widths',0.75);
 ylabel(yLabelStr);
-ylim(yRange)
+ylim(yRangeS)
 set(bh,'LineWidth',2)
 set(gca,'xtick',1.7:2.6:15)
-set(gca,'xticklabel',{'LSTM','NOAH','LR','NN'});
-
+set(gca,'xticklabel',{'LSTM','NN','LR','Noah'});
+box_vars = findall(gca,'Tag','Box');
+hLegend = legend(box_vars([2,1]), {'Train','Test'},'location','northwest');
+if strcmp(stat,'bias')
+    hline=refline([0,0]);
+    set(hline,'color',[0.2 0.2 0.2],'LineWidth',1.5,'LineStyle','-.')
+end
 fname=[figFolder,'\','boxplot_',stat,'_Spatial'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);
 
-%% regional hold out
+%% regional hold out - see paperSMAP_region
+%{
 global kPath
 % outName1='regionCase1';
 % outName2='regionCase1_oneModel';
@@ -157,7 +186,7 @@ nT=length(stat1_LSTM.(stat));
 
 dataLst=[statTrain1_LSTM.(stat);stat1_LSTM.(stat);stat2_LSTM.(stat);stat3_LSTM.(stat);...
     statTrain1_GLDAS.(stat);stat1_GLDAS.(stat);stat2_GLDAS.(stat);stat3_GLDAS.(stat);...
-    statTrain1_LR.(stat);stat1_LR.(stat);stat2_LR.(stat);stat3_LR.(stat);...    
+    statTrain1_LR.(stat);stat1_LR.(stat);stat2_LR.(stat);stat3_LR.(stat);...
     statTrain1_NN.(stat);stat1_NN.(stat);stat2_NN.(stat);stat3_NN.(stat);];
 labelLst1=[repmat({'Train'},nTrain,1);repmat({'ensemble'},nT,1);repmat({'one'},nT,1);repmat({'no'},nT,1);...
     repmat({'Train'},nTrain,1);repmat({'ensemble'},nT,1);repmat({'one'},nT,1);repmat({'no'},nT,1);...
@@ -182,6 +211,6 @@ fname=[figFolder,'\','boxplot_',stat,'_Region'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);
 
-
+%}
 
 
