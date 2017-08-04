@@ -1,4 +1,4 @@
-function [yLRpbp,bLst] = regSMAP_LR_solo( xData,yData,varargin)
+function [yLRpbp,bLst,cLst] = regSMAP_LR_solo( xData,yData,varargin)
 % regress using LR to predict SMAP. Solo on each grid. 
 % outFolder='Y:\Kuai\rnnSMAP\output\USsub_anorm\';
 % trainName='indUSsub4';
@@ -10,6 +10,7 @@ bLst=zeros(nField,ngrid);
 doTrain=1;
 if ~isempty(varargin)
     bLst=varargin{1};
+    cLst=varargin{2};
     doTrain=0;
 end
 
@@ -24,12 +25,18 @@ for k=1:ngrid
         tempMat=[xMat,yMat];
         ind=find(~isnan(sum(tempMat,2)));
         xMatFit=xMat(ind,:);
-        yMatFit=yMat(ind);
-        [yfit,R2Temp,b]=regress_kuai(yMatFit,xMatFit);
+        yMatFit=yMat(ind);   
+        [b,FitInfo] = lasso(xMatFit,yMatFit,'Lambda',0.02);
+        c=FitInfo.Intercept;
+
+        %[yfit,R2Temp,b]=regress_kuai(yMatFit,xMatFit);
         bLst(:,k)=b;
+        cLst(:,k)=c;
     end
     b=bLst(:,k);
-    [yfit,R2Temp,b]=regress_kuai(yMat,xMat,b);
+    c=cLst(:,k);
+    yfit=xMat*b+c;
+    %[yfit,R2Temp,b]=regress_kuai(yMat,xMat,b);
     yLRpbp(:,k)=yfit;    
 end
 

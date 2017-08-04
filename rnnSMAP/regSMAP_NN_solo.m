@@ -24,7 +24,7 @@ for k=1:ngrid
     if doTrain
         hiddensize = 100;
         net = fitnet(hiddensize);
-        net.divideParam.trainRatio=1;
+        net.performParam.regularization = 0.002;
         [net,tr] = train(net,xMat',yMat');
         netLst{k}=net;
     end

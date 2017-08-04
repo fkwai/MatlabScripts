@@ -30,6 +30,7 @@ if doTrain==1
 	net.trainParam.epochs=500;
 	net.trainParam.showWindow = true;
 	net.trainParam.showCommandLine = true; 
+    net.performParam.regularization = 0.002;
     [net,tr] = train(net,xMat',yMat','showResources','yes');
 end
 

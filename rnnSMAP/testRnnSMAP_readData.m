@@ -128,8 +128,8 @@ if readCov==1
         outTrain.yLR=LRmat.yLR_train;
         outTest.yLR=LRmat.yLR_test;
     else
-        [yLR_train,b] = regSMAP_LR(xTrain,yTrain);
-        [yLR_test,b2] = regSMAP_LR(xTest,yTest,b);
+        [yLR_train,b,inte] = regSMAP_LR(xTrain,yTrain);
+        [yLR_test,b2,inte2] = regSMAP_LR(xTest,yTest,b,inte);
         outTrain.yLR=yLR_train;
         outTest.yLR=yLR_test;
         save(LRFile,'yLR_train','yLR_test');
@@ -147,8 +147,8 @@ if readCov==1
             outTrain.yLRpbp=LRpbpmat.yLRpbp_train;
             outTest.yLRpbp=LRpbpmat.yLRpbp_test;
         else
-            [yLRpbp_train,bLst] = regSMAP_LR_solo(xTrain,yTrain);
-            [yLRpbp_test,bLst2] = regSMAP_LR_solo(xTest,yTest,bLst);
+            [yLRpbp_train,bLst,cLst] = regSMAP_LR_solo(xTrain,yTrain);
+            [yLRpbp_test,bLst2,cLst2] = regSMAP_LR_solo(xTest,yTest,bLst,cLst);
             outTrain.yLRpbp=yLRpbp_train;
             outTest.yLRpbp=yLRpbp_test;
             save(LRpbpFile,'yLRpbp_train','yLRpbp_test');

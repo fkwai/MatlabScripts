@@ -19,7 +19,7 @@ statTest_NLDAS=statCal(outTest.yGLDAS,outTest.ySMAP);
 crd=csvread([kPath.DBSMAP_L3,testName,'\crd.csv']);
 [rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
 indSelOrd=[40,100,200,300,362];
-textStr={'%10','%25','%50','%75','%90'};
+textStr={'10%','25%','50%','75%','90%'};
 
 %% plot
 f=figure('Position',[1,1,1600,800]);
@@ -42,10 +42,10 @@ for k=1:5
     elseif col==2
         set(gca,'XTick',[datenum(2015,[7:3:12]',1);datenum(2016,[1:3:12]',1);datenum(2017,[1:3:4]',1)]);
     end
-    datetick('x','mm/yy','keepticks')   
+    datetick('x','mm/yy','keepticks')
     maxY=max([v1;v2;v3]);
-    minY=min([v1;v2;v3]);
-    ylim([max(0,minY),maxY+0.05])
+    minY=max(0,min([v1;v2;v3]));
+    ylim([minY,minY+(maxY-minY)*1.15])
     xlim([tnum(1),tnum(end)])
     
     px0=0.05+0.48*(col-1);
@@ -53,7 +53,9 @@ for k=1:5
     width=0.45;
     heigth=0.25;
     set(gca,'Position',[px0,py0,width,heigth])
-    text(tnum(1)+20,maxY,textStr{k},'fontSize',16,'EdgeColor','k','Margin',6)
+    text(tnum(1)+20,maxY,textStr{k},'fontSize',18,'EdgeColor','k','Margin',6)
+    text(tnum(366)-70,maxY,'Train','fontSize',18,'Margin',6)
+    text(tnum(367)+15,maxY,'Test','fontSize',18,'Margin',6)
 end
 
 subplot(3,2,6)
@@ -75,8 +77,8 @@ for kk=1:length(shape)
 end
 for k=1:5
     ind=indSelOrd(k);
-    plot(crd(ind,2),crd(ind,1),'r*','LineWidth',2);hold on
-    text(crd(ind,2),crd(ind,1)-2,textStr{k},'fontSize',14);hold on
+    plot(crd(ind,2),crd(ind,1),'r*','LineWidth',3,'MarkerSize',15);hold on
+    text(crd(ind,2),crd(ind,1)-3,textStr{k},'fontSize',24);hold on
 end
 xlim([-125,-66])
 ylim([25,50]);
@@ -86,6 +88,11 @@ set(gca,'xTick',[],'yTick',[])
 hold off
 leg=legend(legItem,'SMAP','LSTM','Noah');
 set(leg,'Position',[px0-0.09,py0+0.05,0.08,0.15]);
+
+axes( 'Position', [0, 0.96, 1, 0.05] ) ;
+set(gca,'visible','off')
+text( 0.5, 0, 'Temporal Generalization Test for Randomly Selected Pixels',...
+    'FontSize',20,'HorizontalAlignment','Center','VerticalAlignment', 'Bottom') ;
 
 fname=[figFolder,'\','timeSeries'];
 fixFigure([],[fname,suffix]);

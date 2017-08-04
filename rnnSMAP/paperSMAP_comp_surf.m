@@ -17,12 +17,12 @@ suffix = '.eps';
 
 %% temporal test
 global kPath
-outName='CONUSs4f1_new';
+outName='CONUSs4f1_surf';
 trainName='CONUSs4f1';
 testNameT='CONUSs4f1';
 epoch=500;
 
-[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst_NOAH');
+[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst_NOAH_surf');
 statSel=statCal(outT.yLSTM,outT.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -77,18 +77,19 @@ if strcmp(stat,'bias')
 end
 title([yLabelStr,' of Temporal Generalization Test'])
 
-fname=[figFolder,'\','boxplot_',stat,'_Temporal'];
-% fixFigure([],[fname,suffix]);
-% saveas(gcf, [fname]);
+%fname=[figFolder,'\','boxplot_',stat,'_Temporal'];
+fname=[figFolder,'\','boxplot_surf_',stat,'_Temporal'];
+fixFigure([],[fname,suffix]);
+saveas(gcf, [fname]);
 
 %% spatial test
 global kPath
-outName='CONUSs4f1_new';
+outName='CONUSs4f1_surf';
 trainName='CONUSs4f1';
 testNameS='CONUSs4f2';
 epoch=500;
 
-[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst_NOAH');
+[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst_NOAH_surf');
 statSel=statCal(outS.yLSTM,outS.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -133,11 +134,12 @@ if strcmp(stat,'bias')
     hline=refline([0,0]);
     set(hline,'color',[0.2 0.2 0.2],'LineWidth',1.5,'LineStyle','-.')
 end
-title([yLabelStr,' of Regular Spatial Generalization Test'])
+title([yLabelStr,' of Spatial Generalization Test'])
 
-fname=[figFolder,'\','boxplot_',stat,'_Spatial'];
-% fixFigure([],[fname,suffix]);
-% saveas(gcf, [fname]);
+fname=[figFolder,'\','boxplot_surf_',stat,'_Spatial'];
+
+fixFigure([],[fname,suffix]);
+saveas(gcf, [fname]);
 
 %% regional hold out - see paperSMAP_region
 %{

@@ -9,7 +9,7 @@ epoch=500;
 figFolder='H:\Kuai\rnnSMAP\paper\';
 opt=2;
 unitStr='[-]';
-suffix = '.png';
+suffix = '.eps';
 
 %% read Data
 dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
@@ -30,8 +30,8 @@ statNN{2}=statCal(outTest.yNN,outTest.ySMAP);
 %% Bias LSTM -> 1a
 plotData=statLSTM{opt}.bias;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='Bias Between SMAP and LSTM Predictions';
-colorRange=[-0.1,0.1];
+titleStr='Bias(LSTM)';
+colorRange=[-0.05,0.05];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
 fname=[figFolder,'fig_biasMap_LSTM'];
@@ -54,7 +54,7 @@ saveas(gcf, fname);
 %% Rsq LSTM -> 1c
 plotData=statLSTM{opt}.rsq;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='R^2 Between SMAP and LSTM Predictions';
+titleStr='R^2(LSTM)';
 colorRange=[0,1];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
@@ -78,7 +78,7 @@ saveas(gcf, fname);
 %% rmse LSTM -> 1e
 plotData=statLSTM{opt}.rmse;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='RMSE Between SMAP and LSTM Predictions';
+titleStr='RMSE(LSTM)';
 colorRange=[0,0.1];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
