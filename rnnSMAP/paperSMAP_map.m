@@ -9,7 +9,7 @@ epoch=500;
 figFolder='H:\Kuai\rnnSMAP\paper\';
 opt=2;
 unitStr='[-]';
-suffix = '.eps';
+suffix = '.jpg';
 
 %% read Data
 dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
