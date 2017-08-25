@@ -12,8 +12,6 @@ maskSMAP=load([kPath.SMAP,'maskSMAP_CONUS.mat']);
 ny=length(maskSMAP.lat);
 nx=length(maskSMAP.lon);
 
-global kPath
-
 for iData=1:length(dataLst)
 	dataName=dataLst{iData};
 	saveFolder=[kPath.NLDAS,'NLDAS_gridSMAP_CONUS_Daily',kPath.s,'NLDAS_',dataName,'_Daily',kPath.s];
