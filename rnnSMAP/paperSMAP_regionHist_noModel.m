@@ -39,13 +39,13 @@ for k=1:length(caseSel)
     nTest=length(biasLSTM);
     nTrain=length(biasModel);
 
-    dataLstBias=[dataLstBias;biasLSTM;biasNN;biasModel;biasDiff;];
-    dataLstRsq=[dataLstRsq;rsqLSTM;rsqNN;rsqModel;rsqDiff;];
+    dataLstBias=[dataLstBias;biasLSTM;biasLSTM_noModel;biasNN;biasModel;biasDiff;];
+    dataLstRsq=[dataLstRsq;rsqLSTM;rsqLSTM_noModel;rsqNN;rsqModel;rsqDiff;];
     
     labelLst1=[labelLst1;...
-        repmat({'LSTM_Noah'},nTest,1);...
+        repmat({'LSTM_Noah'},nTest,1);repmat({'LSTM_noModel'},nTest,1);...
         repmat({'NN'},nTest,1);repmat({'Noah'},nTrain,1);repmat({'Diff'},nTest,1);];
-    labelLst2=[labelLst2;repmat(caseLst(indCase),nTest*3+nTrain,1);];
+    labelLst2=[labelLst2;repmat(caseLst(indCase),nTest*4+nTrain,1);];
 end
 
 subplot(3,1,1)
@@ -94,7 +94,7 @@ xlabel('Bias')
 ylabel('Fraction of pixels in bin')
 legend('C1','C2','C3','C4')
 
-fname=[figFolder,'\','regionHist'];
+fname=[figFolder,'\','regionHist_noModel'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);
 

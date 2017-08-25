@@ -44,7 +44,7 @@ statNOAH=statCal(yNOAH,ySMAP);
 stat='rsq';
 plotData=statNOAH.(stat);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='R^2(NOAH)';
+titleStr='R^2(Noah)';
 colorRange=[0,1];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
@@ -55,7 +55,7 @@ saveas(gcf, fname);
 stat='bias';
 plotData=statNOAH.(stat);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='Bias(NOAH)';
+titleStr='Bias(Noah)';
 colorRange=[-0.15,0.15];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
@@ -63,3 +63,30 @@ fname=[figFolder,'fig_biasMap_NOAH'];
 fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
+%% 3 SMAP quality flag
+trainName='CONUS';
+dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
+fileCrd=[dirData,'crd.csv'];
+fileSMAP=[dirData,'SMAP.csv'];
+crd=csvread(fileCrd);
+
+[yData_All,yData_stat] = readDatabaseSMAP(trainName,'flag_qualRec');
+[ySMAP_All,ySMAP_stat] = readDatabaseSMAP(trainName,'SMAP');
+yData_All(isnan(ySMAP_All))=nan;
+plotData=nanmean(yData_All',2);
+[gridData,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+titleStr='Fraction of SMAP Recommand Quality';
+shapefile='H:\Kuai\map\USA.shp';
+
+temp=parula(22);
+cmap=temp(10:end-1,:);
+cmap(1,:)=[1,1,1];
+
+[h,cmap]=showMap(1-gridData,yy,xx,'colorRange',[0,1],'shapefile',shapefile,...
+    'title',titleStr,'Position',[1,1,1600,1000],'cmap',cmap);
+colormap(cmap)
+
+
+fname=[figFolder,'fig_sup_qualFlag'];
+fixFigure(gcf,[fname,suffix]);
+saveas(gcf, fname);
