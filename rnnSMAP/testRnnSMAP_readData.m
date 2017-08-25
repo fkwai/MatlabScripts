@@ -33,18 +33,18 @@ if readData==1
     tic
     if sameRegion
         [xOut,yOut,xStat,yStat]=readDatabaseSMAP_All(testName,...
-            'varLstName',varLstName,'varConstLstName',varConstLstName);
+            'var',varLstName,'varC',varConstLstName);
         xTrain=xOut(tTrain,:,:);
         yTrain=yOut(tTrain,:);
         xTest=xOut(tTest,:,:);
         yTest=yOut(tTest,:);
     else
         [xTrain,yTrain,xStat,yStat]=readDatabaseSMAP_All(trainName,...
-            'varLstName',varLstName,'varConstLstName',varConstLstName);
+            'var',varLstName,'varC',varConstLstName);
         xTrain=xTrain(tTrain,:,:);
         yTrain=yTrain(tTrain,:);
         [xTest,yTest,xStatTest,yStatTest]=readDatabaseSMAP_All(testName,...
-            'varLstName',varLstName,'varConstLstName',varConstLstName);
+            'var',varLstName,'varC',varConstLstName);
         xTest=xTest(tTest,:,:);
         yTest=yTest(tTest,:);
     end
@@ -107,7 +107,7 @@ if exist(LSTMmatFile,'file')
     outTrain.yLSTM=LSTMmat.yLSTM_train;
     outTest.yLSTM=LSTMmat.yLSTM_test;
 else
-    [dataTrain,dataTest]=readRnnPred(outFolder,trainName,testName,iter);
+    [dataTrain,dataTest]=readRnnPred(outName,trainName,testName,iter,timeOpt);
     %yLSTM_train=(dataTrain+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
     %yLSTM_test=(dataTest+1)./2*(ubSMAP-lbSMAP)+lbSMAP;
     yLSTM_train=(dataTrain).*stdSMAP+meanSMAP;
@@ -169,6 +169,7 @@ if readCov==1
     else
         if exist(netFile,'file')
             load(netFile);
+            disp('loading existing NN')
             [yNN_train,net] = regSMAP_NN(xTrain,yTrain,net);
         else
             [yNN_train,net] = regSMAP_NN(xTrain,yTrain);

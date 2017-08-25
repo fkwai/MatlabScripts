@@ -22,7 +22,7 @@ for k=1:ngrid
     
     %% regress and forward
     if doTrain
-        hiddensize = 100;
+        hiddensize = 30;
         net = fitnet(hiddensize);
         net.performParam.regularization = 0.002;
         [net,tr] = train(net,xMat',yMat');

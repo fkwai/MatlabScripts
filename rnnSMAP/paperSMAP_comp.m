@@ -8,12 +8,12 @@ fsize=16
 %% load data
 % temporal
 global kPath
-outName='CONUSs4f1_new';
-trainName='CONUSs4f1';
-testNameT='CONUSs4f1';
+outName='CONUSv4f1';
+trainName='CONUSv4f1';
+testNameT='CONUSv4f1';
 epoch=500;
 
-[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst_NOAH');
+[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst');
 statSel=statCal(outT.yLSTM,outT.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -31,12 +31,12 @@ statTtrain_NNpbp=statCal(outTrainT.yNNpbp,outTrainT.ySMAP);
 statT_NNpbp=statCal(outT.yNNpbp(:,ind),outT.ySMAP(:,ind));
 
 % spatial
-outName='CONUSs4f1_new';
-trainName='CONUSs4f1';
-testNameS='CONUSs4f2';
+outName='CONUSv4f1';
+trainName='CONUSv4f1';
+testNameS='CONUSv4f2';
 epoch=500;
 
-[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst_NOAH');
+[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst');
 statSel=statCal(outS.yLSTM,outS.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -163,7 +163,7 @@ for k=1:length(statLst)
     set(gca,'Position',[0.65,0.1+(3-k)*0.3,0.275,0.25])
 end
 
-fname=[figFolder,'\','boxplot_All'];
+fname=[figFolder,'\','boxplot_All_new'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);
 

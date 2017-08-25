@@ -1,7 +1,12 @@
-datafolder='E:\Kuai\SSRS\data\';
-mat1=load([datafolder,'py_selforward_mB_4949.mat']);
-mat2=load([datafolder,'py_selbackward_mB_4949.mat']);
-load([datafolder,'dataset_mB_4949.mat'],'field')
+% datafolder='H:\Kuai\SSRS\data\';
+% mat1=load([datafolder,'py_selforward_mB_4949.mat']);
+% mat2=load([datafolder,'py_selbackward_mB_4949.mat']);
+% load([datafolder,'dataset_mB_4949.mat'],'field')
+
+datafolder='H:\Kuai\SSRS\dataRev\';
+mat1=load([datafolder,'py_selforward_rmDD_4641.mat']);
+mat2=load([datafolder,'py_selbackward_rmDD_4641.mat']);
+load([datafolder,'dataset_rmDD_4641.mat'],'field')
 field=fieldNameChange(field(1:52));
 
 figure('Position',[0,0,1200,400])

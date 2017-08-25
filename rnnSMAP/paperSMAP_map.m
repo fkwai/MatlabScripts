@@ -1,9 +1,9 @@
 
 %% arguments
 global kPath
-outName='CONUSs4f1_new';
-trainName='CONUSs4f1';
-testName='CONUSs4f1';
+outName='CONUSv4f1';
+trainName='CONUSv4f1';
+testName='CONUSv4f1';
 epoch=500;
 
 figFolder='H:\Kuai\rnnSMAP\paper\';

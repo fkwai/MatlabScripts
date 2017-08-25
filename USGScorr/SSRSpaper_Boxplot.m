@@ -22,14 +22,13 @@
 % 
 
 % mB
-figfolder='E:\Kuai\SSRS\paper\mB\';
-usgsCorrMatfile='E:\Kuai\SSRS\data\usgsCorr_mB_4949.mat';
-shapefile='E:\Kuai\SSRS\data\gages_mB_4949.shp';
-divfile='E:\Kuai\SSRS\data\division_mB_4949.mat';
-datafile='E:\Kuai\SSRS\data\dataset_mB_4949.mat';
-pydistfile='E:\Kuai\SSRS\data\py_dist_mB_4949';
-pypcafile='E:\Kuai\SSRS\data\py_pca_mB_4949';
-predind=[46, 11, 8, 50, 41, 2, 22, 29]+1;
+figfolder='H:\Kuai\SSRS\paperRev\rmDD\';
+usgsCorrMatfile='H:\Kuai\SSRS\dataRev\usgsCorr_rmDD_4641.mat';
+shapefile='H:\Kuai\SSRS\dataRev\gages_rmDD_4641.shp';
+divfile='H:\Kuai\SSRS\dataRev\division_rmDD_4641.mat';
+datafile='H:\Kuai\SSRS\dataRev\dataset_rmDD_4641.mat';
+pydistfile='H:\Kuai\SSRS\dataRev\py_dist_rmDD_4641';
+pypcafile='H:\Kuai\SSRS\dataRev\py_pca_rmDD_4641';
 global fsize
 
 load(pydistfile)

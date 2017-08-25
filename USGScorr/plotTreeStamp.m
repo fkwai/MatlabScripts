@@ -5,8 +5,10 @@ function plotTreeStamp(treeMatFile,varargin)
 % whole CONUS but for a given region. 
 
 %% predefine dataset used
-datafolder='E:\Kuai\SSRS\data\';
-dataname='mB_4949';
+% datafolder='H:\Kuai\SSRS\data\';
+% dataname='mB_4949';
+datafolder='H:\Kuai\SSRS\dataRev\';
+dataname='rmDD_4641';
 
 %shapefile=[datafolder,'gages_',dataname,'.shp'];
 distMat=load([datafolder,'py_dist_',dataname,'.mat']);
@@ -48,13 +50,13 @@ dlmwrite([folder_map,'childrenTab.csv'],childtab,'delimiter',',','newline', 'pc'
 
 suffix = '.eps';
 global fsize
-fsize=18;
+fsize=20;
 
 %% 1. bar stamp
-strsize=18;
+strsize=20;
 for i=1:length(treeMat.nodeind)
     i
-    f=figure('Position',[100,600,300,180]);
+    f=figure('Position',[100,600,240,180]);
     ind=treeMat.nodeind{i}+1;
     ind_train=treeMat.ind_train(treeMat.nodeind_train{i}+1)+1;
     ind_test=treeMat.ind_test(treeMat.nodeind_test{i}+1)+1;
@@ -75,7 +77,7 @@ for i=1:length(treeMat.nodeind)
     
     h=barh([prc_train';prc_test'],0.8,'stacked');
     xlim([0,100]);ylim([0.5,2.4])
-    set(gca,'Ytick',[],'YtickLabel','')
+    set(gca,'Ytick',[],'YtickLabel','','Xtick',[0:20:100],'XtickLabel','')
     
     str1=['node ',num2str(i-1)];
     str2=[num2str(length(ind_train)),'/',num2str(length(ind_test)),'  ',...
@@ -123,7 +125,7 @@ h=barh([prc_train';prc_test'],0.8,'stacked');
 xlim([0,100]);ylim([0.5,2.4])
 set(gca,'Xtick',[0:20:80])
 set(gca,'Ytick',[1,2],'YtickLabel',{'Train','Test'})
-legend('#0','#1','#2','#3','#4','#5','location','northeastoutside')
+legend('#1','#2','#3','#4','#5','#6','location','northeastoutside')
 
 str1=['node #'];
 str2=[' #Training Set / #Test Set     Var(Train) / Var(Test)'];

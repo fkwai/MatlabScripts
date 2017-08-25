@@ -22,14 +22,14 @@
 % end
 
 % mB
-figfolder='E:\Kuai\SSRS\paper\mB\';
-usgsCorrMatfile='E:\Kuai\SSRS\data\usgsCorr_mB_4949.mat';
-shapefile='E:\Kuai\SSRS\data\gages_mB_4949.shp';
-divfile='E:\Kuai\SSRS\data\division_mB_4949.mat';
-datafile='E:\Kuai\SSRS\data\dataset_mB_4949.mat';
-pydistfile='E:\Kuai\SSRS\data\py_dist_mB_4949';
-pypcafile='E:\Kuai\SSRS\data\py_pca_mB_4949';
-predind=[46, 11, 8, 50, 41, 2, 22, 29]+1;
+figfolder='H:\Kuai\SSRS\paperRev\rmDD\';
+usgsCorrMatfile='H:\Kuai\SSRS\dataRev\usgsCorr_rmDD_4641.mat';
+shapefile='H:\Kuai\SSRS\dataRev\gages_rmDD_4641.shp';
+divfile='H:\Kuai\SSRS\dataRev\division_rmDD_4641.mat';
+datafile='H:\Kuai\SSRS\dataRev\dataset_rmDD_4641.mat';
+pydistfile='H:\Kuai\SSRS\dataRev\py_dist_rmDD_4641';
+pypcafile='H:\Kuai\SSRS\dataRev\py_pca_rmDD_4641';
+
 global fsize
 
 
@@ -48,6 +48,7 @@ shpUSA=shaperead('Y:\Maps\USA.shp');
 X=[shape(indvalid+1).X];
 Y=[shape(indvalid+1).Y];
 f=figure('Position',[1,1,1500,1000]);
+
 for i=1:6
     subplot(3,2,i)
     ind=find(label==i-1);
@@ -55,12 +56,12 @@ for i=1:6
     %    scatter(X,Y,[],dist(:,i),'filled');hold on
     scatter(X(indn),Y(indn),[],dist(indn,i),'d','filled');hold on
     scatter(X(ind),Y(ind),[],dist(ind,i),'s','filled');hold on
-    fixColorAxis([],[0,3],5,'distance')
+    fixColorAxis([],[0,3],5,'distance','%0.2f|')
     xlim([-130,-65])
     ylim([25,50])
     colormap(flipud(jet))
     colorbar('off')
-    title(['Distance to Center ',num2str(i-1)])
+    title(['(',char('a'+i-1),')',' Distance to Center #',num2str(i)])
     axis equal
     for j=1:length(shpUSA)
         plot(shpUSA(j).X,shpUSA(j).Y,'--k')
@@ -70,7 +71,7 @@ for i=1:6
 end
 h=colorbar('Position', [0.935,0.15,0.02,0.7]);
     hold off
-fixColorAxis(h,[0,3],5,'distance')
+fixColorAxis(h,[0,3],5,'distance','%0.2f|')
 title(h, 'distance')
 
 suffix = '.eps';

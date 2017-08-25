@@ -19,7 +19,7 @@ field{45}='Amp/P';
 field{46}='\gamma';
 field{47}='acf';
 field{50}='Snow/P';
-field{51}='SimIndex';
+field{51}='\xi';
 
 
 

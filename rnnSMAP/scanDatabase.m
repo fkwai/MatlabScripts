@@ -1,8 +1,9 @@
-function scanDatabase(dbName)
+function scanDatabase(dbName,writeVar)
 % this function will scan given database and write varLst.csv and varConstLst.csv
 
 global kPath
 dirDB=[kPath.DBSMAP_L3,dbName,kPath.s];
+dirVar=[kPath.DBSMAP_L3,'Variable',kPath.s];
 
 varLst={};
 varConstLst={};
@@ -31,13 +32,16 @@ for k=1:length(fileLst)
     end
 end
 
-fid=fopen([dirDB,'varLst.csv'],'w');
-fprintf(fid,'%s\n',varLst{:});
-fclose(fid);
+if writeVar==1
+    fid=fopen([dirVar,'varLst.csv'],'w');
+    fprintf(fid,'%s\n',varLst{:});
+    fclose(fid);
+    
+    fid=fopen([dirVar,'varConstLst.csv'],'w');
+    fprintf(fid,'%s\n',varConstLst{:});
+    fclose(fid);
+end
 
-fid=fopen([dirDB,'varConstLst.csv'],'w');
-fprintf(fid,'%s\n',varConstLst{:});
-fclose(fid);
 end
 
 function b = startsWith(s, pat)

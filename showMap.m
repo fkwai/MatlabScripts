@@ -5,10 +5,10 @@ function [f,cmap]=showMap(grid,y,x,varargin)
 % tsStr.grid: a 3D grid with t in 3rd dimension
 % tsStr.symb: symbol of this ts
 
-pnames={'title','shapefile','colorRange','Position','cbTitle','lonLim','latLim','newFig','nLevel','tsStr'};
-dflts={[],[],[0,1],[1,1,800,500],'[-]',[],[],1,10,[]};
+pnames={'title','shapefile','colorRange','Position','cbTitle','lonLim','latLim','newFig','nLevel','tsStr','cmap'};
+dflts={[],[],[0,1],[1,1,800,500],'[-]',[],[],1,10,[],[]};
 
-[strTitle,shapefile,colorRange,Position,cbTitle,lonLim,latLim,newFig,nLevel,tsStr]=...
+[strTitle,shapefile,colorRange,Position,cbTitle,lonLim,latLim,newFig,nLevel,tsStr,cmap]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -31,14 +31,17 @@ tightmap
 %geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
 
 levels = linspace(colorRange(1),colorRange(2), nLevel+1);
-cmap = jet(length(levels) + 1);
-cmap(1, :,:) = [1 1 1];
+
+if isempty(cmap)
+    cmap = jet(length(levels)+1);
+    cmap(1, :,:) = [1 1 1];
+end
 colormap(cmap)
 Z = zeros(size(grid));
 Z(grid < levels(1)) = 1;
-Z(grid > levels(end)) = length(levels);
+Z(grid >= levels(end)) = length(levels);
 for k = 1:length(levels) - 1
-    Z(grid >= levels(k) & grid <= levels(k+1)) = double(k) ;
+    Z(grid >= levels(k) & grid < levels(k+1)) = double(k) ;
 end
 geoshow(latmesh,lonmesh,uint8(Z),cmap);
 
