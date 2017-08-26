@@ -30,13 +30,14 @@ for yr=yLst
             
             % average to daily
             dataDaily=nanmean(dataTemp,3);
+			dataNLDAS(:,:,iT,:)=dataDaily;
             toc
             
         end
         
         % write output
         for k=1:length(field)
-            data=dataDaily(:,:,:,k);
+            data=dataNLDAS(:,:,:,k);
             tnum=tLst;
             fieldName=field{k};
             save([saveFolder,fieldName,'.mat'],'data','tnum','lat','lon','-v7.3')
