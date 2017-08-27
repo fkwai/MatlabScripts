@@ -2,7 +2,7 @@
 % default to convert all fields. see the -1 line 27
 
 global kPath
-yLst=2015:2016;
+yLst=2010:2014;
 dataLst={'FORA','FORB','NOAH'};
 
 for yr=yLst

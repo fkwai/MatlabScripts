@@ -32,7 +32,10 @@ if strcmp(pcStr,'server')
 	kPath.GLDAS_NOAH='/mnt/sdb1/Database/GLDAS/GLDAS_NOAH025_3H.2.1/';
 	kPath.GLDAS_MOS='/mnt/sdb1/Database/GLDAS/GLDAS_MOS025_3H.2.1/';
 	kPath.GLDAS_VIC='/mnt/sdb1/Database/GLDAS/GLDAS_VIC025_3H.2.1/';
+
 	kPath.NLDAS='/mnt/sdb1/Database/NLDAS/';
+	kPath.NLDAS_Daily='/mnt/sdb1/Database/NLDAS/NLDAS_Daily/';
+	kPath.DBNLDAS='/mnt/sdb1/rnnSMAP/Database_NLDASgrid/';
 	kPath.NLDAS_SMAP_Mat='/mnt/sdb1/Database/NLDAS/NLDAS_gridSMAP_CONUS_Daily/';
     
     kPath.maskSMAP_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS.mat';
