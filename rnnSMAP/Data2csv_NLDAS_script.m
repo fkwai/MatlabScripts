@@ -5,11 +5,11 @@
 global kPath
 
 %% initial Database
-DBname='1516v12f1'
+DBname='1014v12f1'
 dirDatabase=[kPath.DBNLDAS,DBname,kPath.s];
 maskMat=load([kPath.NLDAS,'maskNLDASv12f1.mat']);
-sd=20150101;
-ed=20161231;
+sd=20100101;
+ed=20141231;
 mkdir(dirDatabase);
 
 crdFile=[dirDatabase,'crd.csv'];

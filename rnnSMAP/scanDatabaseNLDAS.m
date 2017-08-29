@@ -1,4 +1,4 @@
-function scanDatabase(dbName,writeVar)
+function scanDatabaseNLDAS(dbName,writeVar)
 % this function will scan given database and write varLst.csv and varConstLst.csv
 
 global kPath
