@@ -88,7 +88,6 @@ if length(xSize)==1 && length(ySize)==1
                     areaMat=(m2Mesh-m1Mesh).*(n1Mesh-n2Mesh);
                     nanMat=~isnan(temp);
                     areaMean=sum(sum(areaMat.*nanMat))/sum(sum(nanMat));
-                    tempArea=(temp.*areaMat)./areaMean;
                     
 %                     [m1Vec,n1Vec]=meshgrid(m1(ix),n1(iy));
 %                     m1Vec=m1Vec(:);n1Vec=n1Vec(:);
@@ -100,11 +99,12 @@ if length(xSize)==1 && length(ySize)==1
                     
                     switch oper
                         case 'mean'
+                            tempArea=(temp.*areaMat)./areaMean;
                             vq(j,i)=nanmean(tempArea(:));
                         case 'max'
-                            vq(j,i)=nanmax(tempArea(:));
+                            vq(j,i)=nanmax(temp(:));
                         case 'mode'
-                            vq(j,i)=mode(tempArea(:));
+                            vq(j,i)=mode(temp(:));
                     end
                 end
             end

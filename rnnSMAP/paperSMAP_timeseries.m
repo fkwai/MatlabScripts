@@ -5,9 +5,9 @@ suffix = '.eps';
 
 %% pick points
 global kPath
-outName='CONUSs4f1_new';
-trainName='CONUSs4f1';
-testName='CONUSs4f1';
+outName='CONUSv4f1';
+trainName='CONUSv4f1';
+testName='CONUSv4f1';
 epoch=500;
 
 [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,testName,epoch);
@@ -16,10 +16,14 @@ statTest_LSTM=statCal(outTest.yLSTM,outTest.ySMAP);
 statTrain_NLDAS=statCal(outTrain.yGLDAS,outTrain.ySMAP);
 statTest_NLDAS=statCal(outTest.yGLDAS,outTest.ySMAP);
 
+
 crd=csvread([kPath.DBSMAP_L3,testName,'\crd.csv']);
-[rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
-indSelOrd=[40,100,200,300,362];
+%[rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
+[rmseOrd,indOrd]=sort(-statTest_LSTM.rsq);
+indSelOrd=indOrd([41,101,200,296,360]);
 textStr={'10%','25%','50%','75%','90%'};
+
+load('H:\Kuai\rnnSMAP\ARMA\yARMApbp_CONUSv4f1.mat')
 
 %% plot
 f=figure('Position',[1,1,1600,800]);
@@ -31,12 +35,16 @@ for k=1:5
     tnum=datenumMulti(20150401):datenumMulti(20170401);
     v1=[outTrain.ySMAP(:,ind);outTest.ySMAP(:,ind)];
     v2=[outTrain.yLSTM(:,ind);outTest.yLSTM(:,ind)];
-    v3=[outTrain.yGLDAS(:,ind);outTest.yGLDAS(:,ind)];
+    v4=[outTrain.yGLDAS(:,ind);outTest.yGLDAS(:,ind)];
+    v3=yARMA(:,ind);
     
     plot([tnum(367),tnum(367)],[0,1],'--k','LineWidth',2);hold on
-    plot(tnum,v1,'or','LineWidth',2);hold on
+        
+    plot(tnum,v4,'m--','LineWidth',2);hold on
+    plot(tnum,v3,'k-','LineWidth',2);hold on
     plot(tnum,v2,'b-','LineWidth',2);hold on
-    plot(tnum,v3,'k-','LineWidth',2);hold off
+    plot(tnum,v1,'or','LineWidth',1);hold off
+
     if col==1
         set(gca,'XTick',[datenum(2015,[4:3:12]',1);datenum(2016,[1:3:12]',1);datenum(2017,[1:3:4]',1)]);
     elseif col==2
@@ -71,6 +79,8 @@ legItem=[];
 legItem(1)=plot([0,0],[1,1],'ro','LineWidth',2);hold on
 legItem(2)=plot([0,0],[1,1],'-b','LineWidth',2);hold on
 legItem(3)=plot([0,0],[1,1],'-k','LineWidth',2);hold on
+legItem(4)=plot([0,0],[1,1],'--m','LineWidth',2);hold on
+
 shape=shaperead('H:\Kuai\map\USA.shp');
 for kk=1:length(shape)
     plot(shape(kk).X,shape(kk).Y,'b');hold on
@@ -86,7 +96,7 @@ axis equal
 
 set(gca,'xTick',[],'yTick',[])
 hold off
-leg=legend(legItem,'SMAP','LSTM','Noah');
+leg=legend(legItem,'SMAP','LSTM','ARMA','Noah');
 set(leg,'Position',[px0-0.09,py0+0.05,0.08,0.15]);
 
 axes( 'Position', [0, 0.96, 1, 0.05] ) ;
@@ -94,6 +104,6 @@ set(gca,'visible','off')
 text( 0.5, 0, 'Temporal Generalization Test for Randomly Selected Pixels',...
     'FontSize',20,'HorizontalAlignment','Center','VerticalAlignment', 'Bottom') ;
 
-fname=[figFolder,'\','timeSeries'];
+fname=[figFolder,'\','timeSeries_ARMA_rsq'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);

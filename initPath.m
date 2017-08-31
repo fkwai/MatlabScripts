@@ -62,6 +62,7 @@ if strcmp(pcStr,'workstation')
 	%kPath.SMAP_L3='Y:\SMAP\SPL3SMP.004\';
 	%kPath.GLDAS='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\';  
     kPath.NLDAS='Y:\NLDAS\';
+    kPath.DBNLDAS='H:\Kuai\rnnSMAP\Database_NLDASgrid\';
     kPath.NLDAS_SCAN_Mat='H:\Kuai\Data\NLDAS\NLDAS_SCAN_Daily\';
     
     kPath.maskSMAP_CONUS='H:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
