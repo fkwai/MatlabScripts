@@ -17,7 +17,7 @@ dlmwrite(crdFile,crd,'precision',12);
 
 timeFile=[dirDatabase,'time.csv'];
 sd=20050401;
-ed=20150401;
+ed=20060401;
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tnum=[sdn:edn]';
@@ -40,9 +40,14 @@ for k=1:length(dataLst)
 			dataFolder=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(yr),kPath.s];
 			matFile=[dataFolder,matFileLst(i).name];
 			matData=load(matFile);
-            dataTempIntp=interpGridArea(matData.lon,matData.lat,matData.data,maskMat.lon,maskMat.lat);
+			dataIntp=zeros(length(maskMat.lat),length(maskMat.lon),length(matData.tnum));
+			for j=1:length(matData.tnum)
+            	disp([fieldName,' day ',num2str(j)])
+				dataIntpTemp=interpGridArea(matData.lon,matData.lat,matData.data,maskMat.lon,maskMat.lat);
+				dataIntp(:,:,j)=dataIntpTemp;
+			end
 
-			dataTemp=cat(3,dataTemp,dataTempIntp);
+			dataTemp=cat(3,dataTemp,dataIntp);
 			tnumTemp=[tnumTemp,matData.tnum];
 		end
 		grid2csv_SMAP(dataTemp,dirDatabase,tnumTemp,tnum,fieldName)

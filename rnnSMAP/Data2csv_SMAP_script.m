@@ -48,10 +48,15 @@ for k=1:height(flagTab)
 	% shrink global to CONUS
 	[C,indTemp,indY]=intersect(maskMat.lat,flagMat.lat,'stable');
 	[C,indTemp,indX]=intersect(maskMat.lon,flagMat.lon,'stable');
-	data=flagMat.data(indY,indX,:);
-	tIn=flagMat.tnum;
-	doStat=double(nBit==-1);
-	grid2csv_SMAP(data,tIn,tnum,fieldName,0,doStat)
+	data=flagMat.data(indY,indX,:);	
+	if nBit==-1
+		doStat=1;
+		data=nanmean(data,3);
+	else
+		doStat=0;
+		data=round(nanmean(data,3));
+	end
+	gridConst2csv_SMAP(data,fieldName,0,doStat)
 	toc
 end
 
@@ -70,7 +75,6 @@ for k=1:length(dataLst)
 		toc
 	end
 end
-
 
 
 
