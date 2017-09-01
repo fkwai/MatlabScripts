@@ -8,7 +8,8 @@ maskFile=[kPath.SMAP,'maskSMAP_CONUS.mat'];
 maskMat=load(maskFile);
 
 %% initial Database
-dirDatabase=kPath.DBSMAP_L3_CONUS;
+dirDatabase=[kPath.DBSMAP_L3,'LongTerm',kPath.s];
+mkdir(dirDatabase)
 
 crdFile=[dirDatabase,'crd.csv'];
 crd=[maskMat.lat1D,maskMat.lon1D];
@@ -41,10 +42,10 @@ for k=1:length(dataLst)
 			matData=load(matFile);
             dataTempIntp=interpGridArea(matData.lon,matData.lat,matData.data,maskMat.lon,maskMat.lat);
 
-			dataTemp=cat(3,dataTemp,matData.data);
+			dataTemp=cat(3,dataTemp,dataTempIntp);
 			tnumTemp=[tnumTemp,matData.tnum];
 		end
-		grid2csv_SMAP(dataTemp,tnumTemp,tnum,fieldName)
+		grid2csv_SMAP(dataTemp,dirDatabase,tnumTemp,tnum,fieldName)
 		toc
 	end
     

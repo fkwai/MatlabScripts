@@ -5,10 +5,10 @@
 global kPath
 
 %% initial Database
-DBname='1014v12f1'
+DBname='0514v12f1'
 dirDatabase=[kPath.DBNLDAS,DBname,kPath.s];
 maskMat=load([kPath.NLDAS,'maskNLDASv12f1.mat']);
-sd=20100101;
+sd=20050101;
 ed=20141231;
 mkdir(dirDatabase);
 
@@ -25,9 +25,10 @@ dlmwrite(timeFile,tnum,'precision',12);
 
 
 %% NLDAS 
-dataLst={'FORA','FORB','NOAH'};
+%dataLst={'FORA','FORB','NOAH'};
+dataLst={'NOAH'};
 for k=1:length(dataLst)
-	dataFolderTemp=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(2016),kPath.s];
+	dataFolderTemp=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(2005),kPath.s];
 	matFileLst=dir([dataFolderTemp,'*.mat']);
 	for i=1:length(matFileLst)
 		tic
@@ -36,6 +37,7 @@ for k=1:length(dataLst)
 		fieldName=matFileLst(i).name(1:end-4);
 		disp(fieldName)
 		for yr=yrLst
+			disp(yr)
 			dataFolder=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(yr),kPath.s];
 			matFile=[dataFolder,matFileLst(i).name];
 			matData=load(matFile);

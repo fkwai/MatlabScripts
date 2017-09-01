@@ -1,4 +1,4 @@
-function grid2csv_SMAP(data,tIn,tOut,varName,varargin)
+function grid2csv_SMAP(data,dirDB,tIn,tOut,varName,varargin)
 % convert grid to csv file that torch can learn from
 % write directory are hard coded as kPath.DBSMAP_L3_CONUS
 % mask are hard coded to kPath.maskSMAP_CONUS 
@@ -24,7 +24,7 @@ end
 
 global kPath
 load(kPath.maskSMAP_CONUS,'mask')
-dirDatabase=kPath.DBSMAP_L3_CONUS;
+dirDatabase=dirDB;
 tIn=VectorDim(tIn,1);
 tOut=VectorDim(tOut,1);
 
