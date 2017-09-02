@@ -24,7 +24,7 @@ for k=1:length(fileLst)
         % fix 0 std
         statFile=[dirDB,varName,'_stat.csv'];
         stat=csvread(statFile);
-        if stat(4)==0
+        if stat(4)<=0.002
             disp(varName)
             stat(4)=1;
             dlmwrite(statFile, stat,'precision',8);

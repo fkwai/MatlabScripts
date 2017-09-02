@@ -40,13 +40,7 @@ for k=1:length(dataLst)
 			dataFolder=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(yr),kPath.s];
 			matFile=[dataFolder,matFileLst(i).name];
 			matData=load(matFile);
-			dataIntp=zeros(length(maskMat.lat),length(maskMat.lon),length(matData.tnum));
-			for j=1:length(matData.tnum)
-            	disp([fieldName,' day ',num2str(j)])
-				dataIntpTemp=interpGridArea(matData.lon,matData.lat,matData.data,maskMat.lon,maskMat.lat);
-				dataIntp(:,:,j)=dataIntpTemp;
-			end
-
+            dataIntp=interpGridArea(matData.lon,matData.lat,matData.data,maskMat.lon,maskMat.lat);
 			dataTemp=cat(3,dataTemp,dataIntp);
 			tnumTemp=[tnumTemp,matData.tnum];
 		end

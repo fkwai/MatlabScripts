@@ -21,7 +21,9 @@ end
 the=0.2;
 nyq=length(yq);
 nxq=length(xq);
-vq=zeros(nyq,nxq)*nan;
+nt=size(v,3);
+vq=zeros(nyq,nxq,nt)*nan;
+
 
 % m,n - new data; x,y - target grid
 [x1,x2,y1,y2]=gridbound(yq,xq);
@@ -76,6 +78,7 @@ if length(xSize)==1 && length(ySize)==1
             ix=find((m2>xx1)&(m1<xx2));
             iy=find((n2<yy1)&(n1>yy2));
             if ~isempty(ix) && ~isempty(iy)
+                tempMat=v(iy,ix,:);
                 temp=v(iy,ix);
                 vRatio=length(find(isnan(temp(:))))/length(temp(:));                
                 if vRatio<=the
@@ -99,8 +102,8 @@ if length(xSize)==1 && length(ySize)==1
                     
                     switch oper
                         case 'mean'
-                            tempArea=(temp.*areaMat)./areaMean;
-                            vq(j,i)=nanmean(tempArea(:));
+                            tempArea=(tempMat.*repmat(areaMat,[1,1,nt]))./areaMean;
+                            vq(j,i,:)=nanmean(nanmean(tempArea,1),2);
                         case 'max'
                             vq(j,i)=nanmax(temp(:));
                         case 'mode'
