@@ -31,27 +31,45 @@ tightmap
 %geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
 
 %
-levels = linspace(colorRange(1),colorRange(2), nLevel-1);
-levels(levels<1e-10&levels>-1e-10)=0;
-
-colormap(cmap);
-Z = zeros(size(grid));
-Z(grid < levels(1)) = 1;
-%Z(grid >= levels(end)) = length(levels);
-for k = 1:length(levels) - 1
-    Z(grid >= levels(k) & grid < levels(k+1)) = double(k+1) ;
-end
-Z(grid >= levels(end)) = length(levels)+2;
-%
-%[tick,tickL,Z,nColor] = colorBarRange(colorRange, nLevel, openEnds, grid);
-if isempty(cmap)
-    %cmap = jet(nColor);
-    cmap = jet(nLevel+1);
-    if openEnds(1)
-        cmap(1, :,:) = [1 1 1];
+plotOpt=0
+if plotOpt==1
+    levels = linspace(colorRange(1),colorRange(2), nLevel-1);
+    levels(levels<1e-10&levels>-1e-10)=0;
+    
+    colormap(cmap);
+    Z = zeros(size(grid));
+    Z(grid < levels(1)) = 1;
+    %Z(grid >= levels(end)) = length(levels);
+    for k = 1:length(levels) - 1
+        Z(grid >= levels(k) & grid < levels(k+1)) = double(k+1) ;
     end
+    Z(grid >= levels(end)) = length(levels)+1;
+else
+    insert0 = 1;
+    [tickP2,tickV2,tickL2,Z,nColor] = colorBarRange(colorRange, nLevel, openEnds, grid, insert0);
+    sel = 2;
+    tick = tickP2(1:sel:end); tickL = tickL2(1:sel:end);
+    tickV = tickV2(1:sel:end);
+end
+if isempty(cmap)
+    if plotOpt==1
+        cmap = jet(nLevel+1); % added one for NaNs
+    else
+        cmap = jet(nColor); % NaN's already considered in colorBarRange
+        % insert zeros if it is in range
+%         [k,tickV3,tickP3] = insertZero(tickV2,tickP2);        
+%         if ~isempty(k)
+%             tickL3 = [tickL2(1:k) '0' tickL2(k+1:end)];
+%         end
+        
+    end
+    %if openEnds(1)
+        cmap(1, :,:) = [1 1 1]; % for NaN converted 0's in Z
+    %end
 end
 colormap(cmap);
+% NaN's are treated as 0's, which get the first color
+% therefore, one color is reserved for NaN's.
 geoshow(latmesh,lonmesh,uint8(Z),cmap);
 
 if isempty(shapefile)
@@ -66,18 +84,20 @@ geoshow(shape.lat, shape.long, 'Color', 'k')
 if ~isempty(strTitle)
     title(strTitle)
 end
-%sel = 2; tick = tick(sel:sel:end); tickL = tickL(sel:sel:end);
 if ~isempty(colorRange)
     caxis auto
-    clevels =cellfun(@num2str,num2cell(levels),'UniformOutput',false);
-    clevels(2:2:end)={''};
-    clevels = [''; clevels]';
-    itick=1/(length(levels)+2);
-    ctick=itick*[2:2:nLevel];
-    h=colorbar('southoutside','XTick',ctick,'XTickLabel',clevels(1:2:end),...
-       'YTick',[],'YTickLabel',[]);
-%     h=colorbar('southoutside','XTick',tick,'XTickLabel',tickL,...
-%         'YTick',[],'YTickLabel',[]);
+    if plotOpt==1
+        clevels =cellfun(@num2str,num2cell(levels),'UniformOutput',false);
+        clevels(2:2:end)={''};
+        clevels = [''; clevels]';%??? doesn't match anymore?
+        itick=1/(length(levels)+2);
+        ctick=itick*[2:2:nLevel];
+        h=colorbar('southoutside','XTick',ctick,'XTickLabel',clevels(1:2:end),...
+            'YTick',[],'YTickLabel',[]);
+    else
+        h=colorbar('southoutside','XTick',tick,'XTickLabel',tickL,...
+            'YTick',[],'YTickLabel',[]);
+    end
     set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',16)
     %cb = lcolorbar('Ticks',1.5:nLevel-0.5,'Location','Horizontal');  
     
