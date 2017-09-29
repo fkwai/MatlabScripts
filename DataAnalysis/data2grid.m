@@ -1,4 +1,4 @@
-function [grid,xx,yy] = data2grid( data,x,y)
+function [grid,xx,yy] = data2grid( data,x,y, varargin)
 %   This function will fit data into grid. The (1,1) cell of grid is
 %   top-left cell. 
 
@@ -8,9 +8,14 @@ function [grid,xx,yy] = data2grid( data,x,y)
 %   cellsize: grace is 1, nldas/gldas is 0.125
 %   -9999 stands for nan values. 
 
+yOrder= 'descend';
+if length(varargin)>0
+    yOrder = varargin{1};
+end
+
 nc=length(data);
 xx=VectorDim(sort(unique(x)),2);
-yy=VectorDim(sort(unique(y),'descend'),1);
+yy=VectorDim(sort(unique(y),yOrder),1);
 nx=length(xx);
 ny=length(yy);
 data(data==-9999)=nan;
@@ -23,6 +28,7 @@ for i=1:nc
 	grid(iy,ix)=data(i);
 end
 
-
+%grid(1,:)=nan;
+%warning('removing the northmost line for SMAP paper');
 end
 
