@@ -26,6 +26,22 @@ for k=1:length(varLst)
     toc
 end
 
+%% hydrologic landscape
+hlr = readGrid('F:\olddrive\DataBase\National\HLR_CONUS.tif');
+zonesIn = hlr;
+saveFolderRt='H:\Kuai\rnnSMAP\Database\Daily\byGrid\';
+for i=1:20
+    i
+    tic
+    zonesIn.zoneSel = i;
+    saveFolder = [saveFolderRt,'_z',num2str(i)];
+    for k=1:length(varLst)
+        k;
+        splitSubset_shapefile(varLst{k},zonesIn,saveFolder,interval,offset)
+    end
+    toc
+end
+
 %% given coordinates
 saveFolder='E:\Kuai\rnnSMAP\Database\Daily\cell_20000\';
 %crdLst=[40.875,-88.125];

@@ -1,8 +1,9 @@
-function indOut=splitSubset_shapefile(varName,dataName,shapefileLst,varargin )
+function indOut=splitSubset_shapefile(varName,dataName,zonesIn,varargin )
 % split dataset by shapefile
 
 % example:
-% shapefileLst={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';...
+% shapefile option
+% zonesIn={'H:\Kuai\map\physio_shp\rnnSMAP\regionA.shp';...
 %     'H:\Kuai\map\physio_shp\rnnSMAP\regionC.shp';...
 %     'H:\Kuai\map\physio_shp\rnnSMAP\regionD.shp'};
 % varName='SMAP';
@@ -22,6 +23,7 @@ crdFileCONUS=[dirData,'crd.csv'];
 data=csvread(dataFileCONUS);
 crd=csvread(crdFileCONUS);
 
+fileMode = 0;
 if isempty(indOut)
     maskMat=load(kPath.maskSMAP_CONUS);
     if ~isdir(saveFolder)
@@ -34,26 +36,48 @@ if isempty(indOut)
     py=crd(:,1);
     
     bPick=zeros(size(px));
-    for k=1:length(shapefileLst)
-        shapefile=shapefileLst{k};
-        maskShape = shaperead(shapefile);
-        for kk=1:length(maskShape)
-            X=maskShape(kk).X;
-            Y=maskShape(kk).Y;
-            eLst=find(isnan(X));
-            eLst=[0,eLst];
-            for i=1:length(eLst)-1
-                xx=X(eLst(i)+1:eLst(i+1)-1);
-                yy=Y(eLst(i)+1:eLst(i+1)-1);
-                inout = int32(zeros(size(px)));
-                pnpoly(xx,yy,px,py,inout);
-                inout=double(inout);
-                inout(inout~=1)=0;
-                bPick(inout==1)=1;
+    if iscell(zonesIn) && exist(zonesIn{1})==2
+        % this is a shapefile to be read
+        shapefileLst = zonesIn;
+        for k=1:length(shapefileLst)
+            shapefile=shapefileLst{k};
+            maskShape = shaperead(shapefile);
+            for kk=1:length(maskShape)
+                X=maskShape(kk).X;
+                Y=maskShape(kk).Y;
+                eLst=find(isnan(X));
+                eLst=[0,eLst];
+                for i=1:length(eLst)-1
+                    xx=X(eLst(i)+1:eLst(i+1)-1);
+                    yy=Y(eLst(i)+1:eLst(i+1)-1);
+                    inout = int32(zeros(size(px)));
+                    pnpoly(xx,yy,px,py,inout);
+                    inout=double(inout);
+                    inout(inout~=1)=0;
+                    bPick(inout==1)=1;
+                end
+            end
+        end
+    elseif isstruct(zonesIn) && isfield(zonesIn,'zoneSel')
+        % a grid read in by readGrid with the addition of zoneSel which has
+        % the zones to be selected
+        fileMode = 1;
+        zoneSel =  zonesIn.zoneSel;
+        datOriginal=zonesIn.z;
+        [gridSMAP] = coordinate2Grid(py,px); % this grid is in ascending order
+        IND = gridSMAP.zz; % an index into the original vector
+        [zz,ind]= area2(zonesIn, gridSMAP, 1);
+        for i=1:length(zoneSel)
+            loc = find(zz == zoneSel(i));
+            for j=1:length(loc)
+                id = loc(j); k =IND(id);
+                if k>0
+                    % index into the original vector
+                    bPick(k) = 1;
+                end
             end
         end
     end
-    
     
     %% interval and offset
     maskIndSub=maskMat.maskInd(offset:interval:end,offset:interval:end);
@@ -68,12 +92,18 @@ if isempty(indOut)
     %% verify
     plot(px,py,'b.');hold on
     plot(px(indOut),py(indOut),'ro');hold on
-    for k=1:length(shapefileLst)
-        shapefile=shapefileLst{k};
-        maskShape = shaperead(shapefile);
-        X=maskShape.X(1:end-1);
-        Y=maskShape.Y(1:end-1);
-        plot(X,Y,'k-');hold on
+    if fileMode==0
+        for k=1:length(zonesIn)
+            shapefile=zonesIn{k};
+            maskShape = shaperead(shapefile);
+            X=maskShape.X(1:end-1);
+            Y=maskShape.Y(1:end-1);
+            plot(X,Y,'k-');hold on
+        end
+    elseif fileMode==1
+        %zonesIn need a function to plot grid!
+    else
+        
     end
     hold off
     saveas(gcf,[saveFolder,'subset.jpg']);
