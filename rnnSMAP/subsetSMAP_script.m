@@ -28,3 +28,28 @@ for k=1:length(shapeAll)
     saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);
     close(gcf)
 end
+
+%% HLR
+hlr = readGrid('F:\olddrive\DataBase\National\HLR_CONUS.tif');
+saveFolderRt='CONUS';
+%interval=1; offset=1;
+% varLst=textread('H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\Variable\varLst.csv','%s');
+% varLst2=textread('H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\Variable\varConstLst.csv','%s');
+% varLst = [varLst; varLst2];
+% rootName = 'H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\byGrid';
+for i=1:20
+    i
+    tic
+    hlr.zoneSel = i; subsetName = ['hlr_',num2str(i)];
+    %saveFolder = ['CONUS',num2str(i)];
+    indSub=subsetSMAP_shape(saveFolderRt,hlr,subsetName );
+    toc
+    
+    subsetPlot(subsetName);hold on
+    if isfield(shape,'col')
+        plot(shape.X,shape.Y,'-k'); end
+    hold off
+    axis equal
+    saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);
+    close(gcf)
+end
