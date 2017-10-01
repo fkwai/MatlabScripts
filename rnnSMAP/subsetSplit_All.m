@@ -5,6 +5,9 @@ function subsetSplit_All(subsetName)
 % And the inds in subset file is replace by -1
 
 global kPath
+if isempty(kPath)
+    initPath workstation
+end    
 
 %% read variable list
 varFile=[kPath.DBSMAP_L3,'Variable',kPath.s,'varLst.csv'];

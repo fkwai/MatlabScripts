@@ -30,7 +30,7 @@ for k=1:length(shapeAll)
 end
 
 %% HLR
-hlr = readGrid('F:\olddrive\DataBase\National\HLR_CONUS.tif');
+dat = readGrid('F:\olddrive\DataBase\National\HLR_CONUS.tif');
 saveFolderRt='CONUS';
 %interval=1; offset=1;
 % varLst=textread('H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\Variable\varLst.csv','%s');
@@ -40,17 +40,67 @@ saveFolderRt='CONUS';
 for i=1:20
     i
     tic
-    hlr.zoneSel = i; subsetName = ['hlr_',num2str(i)];
+    dat.zoneSel = i; subsetName = ['hlr_',num2str(i)];
     %saveFolder = ['CONUS',num2str(i)];
-    indSub=subsetSMAP_shape(saveFolderRt,hlr,subsetName );
+    indSub=subsetSMAP_shape(saveFolderRt,dat,subsetName );
     toc
     subsetSplit_All(subsetName);
 
     
     subsetPlot(subsetName);hold on
-    if ~isfield(hlr,'col')
+    if ~isfield(dat,'col')
         % col means it is a raster grid
-        plot(hlr.X,hlr.Y,'-k'); end
+        plot(dat.X,dat.Y,'-k'); end
+    hold off
+    axis equal
+    saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);
+    close(gcf)
+end
+
+%% HUC2
+% select nc from 18-1=17 HUC2 (nr realizations; contiguous or not)
+dat = readGrid('F:\olddrive\DataBase\National\HUC2_CONUS.tif');
+saveFolderRt='CONUS';
+%interval=1; offset=1;
+% rootName = 'H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\byGrid';
+nt=18; nr = 50;ns=4; exclude=8; elem=1:nt;elem(elem==exclude)=[];
+k=0;A=zeros([1,ns]);
+% A may need to be loaded to extend experiments
+while 1
+    d = randsample(elem,ns); d= sort(d,'ascend');
+    if ~any(ismember(d,A,'rows'))
+        k = k + 1;
+        A(k,:) = d;
+        if k==nr, break; end
+    end
+end
+save exp A
+for i=1: nt-length(exclude) - (ns-1)
+    d = elem(i:i+3);
+    if ~any(ismember(d,A,'rows'))
+        k = k + 1;
+        A(k,:) = d;
+        if k==nr, break; end
+    end
+end
+
+parpool(6);
+dat0=dat;
+parfor i=1:size(A,1)
+    i
+    tic
+    dat = dat0;
+    dat.zoneSel = A(i,:); 
+    ff=''; for j=dat.zoneSel,ff=[ff,sprintf('%02d',j)]; end
+    subsetName = ['huc2_',ff];
+    %saveFolder = ['CONUS',num2str(i)];
+    indSub=subsetSMAP_shape(saveFolderRt,dat,subsetName );
+    toc
+    subsetSplit_All(subsetName);
+    subsetPlot(subsetName);hold on
+    if ~isfield(dat,'col')
+        % col means it is a raster grid
+        plot(dat.X,dat.Y,'-k'); end
     hold off
     axis equal
     saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);

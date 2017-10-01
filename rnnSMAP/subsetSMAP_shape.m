@@ -9,6 +9,9 @@ function indSub=subsetSMAP_shape(rootName,shape,subsetName)
 % dataName='regionACDs2';
 
 global kPath
+if isempty(kPath)
+    initPath workstation
+end    
 subsetFolder=[kPath.DBSMAP_L3,'Subset',kPath.s];
 crdFileRoot=[kPath.DBSMAP_L3,rootName,kPath.s,'crd.csv'];
 crd=csvread(crdFileRoot);
