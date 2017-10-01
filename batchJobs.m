@@ -35,7 +35,7 @@ end
 
 D = dir([rt,filesep,jobHead,'*']); 
 hS = zeros(size(D))+hs;
-testRun  = 1; % inside sub-function
+testRun  = 0; % inside sub-function
 
 
 if ~testRun
