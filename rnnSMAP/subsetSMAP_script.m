@@ -44,10 +44,13 @@ for i=1:20
     %saveFolder = ['CONUS',num2str(i)];
     indSub=subsetSMAP_shape(saveFolderRt,hlr,subsetName );
     toc
+    subsetSplit_All(subsetName);
+
     
     subsetPlot(subsetName);hold on
-    if isfield(shape,'col')
-        plot(shape.X,shape.Y,'-k'); end
+    if ~isfield(hlr,'col')
+        % col means it is a raster grid
+        plot(hlr.X,hlr.Y,'-k'); end
     hold off
     axis equal
     saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);
