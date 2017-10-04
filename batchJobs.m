@@ -29,7 +29,7 @@ if isfield(res,'rt') && ~isempty(res.rt)
 else
     if ispc
         rt ='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily';
-    elseif strcmp(hostname,'CE-406SACKXF227')
+    elseif strcmp(strip(hostname),'CE-406SACKXF227')
         rt = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
     end
 end
@@ -90,22 +90,26 @@ for i=1:nGPU
         fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
     end
 end
-fclose(fid); CA=zeros([nGPU,1]); nk=0;
+fclose(fid); CA=zeros([nGPU,1]); nk=0;nD=length(D);
 for m=1:length(VCFILE)
     varCFile = VCFILE{m};
     for k=1:length(VFILE)
         varFile = VFILE{k};
-        for i=1:length(D)
+        parfor i=1:nD
             %    tic
             if D(i).isdir
+                nk=sub2ind([nD,length(VFILE),length(VCFILE)],i,k,m);
+                %nk = i-1+(length(VFILE)-1)*length(D);
+                %nk = nk+1; % job id in the sequence
+                %ID = mod(nk,nGPU); wd = ['=',num2str(ID)]; CA(ID+1)=CA(ID+1)+1; % ID is GPU iD
+                %j = mod(CA(ID+1)-1,nMultiple)+1; % j is concurrent job id
+                [ID,j,kk]=ind2sub([nGPU,nMultiple,1000],nk); % 1000 is just to make it large enough
+                %ID=kk0(1); j=kk0(2); kk=kk0(3);
+                % kk is the number of training instance on the job script
+                wd = ['=',num2str(ID-1)]; 
                 trainCMD = 'CUDA_VISIBLE_DEVICES=0 th trainLSTM_SMAP.lua -out XX_out -train CONUS -dr 0.5 -timeOpt 1 -hiddenSize 384 -var varLst_Noah -varC varConstLst_Noah -nEpoch 500';
                 trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
                 trainCMD = strrep(trainCMD, '384', num2str(hS(i)));
-                
-                %nk = i-1+(length(VFILE)-1)*length(D);
-                nk = nk+1; % job id in the sequence
-                ID = mod(nk,nGPU); wd = ['=',num2str(ID)]; CA(ID+1)=CA(ID+1)+1; % ID is GPU iD
-                j = mod(CA(ID+1)-1,nMultiple)+1; % j is concurrent job id
                 trainCMD = strrep(trainCMD, '=0', wd);
                 trainCMD = strrep(trainCMD, '-timeOpt 1', ['-timeOpt ',num2str(trainTimeOpt)]);
                 trainCMD = strrep(trainCMD, 'varLst_Noah', varFile);
@@ -115,19 +119,19 @@ for m=1:length(VCFILE)
                 od = [D(i).name,namePadd,'_',varFile,'_',varCFile]; % output folder name. must be unique
                 trainCMD = strrep(trainCMD, 'XX_out', od);
                 if any(action==1)
-                    runCmdInScript(trainCMD,jobHead,i,1,testRun,CID(ID+1,j));
+                    runCmdInScript(trainCMD,jobHead,i,1,testRun,CID(ID,j));
                 end
                 
-                ID = mod(i-1,nGPU);
+                %ID = mod(i-1,nGPU);
                 trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500 -test CONUSv2f1 -timeOpt 2';
-                trainCMD = strrep(trainCMD, '=0', ['=',num2str(ID)]);
+                trainCMD = strrep(trainCMD, '=0', ['=',num2str(ID-1)]);
                 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
                 %trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
                 trainCMD = strrep(trainCMD, '-timeOpt 2', ['-timeOpt ',num2str(testTimeOpt)]);
                 
                 if any(action==2)
-                    runCmdInScript(trainCMD,jobHead,i,2,testRun,CID(ID+1,j));
+                    runCmdInScript(trainCMD,jobHead,nk,2,testRun,CID(ID,j));
                 end
             end
         end
@@ -172,6 +176,7 @@ else
     system(trainCMD)
     t1=toc; 
     if verb>1, disp(['Testing done. Elapsed time = ',num2str(t1)]); end
+    %delete(file);
 end
 
 function caseScripts
