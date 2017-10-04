@@ -80,33 +80,60 @@ else
     VCFILE{1}=varCFile;
 end
 nMultiple = nConc/nGPU;
+
+% the following files are prepared in case we cannot run matlab on the
+% target machine
 fid = fopen('allJobs.sh','wt');
 for i=1:nGPU
     for j=1:nMultiple
         ff=['JOB',jobHead,'_g',num2str(i-1),'_c',num2str(j)];
         CFILE{i,j} = [ff,'.sh'];
-        if exist(CFILE{i,j}), mode='at'; else, mode='wt'; end
-        CID(i,j)= fopen(CFILE{i,j},mode);
+        %if exist(CFILE{i,j}), mode='at'; else, mode='wt'; end
+        %CID(i,j)= fopen(CFILE{i,j},mode);
         fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
     end
 end
 fclose(fid); CA=zeros([nGPU,1]); nk=0;nD=length(D);
-for m=1:length(VCFILE)
-    varCFile = VCFILE{m};
-    for k=1:length(VFILE)
-        varFile = VFILE{k};
-        for i=1:nD
+%for m=1:length(VCFILE)
+%for k=1:length(VFILE)
+%for i=1:nD
+siz = ([nD,length(VFILE),length(VCFILE)]);
+nM=prod(siz);
+nm = ceil(nM/nConc);
+% a 1-nConc loop. each element contains nm. may skip some
+% turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
+% nConc will be further decomposed to [nGPU,nMultiple]
+spmd
+    id = labindex;
+    for is = 1:nm % "is" is the index inside a concurrent process
+        ii = (is-1)*nConc+id; % job id in the entire sequence
+        if ii<=nM
+            [i,k,m] = ind2sub(siz,ii);
+            
+            varFile = VFILE{k};
+            varCFile = VCFILE{m};
+            
             %    tic
             if D(i).isdir
-                nk=sub2ind([nD,length(VFILE),length(VCFILE)],i,k,m);
+                nk = ii;
+                
+                %nk=sub2ind([nD,length(VFILE),length(VCFILE)],i,k,m);
                 %nk = i-1+(length(VFILE)-1)*length(D);
                 %nk = nk+1; % job id in the sequence
                 %ID = mod(nk,nGPU); wd = ['=',num2str(ID)]; CA(ID+1)=CA(ID+1)+1; % ID is GPU iD
                 %j = mod(CA(ID+1)-1,nMultiple)+1; % j is concurrent job id
-                [ID,j,kk]=ind2sub([nGPU,nMultiple,1000],nk); % 1000 is just to make it large enough
+                [ID,j,kk]=ind2sub([nGPU,nMultiple,10000],nk); % 1000 is just to make it large enough
+                
+                if is==1
+                    ff=['JOB',jobHead,'_g',num2str(ID-1),'_c',num2str(j)];
+                    jobScriptFile = [ff,'.sh'];
+                    if exist(jobScriptFile,'file'), mode='at'; else, mode='wt'; end
+                    cid= fopen(jobScriptFile,mode);
+                    %fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
+                end
                 %ID=kk0(1); j=kk0(2); kk=kk0(3);
                 % kk is the number of training instance on the job script
-                wd = ['=',num2str(ID-1)]; 
+                wd = ['=',num2str(ID-1)];
                 trainCMD = 'CUDA_VISIBLE_DEVICES=0 th trainLSTM_SMAP.lua -out XX_out -train CONUS -dr 0.5 -timeOpt 1 -hiddenSize 384 -var varLst_Noah -varC varConstLst_Noah -nEpoch 500';
                 trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
                 trainCMD = strrep(trainCMD, '384', num2str(hS(i)));
@@ -119,7 +146,7 @@ for m=1:length(VCFILE)
                 od = [D(i).name,namePadd,'_',varFile,'_',varCFile]; % output folder name. must be unique
                 trainCMD = strrep(trainCMD, 'XX_out', od);
                 if any(action==1)
-                    runCmdInScript(trainCMD,jobHead,i,1,testRun,CID(ID,j));
+                    runCmdInScript(trainCMD,jobHead,i,1,testRun,cid);
                 end
                 
                 %ID = mod(i-1,nGPU);
@@ -131,16 +158,20 @@ for m=1:length(VCFILE)
                 trainCMD = strrep(trainCMD, '-timeOpt 2', ['-timeOpt ',num2str(testTimeOpt)]);
                 
                 if any(action==2)
-                    runCmdInScript(trainCMD,jobHead,nk,2,testRun,CID(ID,j));
+                    runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
                 end
             end
+            if is==nm, fclose(fid); end
+        else
+            % exceeds bound
+            fclose(fid);
         end
     end
 end
-
-for i=1:numel(CID)
-    fclose(CID(i));
-end
+4;
+% for i=1:numel(CID)
+%     fclose(CID(i));
+% end
 
 function runCmdInScript(cmd,jobHead,i,act,testRun,cid)
 %testRun = 0;
