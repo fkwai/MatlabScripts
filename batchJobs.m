@@ -95,7 +95,7 @@ for m=1:length(VCFILE)
     varCFile = VCFILE{m};
     for k=1:length(VFILE)
         varFile = VFILE{k};
-        parfor i=1:nD
+        for i=1:nD
             %    tic
             if D(i).isdir
                 nk=sub2ind([nD,length(VFILE),length(VCFILE)],i,k,m);
@@ -169,7 +169,8 @@ if ispc || testRun
         disp('runCmdInScript:: cmd to be submitted to OS:')
     end
     fprintf(cid,'%s\n',cmd);
-    disp(trainCMD)
+    %disp(trainCMD)
+    disp(cmd)
     if verb>1 type(file); end
 else
     if verb>1, disp(trainCMD); end;tic
