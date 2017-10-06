@@ -15,10 +15,12 @@ batchJobs(res,prob,[1 2]) % action contains 1: train; contains 2: test
 %}
 diary('batchJobsLog.log')
 
+% Grabbing configurations from input
 nGPU = res.nGPU; nConc = res.nConc; 
 jobHead = prob.jobHead; hs = prob.hs; temporalTest = prob.temporalTest; varFile = prob.varFile;
 epoch = prob.epoch; if isfield(prob,'varCFile'),varCFile = prob.varCFile; else, varCFile='varConstLst_Noah';  end
 if isfield(prob,'namePadd'), namePadd = prob.namePadd; else, namePadd=''; end
+if isfield(prob,'dirIndices'), dirIndices = prob.dirIndices; else, dirIndices=''; end
 testRun  = 1; % inside sub-function--> may get over-written by varargin{2} (4-th input)
 % testRun == 1: just print out statement. ==0, and change for i=1:length(D)
 % to parfor: will run jobs through parfor
@@ -42,6 +44,8 @@ if length(varargin)>1
 end
 
 D = dir([rt,filesep,jobHead,'*']); 
+if ~isempty(dirIndices), D=D(dirIndices); end
+disp(['Number of directories=',num2str(length(D))]);
 hS = zeros(size(D))+hs;
 
 

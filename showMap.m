@@ -30,8 +30,8 @@ tightmap
 % geoshow(latmesh,lonmesh,grid,'DisplayType','surface');
 %geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
 
-%
-plotOpt=0
+%CP: plotOpt=0 new control of color scale: with ends
+plotOpt=0; %
 if plotOpt==1
     levels = linspace(colorRange(1),colorRange(2), nLevel-1);
     levels(levels<1e-10&levels>-1e-10)=0;
@@ -47,9 +47,10 @@ if plotOpt==1
 else
     insert0 = 1;
     [tickP2,tickV2,tickL2,Z,nColor] = colorBarRange(colorRange, nLevel, openEnds, grid, insert0);
-    sel = 2;
-    tick = tickP2(1:sel:end); tickL = tickL2(1:sel:end);
-    tickV = tickV2(1:sel:end);
+    sel = 2; v = tickV2(1:sel:end); 
+    st  = 1; if ~any(abs(v)<1e-10), st=2; end
+    tick = tickP2(st:sel:end); tickL = tickL2(st:sel:end);
+    tickV = tickV2(st:sel:end);
 end
 if isempty(cmap)
     if plotOpt==1
@@ -95,8 +96,7 @@ if ~isempty(colorRange)
         h=colorbar('southoutside','XTick',ctick,'XTickLabel',clevels(1:2:end),...
             'YTick',[],'YTickLabel',[]);
     else
-        h=colorbar('southoutside','XTick',tick,'XTickLabel',tickL,...
-            'YTick',[],'YTickLabel',[]);
+        h=colorbar('southoutside','Ticks',tick,'TickLabels',tickL);
     end
     set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',16)
     %cb = lcolorbar('Ticks',1.5:nLevel-0.5,'Location','Horizontal');  
