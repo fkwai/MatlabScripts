@@ -32,7 +32,7 @@ else
     if ispc
         rt ='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily';
     elseif strcmp(strip(hostname),'CE-406SACKXF227')
-        rt = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
+        rt = '/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily/';
     end
 end
 action =[1 2]; % train and test
@@ -109,6 +109,7 @@ nm = ceil(nM/nConc);
 % nConc will be further decomposed to [nGPU,nMultiple]
 spmd
     id = labindex;
+    %for id=1:nConc
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
         if ii<=nM
@@ -165,10 +166,10 @@ spmd
                     runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
                 end
             end
-            if is==nm, fclose(fid); end
+            if is==nm && fid>0, fclose(fid); fid=-1; end
         else
             % exceeds bound
-            fclose(fid);
+            if fid>0, fclose(fid); end
         end
     end
 end
