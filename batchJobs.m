@@ -4,6 +4,14 @@ function batchJobs(res,prob,varargin)
 nGPU =3; nMultiple=4; jobHead='hlr'; epoch=300; hs=128; temporalTest=2;
 % above are things to adjust. also consider 'varFile' below
 % by default all test are done on CONUS.
+% jobHead: the code finds directories in the rt directory that
+starts with this string. All jobs that match will be put into a queue to be
+run, multiplied by the number of files in varFile and varCFile (could be a
+char string, or)
+% if rt is left empty, it will be decided by the hard-coded directories
+below
+% However, this rt does not concern the code inside the lua codes, which
+now need to be changed manually.
 
 %rt  = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
 rt = ''; % empty if using default settings on each machine
@@ -33,6 +41,8 @@ else
         rt ='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily';
     elseif strcmp(strip(hostname),'CE-406SACKXF227')
         rt = '/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily/';
+    elseif strcmp(strip(hostname),'ce406c-kuai')
+        rt = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
     end
 end
 action =[1 2]; % train and test
@@ -198,7 +208,14 @@ fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
 % Above is what is causing problems with a simple Matlab launch
 fprintf(fid,'%s\r\n',cmd);
 fclose(fid);
-trainCMD = ['. ',file];
+
+if verb>2
+    suffix = '';
+else
+    suffix = ' >/dev/null'; % standard device for discarding screen output
+    % lua already has output logs in each directory
+end
+trainCMD = ['. ',file,suffix];
 if ispc || testRun
     if verb>1
         disp('*******************************************')
@@ -209,10 +226,10 @@ if ispc || testRun
     disp(cmd)
     if verb>1 type(file); end
 else
-    if verb>1, disp(trainCMD); end;tic
+    if verb>0, disp(trainCMD); end;tic
     system(trainCMD)
     t1=toc; 
-    if verb>1, disp(['Testing done. Elapsed time = ',num2str(t1)]); end
+    if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',trainCMD]); end
     %delete(file);
 end
 
