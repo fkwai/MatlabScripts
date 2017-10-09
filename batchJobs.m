@@ -1,7 +1,7 @@
 function batchJobs(res,prob,varargin)
 
 %{
-nGPU =3; nMultiple=4; jobHead='hlr'; epoch=300; hs=128; temporalTest=2;
+nGPU =3; nMultiple=4; jobHead='hlr'; epoch=300; hs=256; temporalTest=2;
 % above are things to adjust. also consider 'varFile' below
 % by default all test are done on CONUS.
 % jobHead: the code finds directories in the rt directory that
@@ -42,7 +42,7 @@ else
     elseif strcmp(strip(hostname),'CE-406SACKXF227')
         rt = '/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily/';
     elseif strcmp(strip(hostname),'ce406c-kuai')
-        rt = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
+        rt = '/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
     end
 end
 action =[1 2]; % train and test
@@ -63,6 +63,8 @@ if ~testRun
     myCluster = parcluster('local');
     dirJ = [cd,filesep,'MPT',filesep,jobHead]; if ~exist(dirJ),mkdir(dirJ); end
     myCluster.JobStorageLocation = dirJ;
+    myCluster.NumWorkers = max(nConc,myCluster.NumWorkers);
+
        
     try
          parpool(myCluster,nConc);
@@ -117,6 +119,7 @@ nm = ceil(nM/nConc);
 % a 1-nConc loop. each element contains nm. may skip some
 % turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
 % nConc will be further decomposed to [nGPU,nMultiple]
+cid = -1;
 spmd
     id = labindex;
     %for id=1:nConc
@@ -176,10 +179,10 @@ spmd
                     runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
                 end
             end
-            if is==nm && fid>0, fclose(fid); fid=-1; end
+            if is==nm && cid>0, fclose(cid); cid=-1; end
         else
             % exceeds bound
-            if fid>0, fclose(fid); end
+            if cid>0, fclose(cid); end
         end
     end
 end
@@ -227,6 +230,7 @@ if ispc || testRun
     if verb>1 type(file); end
 else
     if verb>0, disp(trainCMD); end;tic
+    if verb>0, disp(cmd); end;tic
     system(trainCMD)
     t1=toc; 
     if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',trainCMD]); end
