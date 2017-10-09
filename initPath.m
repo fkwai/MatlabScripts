@@ -66,8 +66,22 @@ if strcmp(pcStr,'workstation')
     kPath.NLDAS_SCAN_Mat='H:\Kuai\Data\NLDAS\NLDAS_SCAN_Daily\';
     
     kPath.maskSMAP_CONUS='H:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
-
 end
+
+if strcmp(pcStr,'pckuai')
+	kPath.s='/';
+
+    kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
+    kPath.DBSMAP_L3_CONUS='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
+    kPath.OutSMAP_L3='/mnt/sdb/rnnSMAP/output_SMAPgrid/';
+    
+    kPath.SCAN='/mnt/sdb/Database/SCAN/';
+    kPath.OutSCAN='/mnt/sdb/rnnGAGE/outputSCAN/';
+    kPath.DBSCAN='/mnt/sdb/rnnGAGE/databaseSCAN/';
+    
+	kPath.DBNLDAS='/mnt/sdb/rnnSMAP/Database_NLDASgrid/';    
+end
+
 
 disp(['Initialized kPath on ',pcStr])
 
