@@ -68,7 +68,7 @@ if strcmp(pcStr,'workstation')
     kPath.maskSMAP_CONUS='H:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
 end
 
-if strcmp(pcStr,'pckuai')
+if strcmp(pcStr,'pc-kuai')
 	kPath.s='/';
 
     kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
