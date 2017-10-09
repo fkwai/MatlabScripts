@@ -229,8 +229,7 @@ if ispc || testRun
     disp(cmd)
     if verb>1 type(file); end
 else
-    if verb>0, disp(trainCMD); end;tic
-    if verb>0, disp(cmd); end;tic
+    if verb>0, disp(cmd); end;tic;
     system(trainCMD)
     t1=toc; 
     if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',trainCMD]); end
