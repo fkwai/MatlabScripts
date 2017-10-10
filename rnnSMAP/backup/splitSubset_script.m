@@ -30,14 +30,19 @@ end
 hlr = readGrid('F:\olddrive\DataBase\National\HLR_CONUS.tif');
 zonesIn = hlr;
 saveFolderRt='H:\Kuai\rnnSMAP\Database\Daily\byGrid\';
+interval=1; offset=1;
+varLst=textread('H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\Variable\varLst.csv','%s');
+varLst2=textread('H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\Variable\varConstLst.csv','%s');
+varLst = [varLst; varLst2];
+
 for i=1:20
     i
     tic
     zonesIn.zoneSel = i;
-    saveFolder = [saveFolderRt,'_z',num2str(i)];
+    saveFolder = ['byGrid\z',num2str(i)];
     for k=1:length(varLst)
         k;
-        splitSubset_shapefile(varLst{k},zonesIn,saveFolder,interval,offset)
+        splitSubset_shapefile(varLst{k},saveFolder,zonesIn,'interval',interval,'offset',offset);
     end
     toc
 end

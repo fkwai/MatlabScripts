@@ -20,10 +20,10 @@ statTest_NLDAS=statCal(outTest.yGLDAS,outTest.ySMAP);
 crd=csvread([kPath.DBSMAP_L3,testName,'\crd.csv']);
 %[rmseOrd,indOrd]=sort(statTest_LSTM.rmse);
 [rmseOrd,indOrd]=sort(-statTest_LSTM.rsq);
-indSelOrd=indOrd([41,101,200,296,360]);
+indSelOrd=indOrd([41,101,200,296,360]); % rank
 textStr={'10%','25%','50%','75%','90%'};
 
-load('H:\Kuai\rnnSMAP\ARMA\yARMApbp_CONUSv4f1.mat')
+load('H:\Kuai\rnnSMAP\ARMA\q0N\yARMApbp_CONUSv4f1.mat')
 
 %% plot
 f=figure('Position',[1,1,1600,800]);
@@ -96,7 +96,7 @@ axis equal
 
 set(gca,'xTick',[],'yTick',[])
 hold off
-leg=legend(legItem,'SMAP','LSTM','ARMA','Noah');
+leg=legend(legItem,'SMAP','LSTM','ARp','Noah');
 set(leg,'Position',[px0-0.09,py0+0.05,0.08,0.15]);
 
 axes( 'Position', [0, 0.96, 1, 0.05] ) ;

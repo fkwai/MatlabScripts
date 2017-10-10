@@ -13,7 +13,7 @@ trainName='CONUSs4f1';
 testNameT='CONUSs4f1';
 epoch=500;
 
-[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst_NOAH');
+[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,'varLst','varLst_NOAH','readData',0);
 statSel=statCal(outT.yLSTM,outT.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -30,13 +30,18 @@ statT_LRpbp=statCal(outT.yLRpbp(:,ind),outT.ySMAP(:,ind));
 statTtrain_NNpbp=statCal(outTrainT.yNNpbp,outTrainT.ySMAP);
 statT_NNpbp=statCal(outT.yNNpbp(:,ind),outT.ySMAP(:,ind));
 
-% spatial
+% ARMA 
+matARMA=load('H:\Kuai\rnnSMAP\ARMA\q0N\yARMApbp_CONUSv4f1.mat');
+statTtrain_ARMA=statCal(matARMA.yARMA(1:366,:),outTrainT.ySMAP);
+statT_ARMA=statCal(matARMA.yARMA(367:732,ind),outT.ySMAP(:,ind));
+
+%% spatial
 outName='CONUSs4f1_surf';
 trainName='CONUSs4f1';
 testNameS='CONUSs4f2';
 epoch=500;
 
-[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst_NOAH');
+[outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,'timeOpt',3,'varLst','varLst_NOAH','readData',0);
 statSel=statCal(outS.yLSTM,outS.ySMAP);
 ind=find(statSel.rmse<0.1);
 
@@ -49,12 +54,10 @@ statS_LR=statCal(outS.yLR(:,ind),outS.ySMAP(:,ind));
 statStrain_NN=statCal(outTrainS.yNN,outTrainS.ySMAP);
 statS_NN=statCal(outS.yNN(:,ind),outS.ySMAP(:,ind));
 
-
 %% plot
 figure('Position',[1,1,1000,1200])
 statLst={'rmse','bias','rsq'};
 subLst={'(a)','(b)','(c)','(d)','(e)','(f)'};
-
 for k=1:length(statLst)
     stat=statLst{k};
     switch stat
@@ -62,14 +65,18 @@ for k=1:length(statLst)
             yRangeT=[0,0.1];
             yRangeS=[0,0.1];
             yLabelStr='RMSE';
+            yTickLst=0:0.02:0.1;
         case 'bias'
             yRangeT=[-0.05,0.05];
             yRangeS=[-0.05,0.05];
             yLabelStr='Bias';
+            yTickLst=-0.05:0.02:0.05;
         case 'rsq'
-            yRangeT=[0,1];
-            yRangeS=[0,1];
-            yLabelStr='R^2';
+            yRangeT=[0.3,1];
+            yRangeS=[0.3,1];
+            yLabelStr='R';
+            yTickLst=0.4:0.2:1;
+
     end
     
     %% plot temporal
@@ -77,6 +84,7 @@ for k=1:length(statLst)
     nT=length(statT_LSTM.(stat));
     dataLst=[statTtrain_LSTM.(stat);statT_LSTM.(stat);...
         statTtrain_NN.(stat);statT_NN.(stat);...
+        statTtrain_ARMA.(stat);statT_ARMA.(stat);...
         statTtrain_LR.(stat);statT_LR.(stat);...
         statTtrain_NNpbp.(stat);statT_NNpbp.(stat);...
         statTtrain_LRpbp.(stat);statT_LRpbp.(stat);...
@@ -87,9 +95,11 @@ for k=1:length(statLst)
         repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
         repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
         repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
+        repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);...
         repmat({'Train'},nTrain,1);repmat({'Test'},nT,1);];
     labelLst2=[repmat({'LSTM'},nTrain+nT,1);...
         repmat({'NN'},nTrain+nT,1);...
+        repmat({'AR'},nTrain+nT,1);...
         repmat({'LR'},nTrain+nT,1);...
         repmat({'NNp'},nTrain+nT,1);...
         repmat({'LRp'},nTrain+nT,1);...
@@ -97,13 +107,15 @@ for k=1:length(statLst)
     
     subplot(3,2,(k-1)*2+1)
     bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
-        'factorgap',9,'factorseparator',1,'color','rk','Symbol','+','Widths',0.75);
+        'factorgap',9,'factorseparator',1,'color','rk','Symbol','','Widths',0.75);
     ylabel(yLabelStr);
     xlabel(subLst{(k-1)*2+1})
-
     ylim(yRangeT)
-    set(gca,'xtick',1.5:3:19.5,'ytick',yRangeT(1):(yRangeT(2)-yRangeT(1))/5:yRangeT(2))
-    set(gca,'xticklabel',{'LSTM','NN','LR','NNp','LRp','Noah'})
+    xLimit=get(gca,'xlim');
+    nBin=length(unique(labelLst2));
+    xTick=linspace(xLimit(1),xLimit(2),2*nBin+1);
+    set(gca,'xtick',xTick(2:2:end),'ytick',yTickLst)
+    set(gca,'xticklabel',{'LSTM','NN','ARp','LR','NNp','LRp','Noah'})
     set(bh,'LineWidth',2)
     box_vars = findall(gca,'Tag','Box');
     %     if strcmp(stat,'rsq')
@@ -114,14 +126,14 @@ for k=1:length(statLst)
     if k==1
         hLegend = legend(box_vars([2,1]), {'Train','Test'},'location','northwest');
     end
-        if strcmp(stat,'bias')
-            hline=refline([0,0]);
-            set(hline,'color',[0.2 0.2 0.2],'LineWidth',1.5,'LineStyle','-.')
-        end
+    if strcmp(stat,'bias')
+        hline=refline([0,0]);
+        set(hline,'color',[0.2 0.2 0.2],'LineWidth',1.5,'LineStyle','-.')
+    end
     if strcmp(stat,'rmse')
         title(['Temporal Generalization Test'])
     end
-    set(gca,'Position',[0.1,0.1+(3-k)*0.3,0.45,0.25])
+    set(gca,'Position',[0.1,0.1+(3-k)*0.3,0.45,0.225])
     
     %% plot spatial
     nTrain=length(statStrain_LSTM.(stat));
@@ -142,12 +154,15 @@ for k=1:length(statLst)
     
     subplot(3,2,(k-1)*2+2)
     bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
-        'factorgap',9,'factorseparator',1,'color','rk','Symbol','+','Widths',0.75);
+        'factorgap',9,'factorseparator',1,'color','rk','Symbol','','Widths',0.75);
     %ylabel(yLabelStr);
     xlabel(subLst{(k-1)*2+2})
     ylim(yRangeS)
     set(bh,'LineWidth',2)
-    set(gca,'xtick',1.7:2.6:15,'ytick',yRangeT(1):(yRangeT(2)-yRangeT(1))/5:yRangeT(2))
+    xLimit=get(gca,'xlim');
+    nBin=length(unique(labelLst2));
+    xTick=linspace(xLimit(1),xLimit(2),2*nBin+1);
+    set(gca,'xtick',xTick(2:2:end),'ytick',yTickLst)
     set(gca,'xticklabel',{'LSTM','NN','LR','Noah'});
     box_vars = findall(gca,'Tag','Box');
 %     if strcmp(stat,'rsq')
@@ -162,10 +177,9 @@ for k=1:length(statLst)
     if strcmp(stat,'rmse')
         title(['Regular Spatial Generalization Test'])
     end
-    set(gca,'Position',[0.65,0.1+(3-k)*0.3,0.25,0.25])
+    set(gca,'Position',[0.65,0.1+(3-k)*0.3,0.275,0.225])
 end
-
-fname=[figFolder,'\','boxplot_surf_All'];
+fname=[figFolder,'\','boxplot_surf_AMRA'];
 fixFigure([],[fname,suffix]);
 saveas(gcf, [fname]);
 

@@ -33,7 +33,7 @@ for k=1:length(caseSel)
     rsqLR=statLR_test{indCase,2}.rsq;
     rsqNN=statNN_test{indCase,2}.rsq;
     rsqModel=statModel_train{indCase,1}.rsq;
-    rsqDiff=statDiff_test{indCase}.rsq*-9999;
+    rsqDiff=statDiff_test{indCase}.rsq*nan;
 
     %biasDiff=statModel_test{indCase,1}.(stat)-statLSTM_test{indCase,2}.(stat);
     nTest=length(biasLSTM);
@@ -47,10 +47,12 @@ for k=1:length(caseSel)
         repmat({'NN'},nTest,1);repmat({'Noah'},nTrain,1);repmat({'Diff'},nTest,1);];
     labelLst2=[labelLst2;repmat(caseLst(indCase),nTest*3+nTrain,1);];
 end
+dataLstRsq=sqrt(dataLstRsq);
+
 
 subplot(3,1,1)
 bh=boxplot(dataLstBias, {labelLst2,labelLst1},'colorgroup',labelLst2,...
-    'factorgap',8,'factorseparator',1,'color','rgbk','Symbol','+',...
+    'factorgap',8,'factorseparator',1,'color','rgbk','Symbol','',...
     'Widths',0.75);
 set(bh,'LineWidth',2)
 ylim([-0.15,0.15])
@@ -61,11 +63,11 @@ set(gca,'xticklabel',{' '});
 
 subplot(3,1,2)
 bh=boxplot(dataLstRsq, {labelLst2,labelLst1},'colorgroup',labelLst2,...
-    'factorgap',8,'factorseparator',1,'color','rgbk','Symbol','+',...
+    'factorgap',8,'factorseparator',1,'color','rgbk','Symbol','',...
     'Widths',0.75);
 set(bh,'LineWidth',2)
 ylim([0,1])
-ylabel('R^2')
+ylabel('R')
 set(gca,'xticklabel',{' '});
 
 %set(gca,'xtick',2.5:5.25:20)

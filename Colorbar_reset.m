@@ -9,7 +9,7 @@ h = colorbar;
 YTick=get(h,'YTick');
 p = linearIntp(YTick,[0,1],range);
 for i=1:length(p), 
-    labels{i}=num2str(p(i),'%.2f');     
+    labels{i}=num2str(p(i),'%.3f');     
     %labels{i}=num2str(p(i));     
 end
 set(h,'YTick',YTick,'YTickLabel',labels,'fontsize',15);

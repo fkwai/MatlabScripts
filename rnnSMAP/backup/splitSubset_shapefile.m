@@ -20,7 +20,13 @@ saveFolder=[kPath.DBSMAP_L3,dataName,kPath.s];
 
 dataFileCONUS=[dirData,varName,'.csv'];
 crdFileCONUS=[dirData,'crd.csv'];
-data=csvread(dataFileCONUS);
+try
+    data=csvread(dataFileCONUS);
+catch
+    warning([dataFileCONUS,' not Found!']);
+    indOut = [];
+    return
+end
 crd=csvread(crdFileCONUS);
 
 fileMode = 0;
