@@ -60,7 +60,9 @@ end
 %% HUC2
 % select nc from 18-1=17 HUC2 (nr realizations; contiguous or not)
 dat = readGrid('F:\olddrive\DataBase\National\HUC2_CONUS.tif');
-saveFolderRt='CONUS';
+% v2f1 saved as huc2_v2f1_control.mat and E:\Kuai\huc2_v2f1_4hucs_50
+% 
+saveFolderRt='CONUSv2f1';
 %interval=1; offset=1;
 % rootName = 'H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\byGrid';
 nt=18; nr = 50;ns=4; exclude=8; elem=1:nt;elem(elem==exclude)=[];
@@ -76,7 +78,7 @@ while 1
 end
 save exp A
 for i=1: nt-length(exclude) - (ns-1)
-    d = elem(i:i+3);
+    d = elem(i:i+ns-1);
     if ~any(ismember(d,A,'rows'))
         k = k + 1;
         A(k,:) = d;
@@ -84,7 +86,7 @@ for i=1: nt-length(exclude) - (ns-1)
     end
 end
 
-parpool(6);
+parpool(8);
 dat0=dat;
 parfor i=1:size(A,1)
     i
@@ -92,7 +94,8 @@ parfor i=1:size(A,1)
     dat = dat0;
     dat.zoneSel = A(i,:); 
     ff=''; for j=dat.zoneSel,ff=[ff,sprintf('%02d',j)]; end
-    subsetName = ['huc2_',ff];
+    jobHead = ['hucv2n',num2str(ns)];
+    subsetName = [jobHead,'_',ff];
     %saveFolder = ['CONUS',num2str(i)];
     indSub=subsetSMAP_shape(saveFolderRt,dat,subsetName );
     toc

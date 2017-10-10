@@ -5,10 +5,12 @@ function [f,cmap]=showMap(grid,y,x,varargin)
 % tsStr.grid: a 3D grid with t in 3rd dimension
 % tsStr.symb: symbol of this ts
 
-pnames={'title','shapefile','colorRange','Position','cbTitle','lonLim','latLim','newFig','nLevel','tsStr','cmap','openEnds'};
-dflts={[],[],[0,1],[1,1,800,500],'[-]',[],[],1,10,[],[],[1 1]};
+pnames={'title','shapefile','colorRange','Position','lonLim','latLim',...
+    'newFig','nLevel','cmap','openEnds'};
+dflts={[],[],[0,1],[100,100,800,500],[],[],1,10,[],[1 1]};
 
-[strTitle,shapefile,colorRange,Position,cbTitle,lonLim,latLim,newFig,nLevel,tsStr,cmap,openEnds]=...
+[strTitle,shapefile,colorRange,Position,lonLim,latLim,...
+    newFig,nLevel,cmap,openEnds]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -23,9 +25,12 @@ if newFig==1
     f=figure('Position',Position);
 end
 axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
-      'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
-      'MapLatlimit', latLim, 'MapLonLimit', lonLim,'LabelFormat','none',...
-      'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50],'FontSize',16)
+    'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
+    'MapLatlimit', latLim, 'MapLonLimit', lonLim,'LabelFormat','none',...
+    'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50],'FontSize',16);
+objLabel=findobj('Tag','MLabel');
+set(objLabel,'VerticalAlignment','middle');
+
 tightmap
 % geoshow(latmesh,lonmesh,grid,'DisplayType','surface');
 %geoshow(latmesh,lonmesh,grid,'DisplayType','texturemap');
@@ -86,7 +91,8 @@ if ~isempty(strTitle)
     title(strTitle)
 end
 if ~isempty(colorRange)
-    caxis auto
+    %caxis auto
+    caxis([0,nColor])
     if plotOpt==1
         clevels =cellfun(@num2str,num2cell(levels),'UniformOutput',false);
         clevels(2:2:end)={''};
@@ -98,12 +104,14 @@ if ~isempty(colorRange)
     else
         h=colorbar('southoutside','Ticks',tick,'TickLabels',tickL);
     end
-    set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',16)
+    set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',20,...
+        'Ticklength',0.034,'LineWidth',1.5)
     %cb = lcolorbar('Ticks',1.5:nLevel-0.5,'Location','Horizontal');  
     
     %cb = lcolorbar(clevels,'TitleString',cbTitle);  
 end
 
+set(gcf,'color','w');
 
 
 end

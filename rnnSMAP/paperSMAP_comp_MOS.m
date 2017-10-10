@@ -1,7 +1,7 @@
 
 
 figFolder='H:\Kuai\rnnSMAP\paper\';
-fname=[figFolder,'\','boxplot_All_ARMA'];
+fname=[figFolder,'\','boxplot_All_MOS'];
 suffix = '.eps';
 global fsize
 fsize=16
@@ -9,28 +9,14 @@ fsize=16
 %% load data
 % temporal
 global kPath
-%{ 
-%CP commented this out
-outName='CONUSv4f1';
+outName='CONUSv4f1_MOS';
 trainName='CONUSv4f1';
 testNameT='CONUSv4f1';
-%}
-outName='fullCONUS02hS512';
-trainName='CONUS';
-testNameT='CONUS';
-
-modelName='Noah';
+modelName='MOS';
 epoch=500;
 
-% CP running by hand:
-CPrun =1;
-if CPrun
-    [outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,...
-        'readCov',0,'readData',0,'model',modelName);
-else
-    [outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,...
-        'readData',0,'model',modelName);
-end
+[outTrainT,outT,covT]=testRnnSMAP_readData(outName,trainName,testNameT,epoch,...
+    'readData',0,'model',modelName);
 
 statTtrain_LSTM=statCal(outTrainT.yLSTM,outTrainT.ySMAP);
 statT_LSTM=statCal(outT.yLSTM,outT.ySMAP);
@@ -51,10 +37,10 @@ statTtrain_ARMA=statCal(matARMA.yARMA(1:366,:),outTrainT.ySMAP);
 statT_ARMA=statCal(matARMA.yARMA(367:732,:),outT.ySMAP);
 
 %% spatial
-outName='CONUSv4f1';
+outName='CONUSv4f1_MOS';
 trainName='CONUSv4f1';
 testNameS='CONUSv4f2';
-modelName='Noah';
+modelName='MOS';
 epoch=500;
 
 [outTrainS,outS,covS]=testRnnSMAP_readData(outName,trainName,testNameS,epoch,...
@@ -124,16 +110,6 @@ for k=1:length(statLst)
         repmat({'LRp'},nTrain+nT,1);...
         repmat({'Noah'},nTrain+nT,1);];
     
-    %SCP: a hack to get rid of the top line;
-    removeTop = 1;
-    if removeTop
-        nrr = size(dataLst,1)/size(crd,1);
-        lat = repmat(crd(:,1),[nrr,1]); loc = lat>49.5;
-        dataLst(loc)=[];
-        labelLst1(loc)=[];
-        labelLst2(loc)=[];
-    end
-    
     subplot(3,2,(k-1)*2+1)
     bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
         'factorgap',9,'factorseparator',1,'color','rk','Symbol','','Widths',0.75);
@@ -181,13 +157,6 @@ for k=1:length(statLst)
         repmat({'LR'},nTrain+nS,1);...
         repmat({'Noah'},nTrain+nS,1);];
     
-    if removeTop
-        nrr = size(dataLst,1)/size(crd,1);
-        lat = repmat(crd(:,1),[nrr,n1]); loc = lat>49.5
-        dataLst(loc)=[];
-        labelLst1(loc)=[];
-        labelLst2(loc)=[];
-    end
     subplot(3,2,(k-1)*2+2)
     bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
         'factorgap',9,'factorseparator',1,'color','rk','Symbol','','Widths',0.75);

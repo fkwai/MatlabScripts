@@ -15,7 +15,8 @@ indV=find(sum(isnan(x),1)./nt<0.1); % assume x is complete time seris and remove
 nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
 rsqTemp=zeros(nInd,1);
 for j=1:nInd
-    rsqTemp(j)=RsqCalculate(y(:,j),x(:,j));
+    %rsqTemp(j)=sqrt(RsqCalculate(y(:,j),x(:,j)));
+    rsqTemp(j)=RsqCalculate(y(:,j),x(:,j),1);
 end
 biasTemp=nanmean(x-y)';
 rmseTemp=sqrt(nanmean((x-y).^2))';

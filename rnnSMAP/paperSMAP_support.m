@@ -26,14 +26,14 @@ fixFigure(gcf,[fname,suffix]);
 saveas(gcf, fname);
 
 %% 2 raw values of R2(Noah) and Bias(Noah)
-trainName='CONUSs4f1';
+trainName='CONUSv4f1';
 tTest=367:732;
 dirData=[kPath.DBSMAP_L3,trainName,kPath.s];
 fileCrd=[dirData,'crd.csv'];
 crd=csvread(fileCrd);
 shapefile='H:\Kuai\map\USA.shp';
 
-[yNOAH_All,yNOAH_stat] = readDatabaseSMAP(trainName,'LSOIL');
+[yNOAH_All,yNOAH_stat] = readDatabaseSMAP(trainName,'LSOIL_0-10');
 [ySMAP_All,yNOAH_stat] = readDatabaseSMAP(trainName,'SMAP');
 
 ySMAP=ySMAP_All(tTest,:);
@@ -44,23 +44,25 @@ statNOAH=statCal(yNOAH,ySMAP);
 stat='rsq';
 plotData=statNOAH.(stat);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='R^2(Noah)';
+titleStr='R(Noah)';
 colorRange=[0,1];
-[h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
+openEnds = [0 0];
+[h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'openEnds',openEnds,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
-fname=[figFolder,'fig_rsqMap_NOAH'];
-fixFigure(gcf,[fname,suffix]);
+fname=[figFolder,'\fig_rsqMap_NOAH'];
+fixFigure([],[fname,suffix]);
 saveas(gcf, fname);
 
 stat='bias';
 plotData=statNOAH.(stat);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
 titleStr='Bias(Noah)';
-colorRange=[-0.15,0.15];
-[h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
+colorRange=[-0.2,0.2]; 
+nLevel=8;
+[h,cmap]=showMap(gridStat,yy,xx,'nLevel',nLevel,'colorRange',colorRange,'shapefile',shapefile,'title',titleStr);
 colormap(cmap)
-fname=[figFolder,'fig_biasMap_NOAH'];
-fixFigure(gcf,[fname,suffix]);
+fname=[figFolder,'\fig_biasMap_NOAH'];
+fixFigure([],[fname,suffix]);
 saveas(gcf, fname);
 
 %% 3 SMAP quality flag
@@ -75,18 +77,16 @@ crd=csvread(fileCrd);
 yData_All(isnan(ySMAP_All))=nan;
 plotData=nanmean(yData_All',2);
 [gridData,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
-titleStr='Fraction of SMAP Recommand Quality';
+titleStr='Fraction of time with SMAP "Recommended Quality"';
 shapefile='H:\Kuai\map\USA.shp';
 
 temp=parula(22);
-cmap=temp(10:end-1,:);
+cmap=temp(11:end-1,:);
 cmap(1,:)=[1,1,1];
-
-[h,cmap]=showMap(1-gridData,yy,xx,'colorRange',[0,1],'shapefile',shapefile,...
+openEnds = [0 0];
+[h,cmap]=showMap(1-gridData,yy,xx,'colorRange',[0,1],'nLevel',10,'openEnds',openEnds,'shapefile',shapefile,...
     'title',titleStr,'Position',[1,1,1600,1000],'cmap',cmap);
-colormap(cmap)
-
 
 fname=[figFolder,'fig_sup_qualFlag'];
-fixFigure(gcf,[fname,suffix]);
+fixFigure([],[fname,suffix]);
 saveas(gcf, fname);

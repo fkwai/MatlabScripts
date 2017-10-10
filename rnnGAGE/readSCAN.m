@@ -51,6 +51,8 @@ if isempty(strfind(tline,'Error'))
         end
         soilM(soilM==-99.9)=nan;
     end
+else
+    fclose(fid);
 end
 
 end

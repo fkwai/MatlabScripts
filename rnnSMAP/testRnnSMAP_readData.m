@@ -2,9 +2,9 @@ function [outTrain,outTest,covMethod]=testRnnSMAP_readData(outName,trainName,tes
 % optSMAP: 1 -> real; 2 -> anomaly
 % optGLDAS: 1 -> real; 2 -> anomaly; 0 -> no soilM
 
-pnames={'readCov','readData','timeOpt','varLstName','varConstLstName'};
-dflts={1,1,1,'varLst','varConstLst'};
-[readCov,readData,timeOpt,varLstName,varConstLstName]=...
+pnames={'readCov','readData','timeOpt','varLstName','varConstLstName','model'};
+dflts={1,1,1,'varLst','varConstLst',[]};
+[readCov,readData,timeOpt,varLstName,varConstLstName,model]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
@@ -26,6 +26,17 @@ elseif timeOpt==2
 elseif timeOpt==3
     tTrain=1:366;
     tTest=1:366;
+end
+
+if isempty(model)
+    modelField='LSOIL_0-10';
+else
+    switch model
+        case 'Noah'
+            modelField='LSOIL_0-10';
+        case 'MOS'
+            modelField='SOILM_0-10_MOS';
+    end
 end
 
 if readData==1
@@ -86,8 +97,8 @@ if exist(GLDASmatFile,'file')
     outTrain.yGLDAS=GLDASmat.yGLDAS_train;
     outTest.yGLDAS=GLDASmat.yGLDAS_test;
 else
-    [xSoilmTrain,xSoilmStatTrain] = readDatabaseSMAP(trainName,'LSOIL');
-    [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(testName,'LSOIL');
+    [xSoilmTrain,xSoilmStatTrain] = readDatabaseSMAP(trainName,modelField);
+    [xSoilmTest,xSoilmStatTest] = readDatabaseSMAP(testName,modelField);
     stdSoilm=xSoilmStatTrain(3);
     meanSoilm=xSoilmStatTrain(4);
     yGLDAS_train=xSoilmTrain(tTrain,:)/100;
