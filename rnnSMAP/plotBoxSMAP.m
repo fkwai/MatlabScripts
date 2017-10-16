@@ -1,0 +1,59 @@
+function f=plotBoxSMAP( statMat,labelX,labelY,varargin )
+% box plot of SMAP LSTM training result
+
+% input:
+% statMat - a 2D-Matrix of cells. Each row will be plot in a bin, and each
+% member of that row will be a box. 
+% labelX - label of each column of statMat
+% labelY - label of each row of statMat
+% varargin - options in plotting
+
+% output:
+% f - figure handle
+
+% example:
+% plotBoxSMAP_example
+
+
+pnames={'newFig','yRange'};
+dflts={1,[]};
+[newFig,yRange]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+
+cLst='rkbg';
+if newFig
+    f=figure;
+else
+    f=[];
+end
+
+%% format data
+[ny,nx]=size(statMat);
+dataLst=[];
+labelLst1={};
+labelLst2={};
+for j=1:ny
+    for i=1:nx
+        nData=length(statMat{j,i});
+        dataLst=[dataLst;statMat{j,i}];
+        labelLst1=[labelLst1;repmat(labelX(i),nData,1)];
+        labelLst2=[labelLst2;repmat(labelY(j),nData,1)];
+    end
+end
+
+%% plot
+bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
+    'factorgap',9,'factorseparator',1,'color',cLst(1:nx),'Symbol','','Widths',0.75);
+
+if ~isempty(yRange)
+    ylim(yRange)
+end
+xLimit=get(gca,'xlim');
+xTick=linspace(xLimit(1),xLimit(2),2*ny+1);
+set(gca,'xtick',xTick(2:2:end))
+set(gca,'xticklabel',labelY)
+set(bh,'LineWidth',2)
+box_vars = findall(gca,'Tag','Box');
+hLegend = legend(box_vars([2,1]), labelX,'location','northwest');
+
+end
+
