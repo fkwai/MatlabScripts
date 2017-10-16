@@ -122,7 +122,8 @@ nm = ceil(nM/nConc);
 cid = -1;
 spmd
     id = labindex;
-    %for id=1:nConc
+    %for id=1:nConc % for debugging, comment out two lines above and
+    %uncomment this line
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
         if ii<=nM
@@ -173,10 +174,13 @@ spmd
                 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
                 %trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
-                trainCMD = strrep(trainCMD, '-timeOpt 2', ['-timeOpt ',num2str(testTimeOpt)]);
+                strTime  = ['-timeOpt ',num2str(testTimeOpt)];
+                trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);
+                trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
                 
                 if any(action==2)
                     runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
+                    %runCmdInScript(trainCMD2,jobHead,nk,2,testRun,cid);
                 end
             end
             if is==nm && cid>0, fclose(cid); cid=-1; end
@@ -224,15 +228,18 @@ if ispc || testRun
         disp('*******************************************')
         disp('runCmdInScript:: cmd to be submitted to OS:')
     end
-    fprintf(cid,'%s\n',cmd);
+    fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
     %disp(trainCMD)
-    disp(cmd)
+    disp(cmd);
     if verb>1 type(file); end
 else
-    if verb>0, disp(cmd); end;tic;
-    system(trainCMD)
+    if verb>0, 
+      fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
+      disp(['runCmdInScript Submitted::', cmd]);
+     end;tic;
+    system(trainCMD);
     t1=toc; 
-    if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',trainCMD]); end
+    if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',cmd]); end
     %delete(file);
 end
 
