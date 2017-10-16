@@ -1,5 +1,6 @@
-function [dataTrain,dataTest]= readRnnPred(outName,trainName,testName,epoch,timeOpt)
+function [dataOut]= readRnnPred(outName,dataName,epoch,timeOpt,varargin)
 % read prediction from testRnnSMAP.lua into a data.mat
+% varargin{1} - root outFolder,default to be kPath.outSMAP_L3
 
 % % example
 % outFolder='Y:\Kuai\rnnSMAP\output\PA';
@@ -8,24 +9,15 @@ function [dataTrain,dataTest]= readRnnPred(outName,trainName,testName,epoch,time
 % iter=2000;
 
 global kPath
-
-if timeOpt==1
-    tTrain='t1';
-    tTest='t2';
-elseif timeOpt==2
-    tTrain='t3';
-    tTest='t3';
-elseif timeOpt==3
-    tTrain='t1';
-    tTest='t1';
+if isempty(varargin)
+    rootOut=kPath.OutSMAP_L3;
+else
+    rootOut=varargin{1};
 end
 
+dataFile=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
+dataOut=csvread([rootOut,outName,kPath.s,dataFile]);
 
-trainFile=['test_',trainName,'_',tTrain,'_epoch',num2str(epoch),'.csv'];
-testFile=['test_',testName,'_',tTest,'_epoch',num2str(epoch),'.csv'];
-
-dataTrain=csvread([kPath.OutSMAP_L3,outName,kPath.s,trainFile]);
-dataTest=csvread([kPath.OutSMAP_L3,outName,kPath.s,testFile]);
 
 end
 
