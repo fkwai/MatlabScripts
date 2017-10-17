@@ -1,9 +1,9 @@
 function [outNameLst,dataNameLst,optLst]=findJobHead(jobHead,varargin)
-% pick outFolders match given pattern. 
+% pick outFolders match given pattern.
 
 % input:
 % jobHead - head pattern of jobs output folder
-% varargin{1} - optional root folder. Default to be kPath.OutSMAP_L3
+% varargin{1} - optional root output folder. Default to be kPath.OutSMAP_L3
 
 % output:
 % outNameLst - list of outName
@@ -25,18 +25,23 @@ else
 end
 
 %% initialize
-outLst = dir([rootOut,filesep,jobHead,'*']); 
+outLst = dir([rootOut,filesep,jobHead,'*']);
 outNameLst={outLst.name}';
 nOut=length(outNameLst);
 dataNameLst=cell(nOut,1);
 
 %% read options and dataName
-for k=1:nOut
-    outName=outNameLst{k};
-    optFile=[rootOut,filesep,outName,filesep,'opt.txt'];
-    opt=readRnnOpt(outName,rootOut);
-    optLst(k)=opt;
-    dataNameLst{k}=opt.train;
+if nOut~=0
+    for k=1:nOut
+        outName=outNameLst{k};
+        optFile=[rootOut,filesep,outName,filesep,'opt.txt'];
+        opt=readRnnOpt(outName,rootOut);
+        optLst(k)=opt;
+        dataNameLst{k}=opt.train;
+    end
+    optLst=optLst';
+else
+    disp('No Output Case found!')
 end
 
 

@@ -24,7 +24,7 @@ batchJobs(res,prob,[1 2]) % action contains 1: train; contains 2: test
 diary('batchJobsLog.log')
 
 % Grabbing configurations from input
-nGPU = res.nGPU; nConc = res.nConc; 
+nGPU = res.nGPU; nConc = res.nConc;
 jobHead = prob.jobHead; hs = prob.hs; temporalTest = prob.temporalTest; varFile = prob.varFile;
 epoch = prob.epoch; if isfield(prob,'varCFile'),varCFile = prob.varCFile; else, varCFile='varConstLst_Noah';  end
 if isfield(prob,'namePadd'), namePadd = prob.namePadd; else, namePadd=''; end
@@ -53,7 +53,7 @@ if length(varargin)>1
     testRun = varargin{2};
 end
 
-D = dir([rt,filesep,jobHead,'*']); 
+D = dir([rt,filesep,jobHead,'*']);
 if ~isempty(dirIndices), D=D(dirIndices); end
 disp(['Number of directories=',num2str(length(D))]);
 hS = zeros(size(D))+hs;
@@ -64,10 +64,10 @@ if ~testRun
     dirJ = [cd,filesep,'MPT',filesep,jobHead]; if ~exist(dirJ),mkdir(dirJ); end
     myCluster.JobStorageLocation = dirJ;
     myCluster.NumWorkers = max(nConc,myCluster.NumWorkers);
-
-       
+    
+    
     try
-         parpool(myCluster,nConc);
+        parpool(myCluster,nConc);
     catch
         p = gcp('nocreate');
         delete(gcp('nocreate'))
@@ -86,13 +86,13 @@ else
 end
 if iscell(varFile) % a list of parameter files)
     VFILE=varFile;
-else 
+else
     VFILE{1}=varFile;
 end
 
 if iscell(varCFile) % a list of parameter files)
     VCFILE=varCFile;
-else 
+else
     VCFILE{1}=varCFile;
 end
 nMultiple = nConc/nGPU;
@@ -120,10 +120,9 @@ nm = ceil(nM/nConc);
 % turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
 % nConc will be further decomposed to [nGPU,nMultiple]
 cid = -1;
-spmd
+%spmd
+for id=1:nConc
     id = labindex;
-    %for id=1:nConc % for debugging, comment out two lines above and
-    %uncomment this line
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
         if ii<=nM
@@ -174,13 +173,10 @@ spmd
                 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
                 %trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
-                strTime  = ['-timeOpt ',num2str(testTimeOpt)];
-                trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);
-                trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
+                trainCMD = strrep(trainCMD, '-timeOpt 2', ['-timeOpt ',num2str(testTimeOpt)]);
                 
                 if any(action==2)
                     runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
-                    %runCmdInScript(trainCMD2,jobHead,nk,2,testRun,cid);
                 end
             end
             if is==nm && cid>0, fclose(cid); cid=-1; end
@@ -211,7 +207,7 @@ file = [sD,sF];
 
 fid = fopen(file,'wt');
 fprintf(fid,'%s\n','. ~/.bashrc');
-fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib'); 
+fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
 % Above is what is causing problems with a simple Matlab launch
 fprintf(fid,'%s\r\n',cmd);
 fclose(fid);
@@ -228,18 +224,15 @@ if ispc || testRun
         disp('*******************************************')
         disp('runCmdInScript:: cmd to be submitted to OS:')
     end
-    fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
+    fprintf(cid,'%s\n',cmd);
     %disp(trainCMD)
-    disp(cmd);
+    disp(cmd)
     if verb>1 type(file); end
 else
-    if verb>0, 
-      fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
-      disp(['runCmdInScript Submitted::', cmd]);
-     end;tic;
-    system(trainCMD);
-    t1=toc; 
-    if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',cmd]); end
+    if verb>0, disp(cmd); end;tic;
+    system(trainCMD)
+    t1=toc;
+    if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',trainCMD]); end
     %delete(file);
 end
 
@@ -284,14 +277,16 @@ switch c
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,'hs',hs,'temporalTest',temporalTest);
         for i=1:length(toDropC) % removing one variable at a time.
             k = ismember(vc0,toDropC{i}); vc=vc0; vc(k)=[];
-            filename = ['varConstLst',num2str(i),'.csv']; 
+            filename = ['varConstLst',num2str(i),'.csv'];
             file = [p,filesep,filename]; writetable(cell2table(vc),file);
             prob.varCFile{i} = filename;
         end
         batchJobs(res,prob,action,1)
+        
+        
     case 4
         % Kuai: forward all hucv2nx model to their local / CONUSv2f1
-        nGPU =2; nMultiple=2; jobHead='hucv2n3'; epoch=300; hs=256; temporalTest=1;
+        nGPU =2; nMultiple=2; jobHead='hucv2n2'; epoch=300; hs=256; temporalTest=1;
         rt = ''; action = [2]; % empty if using default settings on each machine
         res = struct('nGPU',nGPU,'nConc',nMultiple*nGPU,'rt',rt);
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,'hs',hs,'temporalTest',temporalTest);

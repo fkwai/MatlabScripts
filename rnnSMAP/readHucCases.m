@@ -7,7 +7,6 @@ global kPath
 
 %% find all jobs (hard code)
 rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2nc',num2str(nHUC),'\'];
-%rootDB=['E:\Kuai\rnnSMAP_inputs\hucv2nc',num2str(nHUC),'\'];
 rootDB=kPath.DBSMAP_L3;
 
 jobHead=['hucv2n',num2str(nHUC)];
