@@ -3,75 +3,83 @@
 % HUCs. Want to show CONUS model vs HUC models of n HUCs and bias-picked /
 % unbias-picked.
 
-statLst={'rmse','bias','rsq'};
-nHUCLst=1:2;
+nHucLst=1:2;
 global kPath
 
-%% read CONUSv2f1
-%{
-tic
-outTrain_Noah=postRnnSMAP_load('CONUSv2f1_Noah','CONUSv2f1',1,500);
-outTest_Noah=postRnnSMAP_load('CONUSv2f1_Noah','CONUSv2f1',2,500);
-outTrain_NoModel=postRnnSMAP_load('CONUSv2f1_NoModel','CONUSv2f1',1,500);
-outTest_NoModel=postRnnSMAP_load('CONUSv2f1_NoModel','CONUSv2f1',2,500);
-statCONUS_Noah{1}=statCal(outTrain_Noah.yLSTM,outTrain_Noah.ySMAP);
-statCONUS_Noah{2}=statCal(outTest_Noah.yLSTM,outTest_Noah.ySMAP);
-statCONUS_NoModel{1}=statCal(outTrain_NoModel.yLSTM,outTrain_NoModel.ySMAP);
-statCONUS_NoModel{2}=statCal(outTest_NoModel.yLSTM,outTest_NoModel.ySMAP);
-crdCONUSFile=[kPath.DBSMAP_L3,filesep,'CONUSv2f1',filesep,'crd.csv'];
-crdCONUS=csvread(crdCONUSFile);
-toc
-%}
+% %% read CONUSv2f1
+% [outCONUSMat,statCONUSMat,crdCONUSMat,optCONUSLst] = postRnnSMAP_jobHead('CONUSv2f1');
+% % 
+% 
+% %% read all HUC-cases and save matfile
+% for i=1:length(nHucLst)
+%     nHUC=nHucLst(i);
+%     jobHead=['hucv2n',num2str(nHUC)];
+%     rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2n',num2str(nHUC),filesep];
+%     rootDB=['E:\Kuai\rnnSMAP_inputs\hucv2n',num2str(nHUC),filesep];
+%     postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB);    
+% end
 
-%% start HUCs
-kFig=1;
-for kHUC=1:2
-    nHUC=nHUCLst(kHUC);
-    rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2nc',num2str(nHUC),'\'];
-    saveMatFile=[rootOut,'caseMat.mat'];
-    if ~exist(saveMatFile,'file')        
-        [statLstMat,crdMat,bNear,bModel] = readHucCases( nHUC );
-    end
-    load(saveMatFile);
+
+%% plot cases
+CONUSMatFile=[kPath.OutSMAP_L3,filesep,'CONUSv2f1.mat'];
+matCONUS=load(CONUSMatFile);
+crdCONUS=matCONUS.crdMat{1};
+for i=1:length(nHucLst)
+    nHUC=nHucLst(i);
+    jobHead=['hucv2n',num2str(nHUC)];
+    rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2n',num2str(nHUC),filesep];
+    saveMatFile=[rootOut,filesep,jobHead,'.mat'];
+    matHUC=load(saveMatFile);        
     
-    %% plot cases
-    % unbiased
-    kStat=1;
-    stat=statLst{kStat};
+    %% figure out if bias/unbias, with/without model
+    % get HUC id
+    nCase=length(matHUC.optLst);
+    HUCid=zeros(nCase,nHUC)*nan;
+    for k=1:nCase
+        idStr=matHUC.optLst(k).train(end-nHUC*2+1:end);
+        idCell=cellstr(reshape(idStr,[2,nHUC])');
+        HUCid(k,:)=cellfun(@str2num,idCell);
+    end
+    % biased/unbiased
+    bNear=ones(nCase,1);
+    if nHUC~=1
+        bNear=mean(HUCid(:,2:end)-HUCid(:,1:end-1),2)==1;    
+    end
+    % with/without model
+    bModel=strcmp({matHUC.optLst.var},'varLst_Noah')';
+    
+    %% plot
+    stat='rmse';
     for kPick=1:2
         if nHUC~=1 || kPick~=2
-            if kPick==1
-                indPick=find(bNear & bModel);
-                indPick_NM=find(bNear & ~bModel);
-            elseif kPick==2
-                indPick=find(~bNear & bModel);
-                indPick_NM=find(~bNear & ~bModel);
+            if kPick==1 %biased hucs
+                indNoah=find(bNear & bModel);
+                indNoModel=find(bNear & ~bModel);
+            elseif kPick==2 %unbiased hucs
+                indNoah=find(~bNear & bModel);
+                indNoModel=find(~bNear & ~bModel);
             end
             
-            crdHUC=vertcat(crdMat{indPick});
+            crdHUC=vertcat(matHUC.crdMat{indNoah});
             [indHUC,indCONUS]=intersectCrd(crdHUC,crdCONUS);
             
             boxMat=cell(3,2);
-            for kTrain=1:2
-                temp=statCONUS_Noah{kTrain}.(stat);
-                boxMat{1,kTrain}=temp(indCONUS);
-                boxMat{2,kTrain}=vertcat(statLstMat{kStat}{indPick,kTrain});
-                boxMat{3,kTrain}=vertcat(statLstMat{kStat}{indPick_NM,kTrain});
+            for iT=1:2                
+                boxMat{1,iT}=matCONUS.statMat.(stat){2,iT};
+                boxMat{2,iT}=matCONUS.statMat.(stat){1,iT};
+                boxMat{3,iT}=vertcat(matHUC.statMat.(stat){indNoah,iT});
+                boxMat{4,iT}=vertcat(matHUC.statMat.(stat){indNoModel,iT});                
             end
             
-            subplot(2,length(nHUCLst),1+nHUC-1+(kPick-1)*2)
+            subplot(2,length(nHucLst),1+nHUC-1+(kPick-1)*2)
             labelX={'train','test'};
-            labelY={'CONUS','Noah','NoModel'};
-            plotBoxSMAP( boxMat,labelX,labelY,'newFig',0,'yRange',[0,0.05])
+            labelY={'CONUS Noah','CONUS NoModel','HUC Noah','HUC NoModel'};
+            plotBoxSMAP( boxMat,labelX,labelY,'newFig',0,'yRange',[0,0.05]);
             if kPick==1
                 title(['nHUC = ',num2str(nHUC), ' Unbiased']);
             else
                 title(['nHUC = ',num2str(nHUC), ' biased']);
             end
-            kFig=kFig+1;
-        
-        else
-            kFig=kFig+1;
         end
     end
 end

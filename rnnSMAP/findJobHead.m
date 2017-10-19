@@ -1,4 +1,4 @@
-function [outNameLst,dataNameLst,optLst]=findJobHead(jobHead,varargin)
+function [outNameLst,optLst]=findJobHead(jobHead,varargin)
 % pick outFolders match given pattern.
 
 % input:
@@ -26,20 +26,18 @@ end
 
 %% initialize
 outLst = dir([rootOut,filesep,jobHead,'*']);
+outLst(~[outLst.isdir])=[];
 outNameLst={outLst.name}';
 nOut=length(outNameLst);
-dataNameLst=cell(nOut,1);
 
 %% read options and dataName
+optLst=[];
 if nOut~=0
     for k=1:nOut
         outName=outNameLst{k};
-        optFile=[rootOut,filesep,outName,filesep,'opt.txt'];
         opt=readRnnOpt(outName,rootOut);
-        optLst(k)=opt;
-        dataNameLst{k}=opt.train;
+        optLst=[optLst;opt];
     end
-    optLst=optLst';
 else
     disp('No Output Case found!')
 end

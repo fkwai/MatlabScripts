@@ -37,7 +37,7 @@ end
 
 
 %% read SMAP
-disp('read SMAP')
+disp(['read SMAP of ',outName])
 [ySMAP,ySMAPStat] = readDatabaseSMAP(dataName,'SMAP',rootDB);
 ySMAP=ySMAP(tData,:);
 out.ySMAP=ySMAP;
@@ -52,7 +52,7 @@ yGLDAS=xSoilm(tData,:)/100;
 out.yGLDAS=yGLDAS;
 
 %% read LSTM
-disp('read LSTM')
+disp(['read LSTM of ',outName])
 dataOut=readRnnPred(outName,dataName,epoch,timeOpt,rootOut);
 yLSTM=(dataOut).*stdSMAP+meanSMAP;
 out.yLSTM=yLSTM;

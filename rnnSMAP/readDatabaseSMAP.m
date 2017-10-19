@@ -11,7 +11,7 @@ else
 end
 
 %% read subset index
-subsetFile=[rootDB,'Subset',kPath.s,dataName,'.csv'];
+subsetFile=[rootDB,filesep,'Subset',filesep,dataName,'.csv'];
 fid=fopen(subsetFile);
 C = textscan(fid,'%s',1);
 rootName=C{1}{1};
@@ -21,8 +21,8 @@ fclose(fid);
 
 %% read var
 if indSub==-1
-    xFile=[rootDB,dataName,kPath.s,varName,'.csv'];
-    xStatFile=[rootDB,dataName,kPath.s,varName,'_stat.csv'];
+    xFile=[rootDB,filesep,dataName,filesep,varName,'.csv'];
+    xStatFile=[rootDB,filesep,dataName,filesep,varName,'_stat.csv'];
     xData=csvread(xFile);
     xStat=csvread(xStatFile);
     xData(xData==-9999)=nan;
