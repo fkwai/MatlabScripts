@@ -57,6 +57,28 @@ for i=1:20
     close(gcf)
 end
 
+%% landcover of SMAP flag
+global kPath
+fileName=[kPath.DBSMAP_L3_CONUS,'const_flag_landcover.csv'];
+lcSMAP=csvread(fileName);
+% reclass
+rcSMAP=zeros(size(lcSMAP));
+rcSMAP(lcSMAP==1|lcSMAP==2|lcSMAP==3|lcSMAP==4|lcSMAP==5)=1;
+rcSMAP(lcSMAP==6|lcSMAP==7|lcSMAP==11|lcSMAP==16)=2;
+rcSMAP(lcSMAP==8|lcSMAP==9)=3;
+rcSMAP(lcSMAP==10)=4;
+rcSMAP(lcSMAP==12|lcSMAP==13|lcSMAP==14)=5;
+
+rootName='CONUS';
+for k=1:5
+    indSub=find(rcSMAP==k);
+    subsetName=['lc_',num2str(k)];
+    subsetSMAP_indSub( rootName,indSub,subsetName )
+    subsetSplit_All(subsetName);    
+    subsetPlot(subsetName)
+end
+
+
 %% HUC2
 % select nc from 18-1=17 HUC2 (nr realizations; contiguous or not)
 dat = readGrid('F:\olddrive\DataBase\National\HUC2_CONUS.tif');

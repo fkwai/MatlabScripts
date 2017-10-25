@@ -53,7 +53,7 @@ set(gca,'xtick',xTick(2:2:end))
 set(gca,'xticklabel',labelY)
 set(bh,'LineWidth',2)
 box_vars = findall(gca,'Tag','Box');
-hLegend = legend(box_vars([2,1]), labelX,'location','northwest');
+hLegend = legend(box_vars([2,1]), labelX,'location','best');
 
 end
 
