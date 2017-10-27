@@ -17,7 +17,7 @@ dlmwrite(crdFile,crd,'precision',12);
 
 timeFile=[dirDatabase,'time.csv'];
 sd=20050401;
-ed=20060401;
+ed=20150401;
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tnum=[sdn:edn]';
@@ -47,8 +47,6 @@ for k=1:length(dataLst)
 		grid2csv_SMAP(dataTemp,dirDatabase,tnumTemp,tnum,fieldName)
 		toc
 	end
-    
-    
 end
 
 

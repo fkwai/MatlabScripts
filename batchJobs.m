@@ -24,7 +24,7 @@ batchJobs(res,prob,[1 2]) % action contains 1: train; contains 2: test
 diary('batchJobsLog.log')
 
 % Grabbing configurations from input
-nGPU = res.nGPU; nConc = res.nConc; 
+nGPU = res.nGPU; nConc = res.nConc;
 jobHead = prob.jobHead; hs = prob.hs; temporalTest = prob.temporalTest; varFile = prob.varFile;
 epoch = prob.epoch; if isfield(prob,'varCFile'),varCFile = prob.varCFile; else, varCFile='varConstLst_Noah';  end
 if isfield(prob,'namePadd'), namePadd = prob.namePadd; else, namePadd=''; end
@@ -53,7 +53,7 @@ if length(varargin)>1
     testRun = varargin{2};
 end
 
-D = dir([rt,filesep,jobHead,'*']); 
+D = dir([rt,filesep,jobHead,'*']);
 if ~isempty(dirIndices), D=D(dirIndices); end
 disp(['Number of directories=',num2str(length(D))]);
 hS = zeros(size(D))+hs;
@@ -64,10 +64,10 @@ if ~testRun
     dirJ = [cd,filesep,'MPT',filesep,jobHead]; if ~exist(dirJ),mkdir(dirJ); end
     myCluster.JobStorageLocation = dirJ;
     myCluster.NumWorkers = max(nConc,myCluster.NumWorkers);
-
-       
+    
+    
     try
-         parpool(myCluster,nConc);
+        parpool(myCluster,nConc);
     catch
         p = gcp('nocreate');
         delete(gcp('nocreate'))
@@ -86,13 +86,13 @@ else
 end
 if iscell(varFile) % a list of parameter files)
     VFILE=varFile;
-else 
+else
     VFILE{1}=varFile;
 end
 
 if iscell(varCFile) % a list of parameter files)
     VCFILE=varCFile;
-else 
+else
     VCFILE{1}=varCFile;
 end
 nMultiple = nConc/nGPU;
@@ -121,8 +121,8 @@ nm = ceil(nM/nConc);
 % nConc will be further decomposed to [nGPU,nMultiple]
 cid = -1;
 spmd
-    id = labindex;
-    %for id=1:nConc % for debugging, comment out two lines above and
+id = labindex;
+%for id=1:nConc % for debugging, comment out two lines above and
     %uncomment this line
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
@@ -162,20 +162,29 @@ spmd
                 trainCMD = strrep(trainCMD, 'varConstLst_Noah', varCFile);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
                 
+                %od = [D(i).name,namePadd,'_',varFile,'_',varCFile]; % output folder name. must be unique
+                % for huc n4
                 od = [D(i).name,namePadd,'_',varFile,'_',varCFile]; % output folder name. must be unique
+				if strcmp(jobHead,'huc2_')
+                	od=[D(i).name,'_hS256_VF',varFile];
+				end
+                                
                 trainCMD = strrep(trainCMD, 'XX_out', od);
                 if any(action==1)
                     runCmdInScript(trainCMD,jobHead,i,1,testRun,cid);
                 end
                 
                 %ID = mod(i-1,nGPU);
-                trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500 -test CONUSv2f1 -timeOpt 2';
+                trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500  -rootOut aaa -rootDB bbb -test CONUSv2f1 -timeOpt 2';
                 trainCMD = strrep(trainCMD, '=0', ['=',num2str(ID-1)]);
                 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
-                %trainCMD = strrep(trainCMD, 'CONUS', D(i).name);
+                %trainCMD = strrep(trainCMD, 'CONUSv2f1', D(i).name);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
                 strTime  = ['-timeOpt ',num2str(testTimeOpt)];
                 trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);
+                trainCMD = strrep(trainCMD, 'aaa', prob.rootOut);
+                trainCMD = strrep(trainCMD, 'bbb', prob.rootDB);
+                
                 trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
                 
                 if any(action==2)
@@ -211,7 +220,7 @@ file = [sD,sF];
 
 fid = fopen(file,'wt');
 fprintf(fid,'%s\n','. ~/.bashrc');
-fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib'); 
+fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
 % Above is what is causing problems with a simple Matlab launch
 fprintf(fid,'%s\r\n',cmd);
 fclose(fid);
@@ -233,12 +242,12 @@ if ispc || testRun
     disp(cmd);
     if verb>1 type(file); end
 else
-    if verb>0, 
-      fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
-      disp(['runCmdInScript Submitted::', cmd]);
-     end;tic;
+    if verb>0,
+        fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
+        disp(['runCmdInScript Submitted::', cmd]);
+    end;tic;
     system(trainCMD);
-    t1=toc; 
+    t1=toc;
     if verb>0, disp(['Elapsed time = ',num2str(t1),' for job: ',cmd]); end
     %delete(file);
 end
@@ -284,7 +293,7 @@ switch c
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,'hs',hs,'temporalTest',temporalTest);
         for i=1:length(toDropC) % removing one variable at a time.
             k = ismember(vc0,toDropC{i}); vc=vc0; vc(k)=[];
-            filename = ['varConstLst',num2str(i),'.csv']; 
+            filename = ['varConstLst',num2str(i),'.csv'];
             file = [p,filesep,filename]; writetable(cell2table(vc),file);
             prob.varCFile{i} = filename;
         end
@@ -295,6 +304,8 @@ switch c
         rt = ''; action = [2]; % empty if using default settings on each machine
         res = struct('nGPU',nGPU,'nConc',nMultiple*nGPU,'rt',rt);
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,'hs',hs,'temporalTest',temporalTest);
+        prob.rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/',jobHead];
+        prob.rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/',jobHead];
         
         batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
         

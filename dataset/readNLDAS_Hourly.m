@@ -10,7 +10,7 @@ function [ data,lat,lon,tnum,fieldLst ] = readNLDAS_Hourly(productName,t,fieldin
 % lat,lon,tnum - 1d vector for lat, lon and time (hour, min, second)
 
 global kPath
-
+if isempty(kPath), initPath; end
 switch productName
 	case 'FORA'
 		NLDASdir=[kPath.NLDAS,'NLDAS_FORA0125_H.002',kPath.s];

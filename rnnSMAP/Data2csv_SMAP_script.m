@@ -22,6 +22,7 @@ edn=datenumMulti(ed,1);
 tnum=[sdn:edn]';
 dlmwrite(timeFile,tnum,'precision',12);
 
+%{
 %% write SMAP
 disp('SMAP')
 tic
@@ -59,9 +60,10 @@ for k=1:height(flagTab)
 	gridConst2csv_SMAP(data,fieldName,0,doStat)
 	toc
 end
+%}
 
 %% NLDAS - see script_NLDAS2SMAP_CONUS
-dataLst={'FORA','FORB','NOAH'};
+dataLst={'MOS'};
 for k=1:length(dataLst)
 	dataFolder=[kPath.NLDAS,'NLDAS_gridSMAP_CONUS_Daily',kPath.s,'NLDAS_',dataLst{k},'_Daily',kPath.s];
 	matFileLst=dir([dataFolder,'*.mat']);
@@ -69,9 +71,12 @@ for k=1:length(dataLst)
 		matFile=[dataFolder,matFileLst(i).name];
 		fieldName=matFileLst(i).name(1:end-4);
 		matData=load(matFile);
+		if strcmp(dataLst{k},'MOS') || strcmp(dataLst{k},'VIC')
+			fieldName=[fieldName,'_MOS'];
+		end
 		disp(fieldName)
 		tic
-		grid2csv_SMAP(matData.data,matData.tnum,tnum,fieldName)
+		grid2csv_SMAP(matData.data,dirDatabase,matData.tnum,tnum,fieldName)
 		toc
 	end
 end
