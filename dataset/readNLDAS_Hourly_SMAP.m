@@ -4,7 +4,7 @@
 global kPath
 sd=20150101;
 ed=20170611;
-dataLst={'FORA','FORB','NOAH'};
+dataLst={'MOS'};
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=sdn:edn;
@@ -33,7 +33,7 @@ for iData=1:length(dataLst)
 		dataDaily=nanmean(dataTemp,3);
 
 		% intecept to SMAP grid
-		for k=1:length(field)
+		parfor k=1:length(field)
 			dataNLDAS(:,:,iT,k)=interpGridArea(lon,lat,dataDaily(:,:,1,k),maskSMAP.lon,maskSMAP.lat);
 		end
 		toc

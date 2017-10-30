@@ -7,7 +7,7 @@ nanSMAP=dataSMAP==-9999;
 
 k=1;
 for k=1:length(flagTab.Filename)
-    fileName=[dirDB,flagTab.Filename{k},'.csv'];
+    fileName=[dirDB,'const_',flagTab.Filename{k},'.csv'];
     
     data=csvread(fileName);
     data(nanSMAP)=nan;
