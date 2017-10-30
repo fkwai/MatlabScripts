@@ -1,4 +1,4 @@
-function [ statLstMat,crdMat,bNear,bModel ] = readHucCases( nHUC )
+function [ statLstMat,crdMat,bNear,bModel ] = loadHucCases( nHUC )
 %read cases of HUC combinations
 
 statLst={'rmse','bias','rsq'};

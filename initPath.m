@@ -20,6 +20,8 @@ if strcmp(pcStr,'server')
 	kPath.SMAP='/mnt/sdb1/Database/SMAP/';
 	kPath.SMAP_L2='/mnt/sdb1/Database/SMAP/SPL2SMP.004/';
 	kPath.SMAP_L3='/mnt/sdb1/Database/SMAP/SPL3SMP.004/';
+    kPath.SMAP_VAL='/mnt/sdb1/Database/SMAP/SMAP_VAL/';
+
     kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/';
     kPath.DBSMAP_L3_CONUS='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
     kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
@@ -70,9 +72,11 @@ end
 
 if strcmp(pcStr,'pc-kuai')
 	kPath.s='/';
-
+    
+    kPath.SMAP_VAL='/mnt/sdb/Database/SMAP/SMAP_VAL/';
+    
     kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
-    kPath.DBSMAP_L3_CONUS='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
+    kPath.DBSMAP_L3_CONUS='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';    
     kPath.OutSMAP_L3='/mnt/sdb/rnnSMAP/output_SMAPgrid/';
     
     kPath.SCAN='/mnt/sdb/Database/SCAN/';

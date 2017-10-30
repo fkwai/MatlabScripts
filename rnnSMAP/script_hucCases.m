@@ -30,7 +30,7 @@ for kHUC=1:2
     rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2nc',num2str(nHUC),'\'];
     saveMatFile=[rootOut,'caseMat.mat'];
     if ~exist(saveMatFile,'file')        
-        [statLstMat,crdMat,bNear,bModel] = readHucCases( nHUC );
+        [statLstMat,crdMat,bNear,bModel] = loadHucCases( nHUC );
     end
     load(saveMatFile);
     
