@@ -8,28 +8,19 @@ maskFile=[kPath.SMAP,'maskSMAP_CONUS.mat'];
 maskMat=load(maskFile);
 
 %% initial Database
-dirDatabase=[kPath.DBSMAP_L3,'LongTerm',kPath.s];
-mkdir(dirDatabase)
-
-crdFile=[dirDatabase,'crd.csv'];
-crd=[maskMat.lat1D,maskMat.lon1D];
-dlmwrite(crdFile,crd,'precision',12);
-
-timeFile=[dirDatabase,'time.csv'];
-sd=20050401;
+dirDatabase=[kPath.DBSMAP_L3,'LongTerm_35yr',kPath.s];
+sd=19800401;
 ed=20150401;
-sdn=datenumMulti(sd,1);
-edn=datenumMulti(ed,1);
-tnum=[sdn:edn]';
-yrLst=year(tnum(1)):year(tnum(end));
-dlmwrite(timeFile,tnum,'precision',12);
+initDBcsv( maskMat,dirDatabase,sd,ed )
 
-%% NLDAS - see script_NLDAS2SMAP_CONUS
+%% NLDAS - see readNLDAS_Daily_script
+yrLst=year(datenumMulti(sd,1)):year(datenumMulti(ed,1));
 dataLst={'FORA','FORB','NOAH'};
+
 for k=1:length(dataLst)    
     dataFolderTemp=[kPath.NLDAS,'NLDAS_Daily',kPath.s,dataLst{k},kPath.s,num2str(2005),kPath.s];
-	matFileLst=dir([dataFolderTemp,'*.mat']);
-	for i=1:length(matFileLst)
+	matFileLst=dir([dataFolderTemp,'*.mat']);    
+	parfor i=1:length(matFileLst)
 		tic
 		tnumTemp=[];
 		dataTemp=[];

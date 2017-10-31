@@ -1,4 +1,4 @@
-% read NLDAS hourly data, convert to daily SMAP grid and save as matfile for each year
+% read NLDAS hourly data, and save as matfile for each year.
 % default to convert all fields. see the -1 line 27
 
 global kPath
@@ -19,20 +19,17 @@ for yr=yLst
         [dataTemp,lat,lon,tnumTemp,field] = readNLDAS_Hourly(dataName,tLst(1),-1);
         ny=length(lat);
 		nx=length(lon);
-		dataNLDAS=zeros(ny,nx,length(sdn:edn),length(field))*nan;
-            
+		dataNLDAS=zeros(ny,nx,length(sdn:edn),length(field))*nan;            
 
         parfor iT=1:length(tLst)
             tic
             t=tLst(iT);
             % read NLDAS
-            %[dataTemp,lat,lon,tnumTemp,field] = readNLDAS_Hourly(dataName,t,-1);
             disp([dataName,' ',datestr(t)])
-            
+            dataTemp = readNLDAS_Hourly(dataName,t,-1);            
             % average to daily
-            %dataDaily=nanmean(dataTemp,3);
-			%dataNLDAS(:,:,iT,:)=dataDaily;
-			dataNLDAS(:,:,iT,:)=readNLDAS_Daily(dataName,t,-1);
+            dataDaily=nanmean(dataTemp,3);
+			dataNLDAS(:,:,iT,:)=dataDaily;
             toc
         end
         

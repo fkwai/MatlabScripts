@@ -30,6 +30,7 @@ ed=20170614;
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=[sdn:edn]';
+tErr=[];
 dataSMAP=zeros(406,964,length(tLst))*nan;
 for k=1:length(tLst)
 	t=tLst(k);
@@ -38,6 +39,8 @@ for k=1:length(tLst)
     [data,lat,lon] = readSMAP_L3(t);
 	if ~isempty(data)
 		dataSMAP(:,:,k)=data;
+    else
+        tErr=[tErr,t];
 	end
 	toc
 end

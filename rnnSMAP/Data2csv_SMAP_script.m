@@ -22,7 +22,7 @@ edn=datenumMulti(ed,1);
 tnum=[sdn:edn]';
 dlmwrite(timeFile,tnum,'precision',12);
 
-%{
+
 %% write SMAP
 disp('SMAP')
 tic
@@ -33,8 +33,8 @@ SMAPmat=load(SMAPFile);
 [C,indTemp,indX]=intersect(maskMat.lon,SMAPmat.lon,'stable');
 data=SMAPmat.data(indY,indX,:);
 tIn=SMAPmat.tnum;
-grid2csv_SMAP(data,tIn,tnum,'SMAP')
-grid2csv_SMAP(data,tIn,tnum,'SMAP',1)
+grid2csv_SMAP(data,dirDatabase,tIn,tnum,'SMAP')
+grid2csv_SMAP(data,dirDatabase,tIn,tnum,'SMAP',1)
 toc
 
 %% SMAP flags - see readSMAPflag_script.m
@@ -60,7 +60,7 @@ for k=1:height(flagTab)
 	gridConst2csv_SMAP(data,fieldName,0,doStat)
 	toc
 end
-%}
+
 
 %% NLDAS - see script_NLDAS2SMAP_CONUS
 dataLst={'MOS'};
