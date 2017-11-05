@@ -24,14 +24,23 @@ batchJobs(res,prob,[1 2]) % action contains 1: train; contains 2: test
 diary('batchJobsLog.log')
 
 % Grabbing configurations from input
-nGPU = res.nGPU; nConc = res.nConc;
+nGPU = res.nGPU; nConc = res.nConc; 
+if ~isfield(res,'torchDir') || isempty(res.torchDir), 
+    res.torchDir= '/home/kxf227/torch/install/lib'; end
 jobHead = prob.jobHead; hs = prob.hs; temporalTest = prob.temporalTest; varFile = prob.varFile;
 epoch = prob.epoch; if isfield(prob,'varCFile'),varCFile = prob.varCFile; else, varCFile='varConstLst_Noah';  end
 if isfield(prob,'namePadd'), namePadd = prob.namePadd; else, namePadd=''; end
 if isfield(prob,'dirIndices'), dirIndices = prob.dirIndices; else, dirIndices=''; end
+if isfield(prob,'jobN'), jobN = prob.jobN; else, jobN = prob.jobHead; end
 testRun  = 1; % inside sub-function--> may get over-written by varargin{2} (4-th input)
 % testRun == 1: just print out statement. ==0, and change for i=1:length(D)
 % to parfor: will run jobs through parfor
+
+% the following fields will be added to the command line if they are
+% present in res or prob.
+AddFieldsTrain = {'rootDB','rootOut','saveEpoch'};
+AddFieldsTest  = {'rootDB','rootOut','saveEpoch'};
+R{1}=res; R{2}=prob;
 
 [s,hostname] = system('hostname');
 if isfield(res,'rt') && ~isempty(res.rt)
@@ -99,17 +108,26 @@ nMultiple = nConc/nGPU;
 
 % the following files are prepared in case we cannot run matlab on the
 % target machine
-fid = fopen(['allJobs_',jobHead,'.sh'],'wt');
-queueHeadGPU(fid,res,jobHead,'xstream');
+fid = fopen(['allJobs_',jobN,'.sh'],'wt');
+queueHeadGPU(fid,res,jobN,'xstream');
+k = 0;
 for i=1:nGPU
     for j=1:nMultiple
-        ff=['JOB',jobHead,'_g',num2str(i-1),'_c',num2str(j)];
+        ff=['JOB',jobN,'_g',num2str(i-1),'_c',num2str(j)];
         CFILE{i,j} = [ff,'.sh'];
         %if exist(CFILE{i,j}), mode='at'; else, mode='wt'; end
         %CID(i,j)= fopen(CFILE{i,j},mode);
         fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
+        k = k + 1;
+        line = ['var[',num2str(k-1),']=$!']; fprintf(fid,'%s\n',line);
     end
 end
+
+for k=1:nGPU*nMultiple
+    line = ['wait ${var[',num2str(k-1),']}'];
+    fprintf(fid,'%s\n',line);
+end
+fprintf(fid,'unset var');
 fclose(fid); CA=zeros([nGPU,1]); nk=0;nD=length(D);
 %for m=1:length(VCFILE)
 %for k=1:length(VFILE)
@@ -121,8 +139,6 @@ nm = ceil(nM/nConc);
 % turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
 % nConc will be further decomposed to [nGPU,nMultiple]
 cid = -1;
-AddFieldsTrain = {'rootDB','rootOut'};
-AddFieldsTest  = {'rootDB','rootOut'};
 %spmd
 %id = labindex;
 for id=1:nConc % for debugging or writting scripts for clusters, comment out two lines above and
@@ -151,6 +167,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                     jobScriptFile = [ff,'.sh'];
                     if exist(jobScriptFile,'file'), mode='at'; else, mode='wt'; end
                     cid= fopen(jobScriptFile,mode);
+                    fprintf(cid,'%s\n',['export LD_LIBRARY_PATH=',res.torchDir]);
                     %fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
                 end
                 %ID=kk0(1); j=kk0(2); kk=kk0(3);
@@ -165,10 +182,14 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 trainCMD = strrep(trainCMD, 'varConstLst_Noah', varCFile);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
                 AddFields = AddFieldsTrain;
-                for i=1:length(AddFields)
-                    f = AddFields{i};
-                    if isfield(res,f);
-                        trainCMD = [trainCMD, '-',f,' ',res.(f)];
+                for k=1:length(R)
+                    obj = R{k}; % it will work either the field is on prob or res
+                    % prob will overwrite the one in res if they conflict
+                    for i=1:length(AddFields)
+                        f = AddFields{i};
+                        if isfield(obj,f)
+                            trainCMD = [trainCMD, '-',f,' ',obj.(f)];
+                        end
                     end
                 end
                 
@@ -194,10 +215,14 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 strTime  = ['-timeOpt ',num2str(testTimeOpt)];
                 trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);
                 AddFields = AddFieldsTest;
-                for i=1:length(AddFields)
-                    f = AddFields{i};
-                    if isfield(res,f);
-                        trainCMD = [trainCMD, '-',f,' ',res.(f)];
+                for k=1:length(R)
+                    obj = R{k}; % it will work either the field is on prob or res
+                    % prob will overwrite the one in res if they conflict
+                    for i=1:length(AddFields)
+                        f = AddFields{i};
+                        if isfield(obj,f)
+                            trainCMD = [trainCMD, '-',f,' ',obj.(f)];
+                        end
                     end
                 end
                 
@@ -327,7 +352,22 @@ switch c
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,'hs',hs,'temporalTest',temporalTest);
         prob.rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/',jobHead];
         prob.rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/',jobHead];
-        
+        % on either prob or res these AddFields will work
         batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
-        
+    case 5
+        % XSEDE jobs
+        nGPU =1; nMultiple=4; jobHead='hucv2n4'; epoch=300; hs=256; temporalTest=1;
+        rt = ''; action = [1 2]; % empty if using default settings on each machine
+        jobID = 1;
+        res = struct('nGPU',nGPU,'nConc',nMultiple*nGPU,'rt',rt,...
+            'saveEpoch',50,'torchDir','~/torch/lib','rootDB','',...
+            'rootOut','','t','02:00:00','memMB','2500');
+        prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,...
+            'hs',hs,'temporalTest',temporalTest,'jobN',[jobHead,num2str(jobID)]);
+        rt = '/cstor/xsede/users/xs-cxs1024/rnnSMAP/';
+        res.rootOut=[rt,jobHead];
+        res.rootDB=[rt,'/Output_SMAPgrid/',jobHead];
+        % on either prob or res these AddFields will work
+        batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
+        % generate the scripts. Upload it to XSEDE to run
 end
