@@ -8,6 +8,11 @@ nGPU =3; nMultiple=4; jobHead='hlr'; epoch=300; hs=256; temporalTest=2;
 starts with this string. All jobs that match will be put into a queue to be
 run, multiplied by the number of files in varFile and varCFile (could be a
 char string, or)
+% jobN: constructed from jobHead, it distinguishes between job scripts
+written from different times, because jobs might be too many to
+run at once, and may needed to be done in different batches
+% namePadd: if desired, this variable can padd the name to distinguish
+between multiple runs of the same job.
 % if rt is left empty, it will be decided by the hard-coded directories
 below
 % However, this rt does not concern the code inside the lua codes, which
@@ -39,7 +44,7 @@ testRun  = 1; % inside sub-function--> may get over-written by varargin{2} (4-th
 % the following fields will be added to the command line if they are
 % present in res or prob.
 AddFieldsTrain = {'rootDB','rootOut','saveEpoch'};
-AddFieldsTest  = {'rootDB','rootOut','saveEpoch'};
+AddFieldsTest  = {'rootDB','rootOut'};
 R{1}=res; R{2}=prob;
 
 [s,hostname] = system('hostname');
@@ -163,7 +168,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 [ID,j,kk]=ind2sub([nGPU,nMultiple,10000],nk); % 1000 is just to make it large enough
                 
                 if is==1
-                    ff=['JOB',jobHead,'_g',num2str(ID-1),'_c',num2str(j)];
+                    ff=['JOB',jobN,'_g',num2str(ID-1),'_c',num2str(j)];
                     jobScriptFile = [ff,'.sh'];
                     if exist(jobScriptFile,'file'), mode='at'; else, mode='wt'; end
                     cid= fopen(jobScriptFile,mode);
@@ -188,7 +193,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                     for i=1:length(AddFields)
                         f = AddFields{i};
                         if isfield(obj,f)
-                            trainCMD = [trainCMD, '-',f,' ',obj.(f)];
+                            trainCMD = [trainCMD, ' -',f,' ',obj.(f)];
                         end
                     end
                 end
@@ -202,7 +207,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                                 
                 trainCMD = strrep(trainCMD, 'XX_out', od);
                 if any(action==1)
-                    runCmdInScript(trainCMD,jobHead,i,1,testRun,cid);
+                    runCmdInScript(trainCMD,jobN,i,1,testRun,cid);
                 end
                 
                 %ID = mod(i-1,nGPU);
@@ -221,7 +226,8 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                     for i=1:length(AddFields)
                         f = AddFields{i};
                         if isfield(obj,f)
-                            trainCMD = [trainCMD, '-',f,' ',obj.(f)];
+                            if isnumeric(obj.(f)), obj.(f)=num2str(obj.(f)); end
+                            trainCMD = [trainCMD, ' -',f,' ',obj.(f)];
                         end
                     end
                 end
@@ -229,7 +235,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
                 
                 if any(action==2)
-                    runCmdInScript(trainCMD,jobHead,nk,2,testRun,cid);
+                    runCmdInScript(trainCMD,jobN,nk,2,testRun,cid);
                     %runCmdInScript(trainCMD2,jobHead,nk,2,testRun,cid);
                 end
             end
@@ -356,18 +362,23 @@ switch c
         batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
     case 5
         % XSEDE jobs
-        nGPU =1; nMultiple=4; jobHead='hucv2n4'; epoch=300; hs=256; temporalTest=1;
+        nGPU =8; nMultiple=4; jobHead='hucv2n4'; epoch=300; hs=256; temporalTest=1;
         rt = ''; action = [1 2]; % empty if using default settings on each machine
         jobID = 1;
         res = struct('nGPU',nGPU,'nConc',nMultiple*nGPU,'rt',rt,...
-            'saveEpoch',50,'torchDir','~/torch/lib','rootDB','',...
-            'rootOut','','t','02:00:00','memMB','2500');
+            'saveEpoch','50','torchDir','~/torch/lib','rootDB',['$WORK/rnnSMAP/Database_SMAPgrid/',jobHead],...
+            'rootOut',['$WORK/rnnSMAP/'],'t','47:00:00','memMB','2000');
+        % 2000 means each job requires 2 GB. This number will be multiplied
+        % by the nConc/nGPU, which is what is needed on each CPU
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,...
-            'hs',hs,'temporalTest',temporalTest,'jobN',[jobHead,num2str(jobID)]);
+            'hs',hs,'temporalTest',temporalTest,'jobN',[jobHead,'_j',num2str(jobID)],...
+            'namePadd',''); % namePadd is to distinguish between multiple runs of the same job
         rt = '/cstor/xsede/users/xs-cxs1024/rnnSMAP/';
         res.rootOut=[rt,jobHead];
         res.rootDB=[rt,'/Output_SMAPgrid/',jobHead];
+        res.rt = 'E:\Kuai\rnnSMAP_inputs\hucv2n4'; % this is for local generation of scripts only
         % on either prob or res these AddFields will work
+        
         batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
         % generate the scripts. Upload it to XSEDE to run
 end

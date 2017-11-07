@@ -40,6 +40,7 @@ statNN{2}=statCal(outTest.yNN,outTest.ySMAP);
 %% Bias LSTM -> 1a
 plotData=statLSTM{opt}.bias;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='Bias(LSTM)';
 colorRange=[-0.02,0.02];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',8,'shapefile',shapefile,'title',titleStr);
@@ -52,6 +53,7 @@ saveas(gcf, fname);
 %% Bias LSTM - NLDAS -> 1b
 plotData=abs(statLSTM{opt}.bias)-abs(statNLDAS{opt}.bias);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='|Bias(LSTM)| minus |Bias(Noah)|';
 colorRange=[-0.125,0.125]; 
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',10,'shapefile',shapefile,'title',titleStr);
@@ -63,6 +65,7 @@ saveas(gcf, fname);
 %% Rsq LSTM -> 1c
 plotData=statLSTM{opt}.rsq;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='R(LSTM)';
 colorRange=[0.4,1]; openEnds = [1 0];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',12,'openEnds',openEnds,'shapefile',shapefile,'title',titleStr);
@@ -75,6 +78,7 @@ saveas(gcf, fname);
 %% Rsq LSTM - NLDAS -> 1d
 plotData=abs(statLSTM{opt}.rsq)-abs(statNLDAS{opt}.rsq);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='R(LSTM) minus R(Noah)';
 colorRange=[-0.6,0.6]; openEnds = [0 0];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',12,'openEnds',openEnds,'shapefile',shapefile,'title',titleStr);
@@ -87,6 +91,7 @@ saveas(gcf, fname);
 %% rmse LSTM -> 1e
 plotData=statLSTM{opt}.rmse;
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='RMSE(LSTM)';
 colorRange=[0,0.05];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',10,'shapefile',shapefile,'title',titleStr);
@@ -100,6 +105,7 @@ saveas(gcf, fname);
 %plotData=abs(statLSTM{opt}.rmse)-abs(statNN{opt}.rmse);
 plotData=abs(statLSTM{opt}.rmse)-abs(statNN{opt}.rmse);
 [gridStat,xx,yy] = data2grid(plotData,crd(:,2),crd(:,1));
+gridStat(1,:)=nan;
 titleStr='RMSE(LSTM) minus RMSE(NN)';
 colorRange=[-0.03,0.03];
 [h,cmap]=showMap(gridStat,yy,xx,'colorRange',colorRange,'nLevel',8,'shapefile',shapefile,'title',titleStr);

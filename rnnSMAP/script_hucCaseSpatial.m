@@ -7,7 +7,7 @@
 %% read data and save matfile
 
 global kPath
-nHucLst=[1,2,3,5];
+nHucLst=[1:5];
 rmStd=0;
 
 for i=1:length(nHucLst)
@@ -18,22 +18,22 @@ for i=1:length(nHucLst)
     if nHUC~=4
         jobHead=['hucv2n',num2str(nHUC)];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'rmStd',rmStd,'testName','CONUSv2f1','timeOpt',1);
+            'rmStd',rmStd,'testName','CONUSv2f1');
     else
         jobHead=['huc2_'];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'saveName','hucv2n4','rmStd',rmStd,'testName','CONUSv2f1','timeOpt',1);
+            'saveName','hucv2n4','rmStd',rmStd,'testName','CONUSv2f1');
     end
 end
-
 
 %% plot cases - temporal
 global kPath
 
 statLst={'rmse','nash','rsq','bias'};
 yRangeLst=[0,0.2;-2,1;0.2,1;-0.1,0.1];
-nHucLst=[1,2,3,5];
+nHucLst=[1,2,3,4,5];
 rmStdLst=[0];
+timeOpt=2;
 
 testName='CONUSv2f1';
 crdCONUSFile=[kPath.DBSMAP_L3,filesep,testName,filesep,'crd.csv'];
@@ -53,6 +53,7 @@ for iR=1:length(rmStdLst)
         for i=1:length(nHucLst)
             nHUC=nHucLst(i);
             disp(['working on ',num2str(nHUC)])
+            tic
             jobHead=['hucv2n',num2str(nHUC)];
             rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2n',num2str(nHUC),filesep];
             if rmStd==0
@@ -105,7 +106,7 @@ for iR=1:length(rmStdLst)
                         end
                         for k=1:length(indLst)
                             ind=indLst(k);
-                            temp=matHUC.statMat.(stat){ind,1};
+                            temp=matHUC.statMat.(stat){ind,timeOpt};
                             trainName=matHUC.optLst(ind).train;
                             if strcmp(trainName,matHUC_local.optLst(ind).train)
                                 crdHUC=matHUC_local.crdMat{ind};
@@ -122,6 +123,7 @@ for iR=1:length(rmStdLst)
                     end
                 end
             end
+            toc
         end
         
         for kPick=1:2
@@ -141,7 +143,7 @@ for iR=1:length(rmStdLst)
         if ~exist(figFolder,'dir')
             mkdir(figFolder);
         end
-        figName=[figFolder,'huc_',stat,'_','rmStd',num2str(rmStd)];
+        figName=[figFolder,'huc_',stat,'_','rmStd',num2str(rmStd),'_t',num2str(timeOpt)];
         savefig(f,figName)
         close(f)
     end

@@ -110,13 +110,16 @@ end
 
 parpool(8);
 dat0=dat;
+writeHucComA(A,dat,saveFolderRt)
+
+%{
 parfor i=1:size(A,1)
     i
     tic
     dat = dat0;
     dat.zoneSel = A(i,:); 
     ff=''; for j=dat.zoneSel,ff=[ff,sprintf('%02d',j)]; end
-    jobHead = ['hucv2n',num2str(ns)];
+    jobHead = ['hucv2n',size(A,2)];
     subsetName = [jobHead,'_',ff];
     %saveFolder = ['CONUS',num2str(i)];
     indSub=subsetSMAP_shape(saveFolderRt,dat,subsetName );
@@ -131,3 +134,4 @@ parfor i=1:size(A,1)
     saveas(gcf,[kPath.DBSMAP_L3,'Subset',kPath.s,'fig',kPath.s,subsetName,'.fig']);
     close(gcf)
 end
+%}
