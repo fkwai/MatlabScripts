@@ -2,13 +2,14 @@
 % default to convert all fields. see the -1 line 27
 
 global kPath
-yLst=1980:2004;
+yLst=2017;
 dataLst={'FORA','FORB','NOAH'};
 %dataLst={'NOAH'};
 parpool(50)
 for yr=yLst
     sdn=datenumMulti(yr*10000+101,1);
-    edn=datenumMulti(yr*10000+1231,1);
+    %edn=datenumMulti(yr*10000+1231,1);
+    edn=sdn+160;
     tLst=sdn:edn;    
     for iData=1:length(dataLst)
         dataName=dataLst{iData};
@@ -42,3 +43,6 @@ for yr=yLst
         end
     end
 end
+
+poolobj=gcp('nocreate');
+delete(poolobj);
