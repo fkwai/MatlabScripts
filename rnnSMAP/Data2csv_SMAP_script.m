@@ -33,8 +33,10 @@ SMAPmat=load(SMAPFile);
 [C,indTemp,indX]=intersect(maskMat.lon,SMAPmat.lon,'stable');
 data=SMAPmat.data(indY,indX,:);
 tIn=SMAPmat.tnum;
-grid2csv_SMAP(data,dirDatabase,tIn,tnum,'SMAP')
-grid2csv_SMAP(data,dirDatabase,tIn,tnum,'SMAP',1)
+
+grid2csvDB(data,tIn,dirDatabase,maskMat.mask,'SMAP')
+grid2csvDB(data,tIn,dirDatabase,maskMat.mask,'SMAP','doAnomaly',1)
+
 toc
 
 %% SMAP flags - see readSMAPflag_script.m
@@ -57,7 +59,8 @@ for k=1:height(flagTab)
 		doStat=0;
 		data=round(nanmean(data,3));
 	end
-	gridConst2csv_SMAP(data,fieldName,0,doStat)
+    grid2csvDB(data,0,dirDatabase,maskMat.mask,fieldName,'doStat',doStat)
+
 	toc
 end
 
@@ -76,7 +79,7 @@ for k=1:length(dataLst)
 		end
 		disp(fieldName)
 		tic
-		grid2csv_SMAP(matData.data,dirDatabase,matData.tnum,tnum,fieldName)
+        grid2csvDB(data,tIn,dirDatabase,maskMat.mask,fieldName)
 		toc
 	end
 end

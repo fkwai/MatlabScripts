@@ -22,7 +22,6 @@ dflts={0,1,0,0};
 [doAnomaly,doStat]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
-global kPath
 tIn=VectorDim(tIn,1);
 
 timeFile=[dirDB,filesep,'time.csv'];
