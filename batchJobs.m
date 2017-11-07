@@ -99,7 +99,8 @@ nMultiple = nConc/nGPU;
 
 % the following files are prepared in case we cannot run matlab on the
 % target machine
-fid = fopen('allJobs.sh','wt');
+fid = fopen(['allJobs_',jobHead,'.sh'],'wt');
+queueHeadGPU(fid,res,jobHead,'xstream');
 for i=1:nGPU
     for j=1:nMultiple
         ff=['JOB',jobHead,'_g',num2str(i-1),'_c',num2str(j)];
@@ -120,9 +121,11 @@ nm = ceil(nM/nConc);
 % turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
 % nConc will be further decomposed to [nGPU,nMultiple]
 cid = -1;
-spmd
-id = labindex;
-%for id=1:nConc % for debugging, comment out two lines above and
+AddFieldsTrain = {'rootDB','rootOut'};
+AddFieldsTest  = {'rootDB','rootOut'};
+%spmd
+%id = labindex;
+for id=1:nConc % for debugging or writting scripts for clusters, comment out two lines above and
     %uncomment this line
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
@@ -161,6 +164,13 @@ id = labindex;
                 trainCMD = strrep(trainCMD, 'varLst_Noah', varFile);
                 trainCMD = strrep(trainCMD, 'varConstLst_Noah', varCFile);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
+                AddFields = AddFieldsTrain;
+                for i=1:length(AddFields)
+                    f = AddFields{i};
+                    if isfield(res,f);
+                        trainCMD = [trainCMD, '-',f,' ',res.(f)];
+                    end
+                end
                 
                 %od = [D(i).name,namePadd,'_',varFile,'_',varCFile]; % output folder name. must be unique
                 % for huc n4
@@ -175,15 +185,21 @@ id = labindex;
                 end
                 
                 %ID = mod(i-1,nGPU);
-                trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500  -rootOut aaa -rootDB bbb -test CONUSv2f1 -timeOpt 2';
+                %trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500  -rootOut aaa -rootDB bbb -test CONUSv2f1 -timeOpt 2';
+                trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500 -test CONUSv2f1 -timeOpt 2';
                 trainCMD = strrep(trainCMD, '=0', ['=',num2str(ID-1)]);
                 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
                 %trainCMD = strrep(trainCMD, 'CONUSv2f1', D(i).name);
                 trainCMD = strrep(trainCMD, '500', num2str(epoch));
                 strTime  = ['-timeOpt ',num2str(testTimeOpt)];
                 trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);
-                trainCMD = strrep(trainCMD, 'aaa', prob.rootOut);
-                trainCMD = strrep(trainCMD, 'bbb', prob.rootDB);
+                AddFields = AddFieldsTest;
+                for i=1:length(AddFields)
+                    f = AddFields{i};
+                    if isfield(res,f);
+                        trainCMD = [trainCMD, '-',f,' ',res.(f)];
+                    end
+                end
                 
                 trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
                 
@@ -218,6 +234,11 @@ end
 sF = [jobHead,'_',num2str(i),'_a',num2str(act),'.sh'];
 file = [sD,sF];
 
+% Why do this?
+% This file is only needed when running in Linux and launching jobs
+% directly from Matlab using a 'system' call.
+% to set some environmental variables and avoid conflict in java
+% between Matlab and Scripts
 fid = fopen(file,'wt');
 fprintf(fid,'%s\n','. ~/.bashrc');
 fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
@@ -225,22 +246,22 @@ fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
 fprintf(fid,'%s\r\n',cmd);
 fclose(fid);
 
+
 if verb>2
     suffix = '';
 else
     suffix = ' >/dev/null'; % standard device for discarding screen output
     % lua already has output logs in each directory
 end
-trainCMD = ['. ',file,suffix];
+%trainCMD = ['. ',file,suffix];
 if ispc || testRun
-    if verb>1
-        disp('*******************************************')
-        disp('runCmdInScript:: cmd to be submitted to OS:')
-    end
-    fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
-    %disp(trainCMD)
-    disp(cmd);
-    if verb>1 type(file); end
+%     if verb>1
+%         disp('*******************************************')
+%         disp('runCmdInScript:: cmd to be submitted to OS:')
+%     end
+    fprintf(cid,'%s\n',cmd);
+    disp(['runCmdInScript Written::', cmd]);
+    %if verb>1 type(file); end
 else
     if verb>0,
         fprintf(cid,'%s\n',['runCmdInScript Submitted::', cmd]);
