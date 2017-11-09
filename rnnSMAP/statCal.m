@@ -4,12 +4,13 @@ function stat=statCal(x,y,varargin)
 % y: [#time step * #points]
 % rmStd: remove points within [mean-n*std,mean+n*std]
 
-pnames={'rmStd'};
-dflts={0};
-[rmStd]=...
+pnames={'rmStd','batch'};
+dflts={0,[]};
+[rmStd,xBatch]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 
+%% stat of x
 [nt,nInd]=size(x);
 nash=zeros(nInd,1)*nan;
 rsq=zeros(nInd,1)*nan;
@@ -24,9 +25,7 @@ if rmStd~=0
     y(:,indRm)=nan;
 end
 
-%indV=find(sum(isnan(x),1)./nt<0.1); % assume x is complete time seris and remove ones with too many nans
-indV=1:size(x,2);
-% not doing anything actually
+indV=find(sum(isnan(x),1)./nt<0.1); % leave NaN when nan in x >10%. 
 
 nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
 rsqTemp=zeros(nInd,1);
@@ -37,17 +36,18 @@ end
 biasTemp=nanmean(x-y)';
 rmseTemp=sqrt(nanmean((x-y).^2))';
 
-
 nash(indV)=nashTemp(indV);
 rsq(indV)=rsqTemp(indV);
 bias(indV)=biasTemp(indV);
 rmse(indV)=rmseTemp(indV);
 
 
+%% return results
 stat.nash=nash;
 stat.rsq=rsq;
 stat.bias=bias;
 stat.rmse=rmse;
+
 
 end
 

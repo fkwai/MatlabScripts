@@ -13,14 +13,23 @@ if drBatch==0
     data=csvread([rootOut,outName,filesep,dataFile]);
 else
     disp('read LSTM dropout batch')
-    dataFolder=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'_drM',num2str(drBatch)];
-    dataFile=[rootOut,outName,filesep,dataFolder,filesep,'drEm_1.csv'];
-    temp=csvread(dataFile);
-    data=zeros([size(temp),drBatch]);
-    for k=2:drBatch
-        dataFile=[rootOut,outName,filesep,dataFolder,filesep,'drEm_',num2str(k),'.csv'];
+    batchName=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'_drM',num2str(drBatch)];
+    batchMatFile=[rootOut,outName,filesep,batchName,'.mat'];
+    if exist([rootOut,outName,filesep,batchName,'.mat'],'file')
+        batchMat=load(batchMatFile);
+        data=batchMat.yLSTM_batch;
+    else
+        disp('--> one by one for the first time')
+        dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_1.csv'];
         temp=csvread(dataFile);
-        data(:,:,k)=temp;
+        data=zeros([size(temp),drBatch]);
+        for k=2:drBatch
+            dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_',num2str(k),'.csv'];
+            temp=csvread(dataFile);
+            data(:,:,k)=temp;
+        end
+        yLSTM_batch=data;
+        save(batchMatFile,'yLSTM_batch')
     end
 end
 

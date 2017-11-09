@@ -77,7 +77,7 @@ f=plotBoxSMAP(boxMat,labelX,labelY);
 %}
 
 %% compare old and new result of huc 01, 15
-
+%{
 hucLst=[1,15];
 rootDB='E:\Kuai\rnnSMAP_inputs\hucv2n1\';
 rootOut='E:\Kuai\rnnSMAP_outputs\hucv2n1\';
@@ -105,14 +105,13 @@ for kk=1:length(hucLst)
     subplot(2,1,kk)
     plotBoxSMAP(boxMat,labelX,labelY,'newFig',0);
 end
-
+%}
 
 %% test for ensembles
-%{
-rootDB='E:\Kuai\rnnSMAP_inputs\hucv2n1\';
-rootOut='E:\Kuai\rnnSMAP_outputs\hucv2n1\';
+%
+% rootDB='E:\Kuai\rnnSMAP_inputs\hucv2n1\';
+% rootOut='E:\Kuai\rnnSMAP_outputs\hucv2n1\';
 epoch=300;
-stat='rmse';
 drBatch=1000;
 
 outName='hucv2n1_15_new';
@@ -120,8 +119,8 @@ dataName='hucv2n1_15';
 out=cell(2,1);
 outBatch=cell(2,1);
 for t=1:2    
-    out{t}=postRnnSMAP_load(outName,dataName,t,epoch,'rootDB',rootDB,'rootOut',rootOut);
-    outBatch{t}=postRnnSMAP_load(outName,dataName,t,epoch,'rootDB',rootDB,'rootOut',rootOut,'drBatch',drBatch);
+    out{t}=postRnnSMAP_load(outName,dataName,t,epoch);
+    outBatch{t}=postRnnSMAP_load(outName,dataName,t,epoch,'drBatch',drBatch);
 end
 
 ind=randi([1,size(out{1}.yLSTM,2)]);
@@ -146,6 +145,6 @@ end
 labelX={'train','test'};
 labelY={'old','mean of batch'};
 plotBoxSMAP(boxMat,labelX,labelY,'newFig',0,'title',stat);
-%}
+%
 
 

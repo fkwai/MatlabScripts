@@ -1,10 +1,10 @@
-function out = postRnnSMAP_load(outName,dataName,timeOpt,epoch,varargin)
+function out = postRnnSMAP_load(outName,dataName,timeOpt,varargin)
 %POSTRNNSMAP_LOAD 
 % load data for LSTM simulations
 
-pnames={'rootOut','rootDB','model','readModel','readSMAP','drBatch'};
-dflts={[],[],'Noah',1,1,0};
-[rootOut,rootDB,model,readModel,readSMAP,drBatch]=...
+pnames={'rootOut','rootDB','epoch','model','readModel','readSMAP','drBatch'};
+dflts={[],[],0,'Noah',1,1,0};
+[rootOut,rootDB,epoch,model,readModel,readSMAP,drBatch]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
@@ -22,6 +22,11 @@ switch timeOpt
         tData=367:732;
     case 3
         tData=1:732;
+end
+
+opt=readRnnOpt(outName,rootOut);
+if epoch==0
+    epoch=opt.nEpoch;
 end
 
 %% read SMAP
@@ -49,8 +54,13 @@ end
 
 %% read LSTM
 disp(['read LSTM of ',outName])
-yLSTM=readRnnPred(outName,dataName,epoch,timeOpt,'rootOut',rootOut,'drBatch',drBatch);
+yLSTM=readRnnPred(outName,dataName,epoch,timeOpt,'rootOut',rootOut);
 out.yLSTM=yLSTM;
+if drBatch~=0
+    yLSTM_batch=readRnnPred(outName,dataName,epoch,timeOpt,'rootOut',rootOut,'drBatch',drBatch);
+    out.yLSTM_batch=yLSTM_batch;
+end
+
 
 
 
