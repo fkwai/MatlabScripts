@@ -2,9 +2,9 @@ function out = postRnnSMAP_load(outName,dataName,timeOpt,epoch,varargin)
 %POSTRNNSMAP_LOAD 
 % load data for LSTM simulations
 
-pnames={'rootOut','rootDB','model','readModel','readSMAP'};
-dflts={[],[],'Noah',1,1};
-[rootOut,rootDB,model,readModel,readTarget]=...
+pnames={'rootOut','rootDB','model','readModel','readSMAP','drBatch'};
+dflts={[],[],'Noah',1,1,0};
+[rootOut,rootDB,model,readModel,readSMAP,drBatch]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 global kPath
@@ -24,28 +24,12 @@ switch timeOpt
         tData=1:732;
 end
 
-if isempty(model)
-    modelField='LSOIL_0-10';
-else
-    switch model
-        case 'Noah'
-            modelField='LSOIL_0-10';
-        case 'MOS'
-            modelField='SOILM_0-10_MOS';
-    end
-end
-
-
 %% read SMAP
 if readSMAP
     disp(['read SMAP in ',outName])
     [ySMAP,ySMAPStat] = readDatabaseSMAP(dataName,'SMAP',rootDB);
     ySMAP=ySMAP(tData,:);
     out.ySMAP=ySMAP;
-    lbSMAP=ySMAPStat(1);
-    ubSMAP=ySMAPStat(2);
-    meanSMAP=ySMAPStat(3);
-    stdSMAP=ySMAPStat(4);
 end
 
 %% read model soilM
@@ -65,12 +49,7 @@ end
 
 %% read LSTM
 disp(['read LSTM of ',outName])
-dataOut=readRnnPred(outName,dataName,epoch,timeOpt,rootOut);
-statFile=[kPath.DBSMAP_L3_CONUS,filesep,'SMAP_stat.csv'];
-statSMAP=csvread(statFile);
-meanSMAP=statSMAP(3);
-stdSMAP=statSMAP(4);    
-yLSTM=(dataOut).*stdSMAP+meanSMAP;
+yLSTM=readRnnPred(outName,dataName,epoch,timeOpt,'rootOut',rootOut,'drBatch',drBatch);
 out.yLSTM=yLSTM;
 
 

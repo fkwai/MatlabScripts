@@ -15,15 +15,23 @@ function f=plotBoxSMAP( statMat,labelX,labelY,varargin )
 % plotBoxSMAP_example
 
 
-pnames={'newFig','yRange'};
-dflts={1,[]};
-[newFig,yRange]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'newFig','yRange','title'};
+dflts={1,[],[]};
+[newFig,yRange,titleStr]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 cLst='rkbg';
 if newFig
     f=figure;
 else
     f=[];
+end
+
+%% allow empty labelX and labelY
+if isempty(labelX)
+    labelX=arrayfun(@num2str,1:size(statMat,2),'Uniform', false);
+end
+if isempty(labelY)
+    labelY=arrayfun(@num2str,1:size(statMat,1),'Uniform', false);
 end
 
 %% format data
@@ -54,6 +62,9 @@ set(gca,'xticklabel',labelY)
 set(bh,'LineWidth',2)
 box_vars = findall(gca,'Tag','Box');
 hLegend = legend(box_vars([2,1]), labelX,'location','best');
+if ~isempty(titleStr)
+    title(titleStr)
+end
 
 end
 
