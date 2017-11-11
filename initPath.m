@@ -84,6 +84,8 @@ if strcmp(pcStr,'pc-kuai')
     kPath.DBSCAN='/mnt/sdb/rnnGAGE/databaseSCAN/';
     
 	kPath.DBNLDAS='/mnt/sdb/rnnSMAP/Database_NLDASgrid/';    
+    kPath.maskSMAP_CONUS='/mnt/sdb/rnnSMAP/maskSMAP_CONUS.mat';
+
 end
 
 
