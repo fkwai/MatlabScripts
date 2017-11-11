@@ -21,7 +21,8 @@ px=crd(:,2);
 py=crd(:,1);
 
 bPick=zeros(size(px));
-if iscell(shape) && exist(shape{1})==2
+%if iscell(shape) && exist(shape{1})==2
+if ~isfield(shape,'zoneSel')
     for kk=1:length(shape)
         X=shape(kk).X;
         Y=shape(kk).Y;
@@ -37,7 +38,8 @@ if iscell(shape) && exist(shape{1})==2
             bPick(inout==1)=1;
         end
     end
-elseif isstruct(shape) && isfield(shape,'zoneSel')
+%elseif isstruct(shape) && isfield(shape,'zoneSel')
+else 
     % a grid read in by readGrid with the addition of zoneSel which has
     % the zones to be selected
     fileMode = 1;

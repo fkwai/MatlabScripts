@@ -73,7 +73,7 @@ for k=1:length(itemLst)
     tsStr(k).grid=gridTemp;
     tsStr(k).t=tnum;
     tsStr(k).symb=symLst{ind};
-    tsStr(k).legendStr=itemLst{ind};
+    tsStr(k).legendStr=itemLst{k};
 end
 
 %% add std from batch
