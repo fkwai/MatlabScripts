@@ -1,0 +1,21 @@
+fix a bug in ts map. Update scanDatabase for log norm
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is ahead of 'origin/master' by 1 commit.
+#   (use "git push" to publish your local commits)
+#
+# Changes to be committed:
+#	modified:   rnnSMAP/postRnnSMAP_map.m
+#	modified:   rnnSMAP/scanDatabase.m
+#	modified:   rnnSMAP/subsetSMAP_script.m
+#	modified:   rnnSMAP/subsetSMAP_shape.m
+#	new file:   rnnSMAP/untitled2.m
+#
+# Untracked files:
+#	pnpoly.F90
+#	pnpoly.mexa64
+#	pnpoly.mexw32
+#	pnpoly.mexw64
+#	pnpoly.mexw64.exp
+#
