@@ -4,9 +4,12 @@ function statB = statBatch(x)
 
 meanBatch=mean(x,3);
 stdBatch=std(x,0,3);
+varBatch=stdBatch.^2;
 
 statB.mean=meanBatch;
 statB.std=stdBatch;
+statB.var=varBatch;
+
 
 end
 

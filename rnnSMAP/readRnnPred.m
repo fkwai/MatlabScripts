@@ -29,7 +29,7 @@ else
             data(:,:,k)=temp;
         end
         yLSTM_batch=data;
-        save(batchMatFile,'yLSTM_batch')
+        save(batchMatFile,'yLSTM_batch','-v7.3')
     end
 end
 

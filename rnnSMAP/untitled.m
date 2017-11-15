@@ -118,7 +118,7 @@ outName='hucv2n1_15_new';
 dataName='hucv2n1_15';
 out=cell(2,1);
 outBatch=cell(2,1);
-for t=1:2    
+for t=1:2
     out{t}=postRnnSMAP_load(outName,dataName,t,epoch);
     outBatch{t}=postRnnSMAP_load(outName,dataName,t,epoch,'drBatch',drBatch);
 end
@@ -148,28 +148,32 @@ plotBoxSMAP(boxMat,labelX,labelY,'newFig',0,'title',stat);
 %}
 
 %% model ensemble vs non-modle ensemble
-outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
-dataName='hucv2n1_15';
-outMat=cell(2,2);
+% outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
+% dataName='hucv2n1_15';
+outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+dataName='CONUSv2f1';
+
+%outMat=cell(2,2);
 tsStatMat=cell(2,2);
 statMat=cell(2,2);
 for iOut=1:2
     for iT=1:2
         outName=outNameLst{iOut};
-        outMat{iOut,iT}=postRnnSMAP_load(outName,dataName,iT,'drBatch',1000);        
+        %outMat{iOut,iT}=postRnnSMAP_load(outName,dataName,iT,'drBatch',1000);
         tsStatMat{iOut,iT}=statBatch(outMat{iOut,iT}.yLSTM_batch);
         statMat{iOut,iT}=statCal(outMat{iOut,iT}.yLSTM,outMat{iOut,iT}.ySMAP);
+        statMatMean{iOut,iT}=statCal(tsStatMat{iOut,iT}.mean,outMat{iOut,iT}.ySMAP);
     end
 end
 
 % plotTS
-ind=randi([1,size(out{1,1}.yLSTM,2)]);
+ind=randi([1,size(outMat{1,1}.yLSTM,2)]);
 t=[1:732]';
 for iOut=1:2
     v1=[];
     v2=[];
     vMean=[];
-    vLSTM=[];
+    vLSTM=[];d
     vSMAP=[];
     for iT=1:2
         v1=[v1;tsStatMat{iOut,iT}.mean(:,ind)+tsStatMat{iOut,iT}.std(:,ind)];
@@ -189,7 +193,7 @@ end
 
 % compare std of model vs non-model
 for iOut=1:2
-    for iT=1:2        
+    for iT=1:2
         statStdMat{iOut,iT}=mean(tsStatMat{iOut,iT}.std)';
     end
 end
@@ -198,34 +202,63 @@ labelY={'Noah','NoModel'};
 plotBoxSMAP( statStdMat,labelX,labelY)
 
 % plot std vs error
-stat='rmse';
+statLst={'bias^2','mse','varRes'};
+tStrLst={'train','test'};
+outStrLst={'Noah','NoModel'};
 k=0;
-for iOut=1:2
-    for iT=1:2   
+for iOut=1:length(outStrLst)
+    for iS=1:length(statLst)
         titleStr=[];
-        if iT==1
-            titleStr=[titleStr,'Train '];
-        else
-            titleStr=[titleStr,'Test '];
-        end
-        if iOut==1
-            titleStr=[titleStr,'Noah '];
-        else
-            titleStr=[titleStr,'NoModel '];
-        end     
+        titleStr=[titleStr,outStrLst{iOut},'  '];
+        
         k=k+1;
-        a=statMat{iOut,iT}.(stat);
-        b=mean(tsStatMat{iOut,iT}.std)';        
-        subplot(2,2,k);
+        if strcmp(statLst{iS},'bias^2')
+            a=(statMatMean{iOut,iT}.bias).^2;
+        else
+            a=statMatMean{iOut,iT}.(stat);
+        end
+        b=mean(tsStatMat{iOut,iT}.var)';
+        subplot(2,3,k);
         plot(a,b,'b*')
         lsline
         titleStr=[titleStr, 'corr=',num2str(corr(a,b))];
         title(titleStr)
-        xlabel(stat)
-        ylabel('std')        
+        xlabel(statLst{iS})
+        ylabel('var')
     end
 end
-        
+
+for iOut=1:length(outStrLst)
+    titleStr=[];
+    %     a=statMat{iOut,2}.mse-statMat{iOut,2}.bias.^2;
+    %     b=statMat{iOut,2}.varRes;
+    %     a=statMat{iOut,iT}.varRes;
+    %     b=statMat{iOut,iT}.mse;
+    a=statMat{iOut,2}.bias.^2;
+    b=statMat{iOut,iT}.varRes;    
+    
+    subplot(2,1,iOut)
+    plot(a,b,'b*');hold on
+    %plot([0,max([a;b])],[0,max([a;b])],'k');hold off
+    lsline
+    titleStr=[titleStr,outStrLst{iOut},'  '];
+    titleStr=[titleStr, 'corr=',num2str(corr(a,b))];
+    title(titleStr)
+    xlim([0,5e-3])
+    ylim([0,5e-3])
+    xlabel('bias^2')
+    xlabel('var(Res)')
+end
+
+for iOut=1:length(outStrLst)
+    a=statMat{iOut,2}.bias.^2;
+    b=statMat{iOut,iT}.varRes;    
+    r=b./a;
+    [bincounts,ind]=histc(r,[0:20/20:20]);
+    subplot(2,1,iOut)
+    plot([0:20/20:20],bincounts)
+end
+
 
 
 
