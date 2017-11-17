@@ -73,7 +73,7 @@ end
 if strcmp(pcStr,'pc-kuai')
 	kPath.s='/';
     
-    kPath.SMAP_VAL='/mnt/sdb/Database/SMAP/SMAP_VAL/';
+    kPath.SMAP_VAL='/mnt/sdb/Database/SMAP/SMAP_VAL/';    
     
     kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
     kPath.DBSMAP_L3_CONUS='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';    
