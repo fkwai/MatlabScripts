@@ -13,6 +13,7 @@ siteIDstr=sprintf('%04d',siteID);
 
 %% read site
 dirTemp=dir([dirCoreSite,siteIDstr,'*']);
+dirTemp=dirTemp([dirTemp.isdir]);
 folderSite=[dirCoreSite,dirTemp.name,filesep,'dataqc',filesep];
 dirStation=dir([folderSite,filesep,siteIDstr,'*']);
 nStation=length(dirStation);
