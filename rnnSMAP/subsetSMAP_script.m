@@ -13,6 +13,27 @@ for k=1:length(vecV)
     subsetSplit_All(['CONUSv',num2str(interval),'f',num2str(offset)]);
 end
 
+%% interval L4 - write Database
+% vecV=[2,2,4,4,4,4];
+% vecF=[1,2,1,2,3,4];
+global kPath
+vecV=[4];
+vecF=[1];
+dbNameLst={'LongTerm_85-95','LongTerm_95-05','LongTerm_05-15'};
+
+for k=1:length(vecV)
+    interval=vecV(k);
+    offset=vecF(k);
+    for kk=1:length(dbNameLst)
+        dbName=dbNameLst{kk};
+        subsetSMAP_interval(interval,offset,...
+            'mask',kPath.maskSMAPL4_CONUS,'dirRoot',kPath.DBSMAP_L4,'subsetRoot',dbName);
+        subsetSplit_All([dbName,'v',num2str(interval),'f',num2str(offset)],...
+            'dirRoot',kPath.DBSMAP_L4);
+    end
+end
+
+
 %% HUC - write indFile
 interval=2;
 offset=1;

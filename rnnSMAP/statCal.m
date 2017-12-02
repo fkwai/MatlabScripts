@@ -19,8 +19,6 @@ rmse=zeros(nInd,1)*nan;
 mse=zeros(nInd,1)*nan;
 varRes=zeros(nInd,1)*nan;
 
-
-
 if rmStd~=0
     lb=nanmean(x)-rmStd*std(x);
     ub=nanmean(x)-rmStd*std(x);
@@ -29,7 +27,8 @@ if rmStd~=0
     y(:,indRm)=nan;
 end
 
-indV=find(sum(isnan(x),1)./nt<0.1); % leave NaN when nan in x >10%. 
+%indV=find(sum(isnan(x),1)./nt<0.1); % leave NaN when nan in x >10%. 
+indV=1:nInd;
 
 % need to do one by one
 rsqTemp=zeros(nInd,1);
@@ -43,8 +42,11 @@ for j=1:nInd
     varResTemp(j)=var(xx(ind)-yy(ind));
 end
 
+meanX=repmat(nanmean(x,1),[nt,1]);
+meanY=repmat(nanmean(y,1),[nt,1]);
 nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
 biasTemp=nanmean(x-y)';
+ubrmseTemp=sqrt(nanmean(((x-meanX)-(y-meanY)).^2))';
 rmseTemp=sqrt(nanmean((x-y).^2))';
 mseTemp=nanmean((x-y).^2)';
 
@@ -52,6 +54,7 @@ nash(indV)=nashTemp(indV);
 rsq(indV)=rsqTemp(indV);
 bias(indV)=biasTemp(indV);
 rmse(indV)=rmseTemp(indV);
+ubrmse(indV)=ubrmseTemp(indV);
 mse(indV)=mseTemp(indV);
 varRes(indV)=varResTemp(indV);
 
@@ -62,6 +65,7 @@ stat.nash=nash;
 stat.rsq=rsq;
 stat.bias=bias;
 stat.rmse=rmse;
+stat.ubrmse=ubrmse;
 stat.mse=mse;
 stat.varRes=varRes;
 

@@ -1,18 +1,32 @@
-function [ data ] = readSMAPflag(fileName,fieldName,varargin)
+function [ data ] = readSMAPflag(fileName,fieldName,version,varargin)
 % read SMAP files
 % SMAP version 4 add _AM and _PM data. That is why we need varargin
 % varargin{1} - 'AM', 'PM', or empty
 
-groupName='Soil_Moisture_Retrieval_Data';
-if ~isempty(varargin)
-	groupName=[groupName,'_',varargin{1}];
+
+%% initial field name by smap version - same as folder name from NSIDC
+switch version
+    case 'SPL2SMP.004'
+        groupName='Soil_Moisture_Retrieval_Data';
+    case 'SPL3SMAP.004'
+        groupName='Soil_Moisture_Retrieval_Data_AM';
+    case 'SPL4SMGP.003'
+        groupName='Geophysical_Data';
+    case 'SPL4SMLM.003'
+        groupName='Land-Model-Constants_Data';
 end
+
+pnames={'DATAFIELD_NAME'};
+dflts={[groupName,'/',fieldName]};
+[DATAFIELD_NAME]=...
+    internal.stats.parseArgs(pnames, dflts, varargin{:});
+
+%% start
 
 FILE_NAME=fileName;
 file_id = H5F.open (FILE_NAME, 'H5F_ACC_RDONLY', 'H5P_DEFAULT');
 
 % Open the dataset.
-DATAFIELD_NAME = [groupName,'/',fieldName];
 data_id = H5D.open (file_id, DATAFIELD_NAME);
 
 % Read the dataset.
