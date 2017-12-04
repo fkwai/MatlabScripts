@@ -29,6 +29,8 @@ layer='SM_05';
 statTabVar={'siteName','siteID','ubRMSE','Bias','R','RMSE',...
     'ubRMSE_NSIDC','Bias_NSIDC','R_NSIDC','RMSE_NSIDC'};
 statTab=array2table(zeros(length(siteIDLst),length(statTabVar)),'VariableNames',statTabVar);
+statTabVar2={'siteName','siteID','rmse1','rmse2','rmse3','rmse4'};
+statTab2=array2table(zeros(length(siteIDLst),length(statTabVar2)),'VariableNames',statTabVar2);
 siteNameLst=cell(length(siteIDLst),1);
 
 for kk=1:length(siteIDLst)
@@ -136,28 +138,35 @@ for kk=1:length(siteIDLst)
     
     
     %% plot time series
-    %{
-        sdTrain=LSTM.t(1);
-        figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
-        f=figure('Position',[1,1,1500,600]);
-        plot(tSite,vSite0,'r*');hold on
-        plot(tSite,vSite,'r-');hold on
-        plot(tLSTM,vLSTM,'-b');hold on
-        plot(tSMAP,vSMAP,'ko');hold on
-        plot([sdTrain,sdTrain], ylim,'k-');hold off
-        title(['site ',siteIDstr,...
-            '; trainRMSE(LSTM,Site)=',num2str(rmse2,3),...
-            '; trainRMSE(SMAP,Site)=',num2str(rmse3,3),...
-            '; trainRMSE(LSTM,SMAP)=',num2str(rmse4,3),...
-            '; testRMSE(LSTM,Site)=',num2str(rmse1,3)]);
-            
-        legend('in-situ(pure)','in-situ(nanmean)','long term','SMAP')
-        datetick('x')
-        savefig([figFolder,siteIDstr,'.fig'])
-        xlim([tSite(1)-800,tSMAP(end)])
-        savefig([figFolder,siteIDstr,'_part.fig'])
-        close(f)
-    %}
+    
+    sdTrain=LSTM.t(1);
+    figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
+    f=figure('Position',[1,1,1500,600]);
+    plot(tSite,vSite0,'r*');hold on
+    plot(tSite,vSite,'r-');hold on
+    plot(tLSTM,vLSTM,'-b');hold on
+    plot(tSMAP,vSMAP,'ko');hold on
+    plot([sdTrain,sdTrain], ylim,'k-');hold off
+%     title(['site ',siteIDstr,...
+%         '; trainRMSE(LSTM,Site)=',num2str(rmse2,3),...
+%         '; trainRMSE(SMAP,Site)=',num2str(rmse3,3),...
+%         '; trainRMSE(LSTM,SMAP)=',num2str(rmse4,3),...
+%         '; testRMSE(LSTM,Site)=',num2str(rmse1,3)]);
+    title([siteName,': ',siteIDstr])
+        
+    statTab2.siteID(kk,1)=siteID;
+    statTab2.rmse1(kk,1)=rmse1;
+    statTab2.rmse2(kk,1)=rmse2;
+    statTab2.rmse3(kk,1)=rmse3;
+    statTab2.rmse4(kk,1)=rmse4;
+    
+    legend('in-situ(pure)','in-situ(nanmean)','long term','SMAP')
+    datetick('x')
+    savefig([figFolder,siteIDstr,'.fig'])
+    xlim([tSite(1),tSMAP(end)])
+    savefig([figFolder,siteIDstr,'_part.fig'])
+    close(f)
+    
     
     %% calculate stat - ubRMSE, bias, rmse, R for paper period
     sd=datenumMulti(20150401,1);
@@ -196,6 +205,7 @@ for kk=1:length(siteIDLst)
         statTab.R_NSIDC(kk,1)=statNSIDC.rsq;
         statTab.Bias_NSIDC(kk,1)=statNSIDC.bias;
         
+        
         f=figure('Position',[1,1,1500,600]);
         plot(siteNSIDC(iN).tSite,siteNSIDC(iN).vSite,'-*r');hold on
         %plot(siteNSIDC(iN).tSMAP,siteNSIDC(iN).vSMAP,'or');hold on
@@ -206,11 +216,16 @@ for kk=1:length(siteIDLst)
         title([siteName,': ',num2str(siteID)])
         figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
         savefig([figFolder,siteIDstr,'_NSIDC.fig'])
+        close(f)
+
     end
 end
 
 statTab.siteName=siteNameLst;
 writetable(statTab,[figFolder,filesep,'statTab.csv'])
+
+statTab2.siteName=siteNameLst;
+writetable(statTab2,[figFolder,filesep,'statTab2.csv'])
 
 
 

@@ -1,7 +1,7 @@
 global kPath
 vecV=[4];
 vecF=[1];
-dbNameLst={'CONUS','LongTerm_85-95','LongTerm_95-05','LongTerm_05-15'};
+dbNameLst={'LongTerm8595','LongTerm9505','LongTerm0515'};
 
 for k=1:length(vecV)
     interval=vecV(k);

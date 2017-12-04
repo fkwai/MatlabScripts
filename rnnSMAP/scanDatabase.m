@@ -21,6 +21,7 @@ for k=1:length(fileLst)
             ~strcmp(varName,'time') && ...
             ~startsWith(varName,'var') && ...
             ~endsWith(varName,'_stat') && ...
+            ~endsWith(varName,'_backup') && ...
             ~startsWith(varName,'SMAP')
         if startsWith(varName,'const_')
             varConstLst=[varConstLst;varName(7:end)];
@@ -43,7 +44,7 @@ for k=1:length(fileLst)
         
         %% do log
         if doLog
-            if ~startsWith(varName,'const_')
+            if ~startsWith(varName,'const_') && ~endsWith(varName,'_log')
                 statFile=[dirDB,varName,'_stat.csv'];
                 stat=csvread(statFile);
                 tic
