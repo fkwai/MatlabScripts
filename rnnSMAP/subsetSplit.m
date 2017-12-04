@@ -1,13 +1,16 @@
-function subsetSplit(varName,subsetName)
+function subsetSplit(varName,subsetName,varargin)
 % do split of subset of gridSMAP, L3, Daily, CONUS of all datset from
 % reading varLst and varConstLst and SMAP.
 
 % write a subset database for given subset index and variable name
 
 global kPath
+pnames={'dirRoot'};
+dflts={kPath.DBSMAP_L3};
+[dirRoot]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% read subset index
-subsetFile=[kPath.DBSMAP_L3,'Subset',kPath.s,subsetName,'.csv'];
+subsetFile=[dirRoot,'Subset',kPath.s,subsetName,'.csv'];
 fid=fopen(subsetFile);
 C = textscan(fid,'%s',1);
 rootName=C{1}{1};
@@ -16,7 +19,7 @@ indSub=C{1};
 fclose(fid);
 
 %% pick data by indSub
-rootFolder=[kPath.DBSMAP_L3,rootName,kPath.s];
+rootFolder=[dirRoot,rootName,kPath.s];
 dataFileRoot=[rootFolder,varName,'.csv'];
 crdFileRoot=[rootFolder,'crd.csv'];
 data=csvread(dataFileRoot);
@@ -25,7 +28,7 @@ dataSub=data(indSub,:);
 crdSub=crd(indSub,:);
 
 %% save data
-saveFolder=[kPath.DBSMAP_L3,subsetName,kPath.s];
+saveFolder=[dirRoot,subsetName,kPath.s];
 if ~isdir(saveFolder)
     mkdir(saveFolder)
 end

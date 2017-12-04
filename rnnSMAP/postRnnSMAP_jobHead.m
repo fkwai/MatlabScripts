@@ -31,7 +31,7 @@ postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB)
 global kPath
 pnames={'rootOut','rootDB','timeOpt','saveName','rmStd','testName'};
 dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,[1,2],[],0,[]};
-[rootOut,rootDB,timeOpt,saveName,rmStd,testName]=...
+[rootOut,rootDB,timeOpt,saveName,rmStd,testNameUni]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% init
@@ -41,8 +41,8 @@ dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,[1,2],[],0,[]};
 if isempty(saveName)
     saveName=jobHead;
 end
-if ~isempty(testName)
-    saveName=[saveName,'_',testName];
+if ~isempty(testNameUni)
+    saveName=[saveName,'_',testNameUni];    
 end
 if rmStd~=0
     saveName=[saveName,'_rmStd',num2str(rmStd)];
@@ -58,11 +58,13 @@ for k=1:nCase
     for iT=1:length(timeOpt)
         outName=outNameLst{k};
         % default following options. May be change later.
-        if isempty(testName)
+        if isempty(testNameUni)
             testName=optLst(k).train; % test on train set
+        else
+            testName=testNameUni;
         end
         nEpoch=optLst(k).nEpoch; % test on max epoch
-        out=postRnnSMAP_load(outName,testName,timeOpt(iT),nEpoch,...
+        out=postRnnSMAP_load(outName,testName,timeOpt(iT),...
             'rootOut',rootOut,'rootDB',rootDB);
         
         crdFile=[rootDB,filesep,testName,filesep,'crd.csv'];
@@ -105,7 +107,7 @@ for k=1:nCase
 end
 
 %% save a matfile
-save(saveMatFile,'outMat','statMat','crdMat','optLst')
+save(saveMatFile,'outMat','statMat','crdMat','optLst','-v7.3')
 
 
 end
