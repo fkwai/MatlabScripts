@@ -60,8 +60,4 @@ for k=1:length(indCase)
         rmseDiff(k,iT)=nanmean(rmse1-rmse2);
     end
 end
-plot(rmseDiff,biasModelExtMean,'*')    
-
 plot(rmseDiff,biasModelHucMean,'*')    
-
-plot(rmseDiff,biasModelModelMean,'*')    

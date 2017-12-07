@@ -21,6 +21,7 @@ load([kPath.SMAP_VAL,'NSIDC-0712.001',filesep,'siteNSIDC.mat']);
 siteTab=readtable([kPath.SMAP_VAL,'NSIDC-0712.001',filesep,'siteLst.csv']);
 
 siteIDLst=[1601,0401,0901,1603,1602,1607,1606,1604,2701,4801];
+siteIDLst=[401];
 % do not hvae voronoi weight - 0902 2601
 
 errorSite=[];
@@ -29,7 +30,8 @@ layer='SM_05';
 statTabVar={'siteName','siteID','ubRMSE','Bias','R','RMSE',...
     'ubRMSE_NSIDC','Bias_NSIDC','R_NSIDC','RMSE_NSIDC'};
 statTab=array2table(zeros(length(siteIDLst),length(statTabVar)),'VariableNames',statTabVar);
-statTabVar2={'siteName','siteID','rmse1','rmse2','rmse3','rmse4'};
+statTabVar2={'siteName','siteID','rmse1','rmse2','rmse3','rmse4',...
+    'bias1','bias2','bias3','bias4','rsq1','rsq2','rsq3','rsq4'};
 statTab2=array2table(zeros(length(siteIDLst),length(statTabVar2)),'VariableNames',statTabVar2);
 siteNameLst=cell(length(siteIDLst),1);
 
@@ -135,36 +137,64 @@ for kk=1:length(siteIDLst)
     rmse2=sqrt(nanmean((vLSTM(ind2LSTM)-vSite(ind2Site)).^2));
     rmse3=sqrt(nanmean((vSMAP(ind2SMAP)-vSite(ind2Site)).^2));
     rmse4=sqrt(nanmean((vLSTM(ind2LSTM)-vSMAP(ind2SMAP)).^2));
-    
+    bias1=nanmean(vLSTM(ind1LSTM)-vSite(ind1Site));
+    bias2=nanmean(vLSTM(ind2LSTM)-vSite(ind2Site));
+    bias3=nanmean(vSMAP(ind2SMAP)-vSite(ind2Site));
+    bias4=nanmean(vLSTM(ind2LSTM)-vSMAP(ind2SMAP));
+    rsq1=RsqCalculate(vLSTM(ind1LSTM),vSite(ind1Site));
+    rsq2=RsqCalculate(vLSTM(ind2LSTM),vSite(ind2Site));
+    rsq3=RsqCalculate(vSMAP(ind2SMAP),vSite(ind2Site));
+    rsq4=RsqCalculate(vLSTM(ind2LSTM),vSMAP(ind2SMAP));    
     
     %% plot time series
     
     sdTrain=LSTM.t(1);
+    sdSite=tSite(1);
     figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
     f=figure('Position',[1,1,1500,600]);
+    subplot(2,1,1)
     plot(tSite,vSite0,'r*');hold on
     plot(tSite,vSite,'r-');hold on
     plot(tLSTM,vLSTM,'-b');hold on
     plot(tSMAP,vSMAP,'ko');hold on
+    plot([sdTrain,sdTrain], ylim,'k-');hold off
+    datetick('x')
+    title(['30-year Hindcast'])
+    
+    subplot(2,1,2)
+    plot(tSite(find(tSite==sdSite):end),vSite0(find(tSite==sdSite):end),'r*');hold on
+    plot(tSite(find(tSite==sdSite):end),vSite(find(tSite==sdSite):end),'r-');hold on
+    plot(tLSTM(find(tLSTM==sdSite):end),vLSTM(find(tLSTM==sdSite):end),'-b');hold on
+    plot(tSMAP(find(tSMAP==sdSite):end),vSMAP(find(tSMAP==sdSite):end),'ko');hold on
     plot([sdTrain,sdTrain], ylim,'k-');hold off
 %     title(['site ',siteIDstr,...
 %         '; trainRMSE(LSTM,Site)=',num2str(rmse2,3),...
 %         '; trainRMSE(SMAP,Site)=',num2str(rmse3,3),...
 %         '; trainRMSE(LSTM,SMAP)=',num2str(rmse4,3),...
 %         '; testRMSE(LSTM,Site)=',num2str(rmse1,3)]);
-    title([siteName,': ',siteIDstr])
+    datetick('x','yyyy-mm')
+    title(['Zoomed in to Core Validation Site'])
+    %title([siteName,': ',siteIDstr])
         
     statTab2.siteID(kk,1)=siteID;
     statTab2.rmse1(kk,1)=rmse1;
     statTab2.rmse2(kk,1)=rmse2;
     statTab2.rmse3(kk,1)=rmse3;
     statTab2.rmse4(kk,1)=rmse4;
+    statTab2.rsq1(kk,1)=rsq1;
+    statTab2.rsq2(kk,1)=rsq2;
+    statTab2.rsq3(kk,1)=rsq3;
+    statTab2.rsq4(kk,1)=rsq4;
+    statTab2.bias1(kk,1)=bias1;
+    statTab2.bias2(kk,1)=bias2;
+    statTab2.bias3(kk,1)=bias3;
+    statTab2.bias4(kk,1)=bias4;
     
     legend('in-situ(pure)','in-situ(nanmean)','long term','SMAP')
     datetick('x')
-    savefig([figFolder,siteIDstr,'.fig'])
-    xlim([tSite(1),tSMAP(end)])
-    savefig([figFolder,siteIDstr,'_part.fig'])
+    saveas(f,[figFolder,siteIDstr,'.fig'])
+    %xlim([tSite(1),tSMAP(end)])
+    %saveas(f,[figFolder,siteIDstr,'_part.png'])
     close(f)
     
     
@@ -215,17 +245,17 @@ for kk=1:length(siteIDLst)
         legend('NSIDC','Ours','SMAP')
         title([siteName,': ',num2str(siteID)])
         figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
-        savefig([figFolder,siteIDstr,'_NSIDC.fig'])
+        saveas(f,[figFolder,siteIDstr,'_NSIDC.png'])
         close(f)
 
     end
 end
 
-statTab.siteName=siteNameLst;
-writetable(statTab,[figFolder,filesep,'statTab.csv'])
-
-statTab2.siteName=siteNameLst;
-writetable(statTab2,[figFolder,filesep,'statTab2.csv'])
+% statTab.siteName=siteNameLst;
+% writetable(statTab,[figFolder,filesep,'statTab.csv'])
+% 
+% statTab2.siteName=siteNameLst;
+% writetable(statTab2,[figFolder,filesep,'statTab2.csv'])
 
 
 
