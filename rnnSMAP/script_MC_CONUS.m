@@ -25,6 +25,7 @@ end
 
 
 %% plotTS
+%{
 ind=randi([1,size(outMat{1,1}.yLSTM,2)]);
 t=[1:732]';
 for iOut=1:2
@@ -48,7 +49,7 @@ for iOut=1:2
     plot(t,vSMAP,'ro');hold on
     plot([366,366],[0,0.3]);hold off
 end
-
+%}
 
 %% compare std of model vs non-model
 for iOut=1:2
@@ -65,7 +66,7 @@ savefig(f,[figFolder,filesep,'stdBox.fig'])
 close(f)
 
 %% compare std of model vs non-model, 121 plot
-
+%{
 tStrLst={'train','test'};
 outStrLst={'Noah','NoModel'};
 statLst={'bias','varRes'};
@@ -84,6 +85,7 @@ for iS=1:length(statLst)
         title([tStrLst{iT},' ',statLst{iS}])
     end
 end
+%}
 
 
 %% plot std vs error
