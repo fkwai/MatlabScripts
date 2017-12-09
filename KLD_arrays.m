@@ -62,8 +62,6 @@ end
 4;
 %[fA,xA] = ecdf(A);
 
-H:\Wenping\2.svn\pawsPack\PRISM\maths\stats
-
 function y = nudgeZeroEps(y,eps)
 % nudge a eps value into 0
 n0 = sum(y<=0);

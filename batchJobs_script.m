@@ -3,7 +3,7 @@
 cd /home/kxf227/work/GitHUB/rnnSMAP/
 global kPath
 varFileLst={'varLst_Noah','varLst_NoModel'};
-for nHUC=[3]
+for nHUC=[6]
     for temporalTest=[0,1]
         for varOpt=[2]
 			jobHead=['hucv2n',num2str(nHUC)];
@@ -22,8 +22,8 @@ for nHUC=[3]
 			end
 			
 			prob.rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/',jobHead,'/'];
-			%prob.rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/',jobHead,'/'];
-			prob.rootDB=[kPath.DBSMAP_L3];
+			prob.rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/',jobHead,'/'];
+			%prob.rootDB=[kPath.DBSMAP_L3];
 
 			batchJobs(res,prob,action,0) % action contains 1: train; contains 2: test
 		end

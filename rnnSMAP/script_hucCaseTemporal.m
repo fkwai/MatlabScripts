@@ -14,8 +14,8 @@ postRnnSMAP_jobHead('CONUSv2f1','rmStd',rmStd);
 
 for i=1:length(nHucLst)
     nHUC=nHucLst(i);
-    rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2n',num2str(nHUC),filesep];
-    rootDB=['E:\Kuai\rnnSMAP_inputs\hucv2n',num2str(nHUC),filesep];
+    rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHUC),filesep];
+    rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/hucv2n',num2str(nHUC),filesep];
     
     if nHUC~=4
         jobHead=['hucv2n',num2str(nHUC)];

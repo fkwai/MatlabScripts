@@ -28,8 +28,6 @@ bModel=strcmp({matHuc.optLst.var},'varLst_Noah')';
 indCase=find(bModel==1);
 biasModelHuc=cell(length(indCase),2);
 biasModelExt=cell(length(indCase),2);
-biasModelHucMean=zeros(length(indCase),2);
-biasModelExtMean=zeros(length(indCase),2);
 
 for k=1:length(indCase)
     crdHuc=matHuc.crdMat{k};
@@ -47,6 +45,7 @@ for k=1:length(indCase)
 end
 
 %% performance at spatial test
+% difference between model and noModel on extrapolation test
 indCase=find(bModel==1);
 rmseDiff=zeros(length(indCase),2);
 for k=1:length(indCase)    
@@ -60,4 +59,15 @@ for k=1:length(indCase)
         rmseDiff(k,iT)=nanmean(rmse1-rmse2);
     end
 end
-plot(rmseDiff,biasModelHucMean,'*')    
+
+biasModelExtStat=zeros(length(indCase),2);
+biasModelHucStat=zeros(length(indCase),2);
+for k=1:length(indCase)
+    for iT=1:2                        
+        biasModelExtStat(k,iT)=std(biasModelExt{k,iT});
+        biasModelHucStat(k,iT)=std(biasModelHuc{k,iT});
+    end
+end
+
+
+plot(rmseDiff(:,1),biasModelHucStat(:,1),'*')    

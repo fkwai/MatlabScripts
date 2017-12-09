@@ -2,11 +2,11 @@
 global kPath
 
 %% load ensemble - temporal
-%{
-% outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
-% dataName='hucv2n1_15';
-% outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
-% dataName='CONUSv2f1';
+
+outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
+dataName='hucv2n1_15';
+outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+dataName='CONUSv2f1';
 
 outMat=cell(2,2);
 tsStatMat=cell(2,2);
@@ -21,10 +21,10 @@ for iOut=1:2
         statMatMean{iOut,iT}=statCal(tsStatMat{iOut,iT}.mean,outMat{iOut,iT}.ySMAP);
     end
 end
-%}
+
 
 %% load ensemble to mat file - spatial
-%{
+
 outHucLst={'02030406','14151617','10111213',...
     '02101114','03101317','04051118'};
 rootOut='/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n4/';
@@ -41,7 +41,7 @@ for k=1:length(outHucLst)
     postRnnSMAP_load(outName,dataName,iT,'drBatch',1000,'rootOut',rootOut)
     toc
 end
-%}
+
 
 %% load ensemble - spatial
 outHucLst={'01020304','02030406','14151617',...
@@ -88,31 +88,31 @@ for i=2:length(outHucLst)
     end
     
     %% plotTS
-    %{
-ind=randi([1,size(outMat{1,1}.yLSTM,2)]);
-t=[1:732]';
-for iOut=1:2
-    v1=[];
-    v2=[];
-    vMean=[];
-    vLSTM=[];d
-    vSMAP=[];
-    for iT=1:2
-        v1=[v1;tsStatMat{iOut,iT}.mean(:,ind)+tsStatMat{iOut,iT}.std(:,ind)];
-        v2=[v2;tsStatMat{iOut,iT}.mean(:,ind)-tsStatMat{iOut,iT}.std(:,ind)];
-        vMean=[vMean;tsStatMat{iOut,iT}.mean(:,ind)];
-        vSMAP=[vSMAP;outMat{iOut,iT}.ySMAP(:,ind)];
-        vLSTM=[vLSTM;outMat{iOut,iT}.yLSTM(:,ind)];
+    
+    ind=randi([1,size(outMat{1,1}.yLSTM,2)]);
+    t=[1:732]';
+    for iOut=1:2
+        v1=[];
+        v2=[];
+        vMean=[];
+        vLSTM=[];
+        vSMAP=[];
+        for iT=1:2
+            v1=[v1;tsStatMat{iOut,iT}.mean(:,ind)+tsStatMat{iOut,iT}.std(:,ind)];
+            v2=[v2;tsStatMat{iOut,iT}.mean(:,ind)-tsStatMat{iOut,iT}.std(:,ind)];
+            vMean=[vMean;tsStatMat{iOut,iT}.mean(:,ind)];
+            vSMAP=[vSMAP;outMat{iOut,iT}.ySMAP(:,ind)];
+            vLSTM=[vLSTM;outMat{iOut,iT}.yLSTM(:,ind)];
+        end
+        subplot(2,1,iOut)
+        vv=[v1;flipud(v2)];
+        tt=[t;flipud(t)];
+        fill(tt,vv,[0.2,0.8,1],'LineStyle','none');hold on
+        plot(t,vLSTM,'b');hold on
+        plot(t,vSMAP,'ro');hold on
+        plot([366,366],[0,0.3]);hold off
     end
-    subplot(2,1,iOut)
-    vv=[v1;flipud(v2)];
-    tt=[t;flipud(t)];
-    fill(tt,vv,[0.2,0.8,1],'LineStyle','none');hold on
-    plot(t,vLSTM,'b');hold on
-    plot(t,vSMAP,'ro');hold on
-    plot([366,366],[0,0.3]);hold off
-end
-    %}
+    
     
     %% compare std of model vs non-model
     for iOut=1:2
@@ -128,26 +128,26 @@ end
     close(f)
     
     %% compare std of model vs non-model, 121 plot
-    %{
-tStrLst={'train','test'};
-outStrLst={'Noah','NoModel'};
-statLst={'bias','varRes'};
-
-k=0
-for iS=1:length(statLst)
-    for iT=1:length(tStrLst)
-        k=k+1;
-        subplot(2,2,k)
-        a=statMat{1,iT}.(statLst{iS});
-        b=statMat{2,iT}.(statLst{iS});
-        plot(a,b,'*');hold on
-        plot121Line;hold off
-        xlabel(outStrLst{1});
-        ylabel(outStrLst{2});
-        title([tStrLst{iT},' ',statLst{iS}])
+    
+    tStrLst={'train','test'};
+    outStrLst={'Noah','NoModel'};
+    statLst={'bias','varRes'};
+    
+    k=0
+    for iS=1:length(statLst)
+        for iT=1:length(tStrLst)
+            k=k+1;
+            subplot(2,2,k)
+            a=statMat{1,iT}.(statLst{iS});
+            b=statMat{2,iT}.(statLst{iS});
+            plot(a,b,'*');hold on
+            plot121Line;hold off
+            xlabel(outStrLst{1});
+            ylabel(outStrLst{2});
+            title([tStrLst{iT},' ',statLst{iS}])
+        end
     end
-end
-    %}
+    
     
     %% plot std vs error
     f=figure('Position',[1,1,1200,800])
