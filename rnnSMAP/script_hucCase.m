@@ -6,6 +6,7 @@
 
 %% read data
 global kPath
+
 nHuc=4;
 testName='CONUSv2f1';
 rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHuc),filesep];
@@ -24,6 +25,7 @@ saveMatFile=[rootOut,filesep,saveName,'.mat'];
 matHuc=load(saveMatFile);
 bModel=strcmp({matHuc.optLst.var},'varLst_Noah')';
 
+
 %% model bias
 indCase=find(bModel==1);
 biasModelHuc=cell(length(indCase),2);
@@ -37,37 +39,52 @@ for k=1:length(indCase)
     for iT=1:2        
         stat=statCal(matCONUS.outMat.yGLDAS{k,iT}(:,indExt),matCONUS.outMat.ySMAP{k,iT}(:,indExt));
         biasModelExt{k,iT}=stat.bias;
-        biasModelExtMean(k,iT)=nanmean(stat.bias);
         stat=statCal(matHuc.outMat.yGLDAS{k,iT},matHuc.outMat.ySMAP{k,iT});
         biasModelHuc{k,iT}=stat.bias;
-        biasModelHucMean(k,iT)=nanmean(stat.bias);
     end
 end
 
-%% performance at spatial test
+%% performance at spatial test - y
 % difference between model and noModel on extrapolation test
 indCase=find(bModel==1);
 rmseDiff=zeros(length(indCase),2);
+rmse1=zeros(length(indCase),2);
+rmse2=zeros(length(indCase),2);
 for k=1:length(indCase)    
     crdHuc=matHuc.crdMat{k};
     crdCONUS=matCONUS.crdMat{k};
     [indHuc,indCONUS]=intersectCrd(crdHuc,crdCONUS);
     indExt=[1:length(crdCONUS)]';indExt(indCONUS)=[];
     for iT=1:2
-        rmse1=matCONUS.statMat.rmse{k,iT}(indExt);
-        rmse2=matCONUS.statMat.rmse{k+1,iT}(indExt);
-        rmseDiff(k,iT)=nanmean(rmse1-rmse2);
+        rmseTemp1=matCONUS.statMat.rmse{k,iT}(indExt);
+        rmse1(k,iT)=nanmean(rmseTemp1);
+        rmseTemp2=nanmean(matCONUS.statMat.rmse{k+1,iT}(indExt));
+        rmse2(k,iT)=nanmean(rmseTemp2);
+        rmseDiff(k,iT)=nanmean(rmseTemp1-rmseTemp2);
     end
 end
 
-biasModelExtStat=zeros(length(indCase),2);
-biasModelHucStat=zeros(length(indCase),2);
+%% distance between train and test / std(train model bias)
+biasModelExtStd=zeros(length(indCase),2);
+biasModelHucStd=zeros(length(indCase),2);
+klDist=zeros(length(indCase),2);
+xEnds=[-0.1:0.01:0.1];
 for k=1:length(indCase)
     for iT=1:2                        
-        biasModelExtStat(k,iT)=std(biasModelExt{k,iT});
-        biasModelHucStat(k,iT)=std(biasModelHuc{k,iT});
+        biasModelExtStd(k,iT)=nanstd(biasModelExt{k,iT});
+        biasModelHucStd(k,iT)=nanstd(biasModelHuc{k,iT});
+        [KL,xx]=KLD_arrays(biasModelHuc{k,iT},biasModelExt{k,iT},xEnds);
+        klDist(k,iT)=KL;
     end
 end
 
-
-plot(rmseDiff(:,1),biasModelHucStat(:,1),'*')    
+a=klDist(:,1)./biasModelHucStd(:,1);
+b=rmse1(:,1);
+c=rmse2(:,1);
+subplot(1,2,1)
+plot(a,c,'bo');hold on
+lsline
+title([ 'R with Noah=',num2str(corr(a,b),'%.2f')]);
+plot(a,b,'ro');hold on
+lsline
+title([ 'R without Noah=',num2str(corr(a,c),'%.2f')]);

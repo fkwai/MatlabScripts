@@ -106,7 +106,7 @@ for iOut=1:length(outStrLst)
         else
             a=statMat{iOut,iT}.(statLst{iS});
         end
-        b=mean(tsStatMat{iOut,iT}.var)';
+        b=mean(tsStatMat{iOut,iT}.std)';
         subplot(length(statLst),length(outStrLst),k);
         plot(a,b,'b*')
         h=lsline;
@@ -114,7 +114,7 @@ for iOut=1:length(outStrLst)
         titleStr=[titleStr, 'R=',num2str(corr(a,b),'%.2f')];
         title(titleStr)
         xlim([0,0.1])
-        ylim([0,0.0015])
+        ylim([0.01,0.04])
         %xlabel(statLst{iS})
         xlabel('RMSE')
         ylabel('Ensemble std')

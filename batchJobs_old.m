@@ -178,7 +178,7 @@ end
 trainCMD = 'CUDA_VISIBLE_DEVICES=0 th testLSTM_SMAP.lua -gpu 1 -out fullCONUS_hS384dr04 -epoch 500 -rootOut aaa -rootDB bbb -test CONUSv2f1 -timeOpt 2';
 trainCMD = strrep(trainCMD, '=0', ['=',num2str(ID-1)]);
 trainCMD = strrep(trainCMD, 'fullCONUS_hS384dr04', [od]);
-trainCMD = strrep(trainCMD, 'CONUSv2f1', D(i).name);
+%trainCMD = strrep(trainCMD, 'CONUSv2f1', D(i).name);
 trainCMD = strrep(trainCMD, '500', num2str(epoch));
 strTime = ['-timeOpt ',num2str(testTimeOpt)];
 trainCMD = strrep(trainCMD, '-timeOpt 2', strTime);

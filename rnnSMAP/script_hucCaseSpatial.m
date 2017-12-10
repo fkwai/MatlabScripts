@@ -7,22 +7,22 @@
 %% read data and save matfile
 
 global kPath
-nHucLst=[1:5];
+nHucLst=[1:6];
 rmStd=0;
 
 for i=1:length(nHucLst)
     nHUC=nHucLst(i);
-    rootOut=['E:\Kuai\rnnSMAP_outputs\hucv2n',num2str(nHUC),filesep];
+    rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHUC),filesep];
     %rootDB=['E:\Kuai\rnnSMAP_inputs\hucv2n',num2str(nHUC),filesep];
     rootDB=kPath.DBSMAP_L3;
     if nHUC~=4
         jobHead=['hucv2n',num2str(nHUC)];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'rmStd',rmStd,'testName','CONUSv2f1');
+            'rmStd',rmStd,'testName','CONUSv2f1','saveTS',0);
     else
         jobHead=['huc2_'];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'saveName','hucv2n4','rmStd',rmStd,'testName','CONUSv2f1');
+            'saveName','hucv2n4','rmStd',rmStd,'testName','CONUSv2f1','saveTS',0);
     end
 end
 

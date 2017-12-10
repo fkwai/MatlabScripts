@@ -29,9 +29,9 @@ postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB)
 %}
 
 global kPath
-pnames={'rootOut','rootDB','timeOpt','saveName','rmStd','testName'};
-dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,[1,2],[],0,[]};
-[rootOut,rootDB,timeOpt,saveName,rmStd,testNameUni]=...
+pnames={'rootOut','rootDB','timeOpt','saveName','rmStd','testName','saveTS'};
+dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,[1,2],[],0,[],1};
+[rootOut,rootDB,timeOpt,saveName,rmStd,testNameUni,saveTS]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% init
@@ -47,7 +47,6 @@ end
 if rmStd~=0
     saveName=[saveName,'_rmStd',num2str(rmStd)];
 end
-saveMatFile=[rootOut,filesep,saveName,'.mat'];
 
 %% read case results
 nCase=length(outNameLst);
@@ -106,8 +105,36 @@ for k=1:nCase
     end
 end
 
+%% calculate stat between yGLDAS and ySMAP
+for k=1:nCase
+    for iT=1:length(timeOpt)
+        stat=statCal(outMat.yGLDAS{k,iT},outMat.ySMAP{k,iT},'rmStd',rmStd);
+        
+        % init statMat
+        if k==1 && iT==1
+            fieldLst=fieldnames(stat);
+            for iField=1:length(fieldLst)
+                statModelMat.(fieldLst{iField})=cell(nCase,nT);
+            end
+        end
+        
+        % fill in statMat
+        for iField=1:length(fieldLst)
+            statModelMat.(fieldLst{iField}){k,iT}=stat.(fieldLst{iField});
+        end
+    end
+end
+
+
 %% save a matfile
-save(saveMatFile,'outMat','statMat','crdMat','optLst','-v7.3')
+if saveTS
+    saveMatFile=[rootOut,filesep,saveName,'.mat'];
+    save(saveMatFile,'outMat','statMat','statModelMat','crdMat','optLst','-v7.3')
+else
+    saveMatFile=[rootOut,filesep,saveName,'_stat.mat'];
+    save(saveMatFile,'statMat','statModelMat','crdMat','optLst')
+end
+    
 
 
 end
