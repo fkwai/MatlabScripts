@@ -125,14 +125,35 @@ for k=1:nCase
     end
 end
 
+%% calculate stat between yLSTM and yGLDAS
+for k=1:nCase
+    for iT=1:length(timeOpt)
+        stat=statCal(outMat.yLSTM{k,iT},outMat.yGLDAS{k,iT},'rmStd',rmStd);
+        
+        % init statMat
+        if k==1 && iT==1
+            fieldLst=fieldnames(stat);
+            for iField=1:length(fieldLst)
+                statSelfMat.(fieldLst{iField})=cell(nCase,nT);
+            end
+        end
+        
+        % fill in statMat
+        for iField=1:length(fieldLst)
+            statSelfMat.(fieldLst{iField}){k,iT}=stat.(fieldLst{iField});
+        end
+    end
+end
+
+
 
 %% save a matfile
 if saveTS
     saveMatFile=[rootOut,filesep,saveName,'.mat'];
-    save(saveMatFile,'outMat','statMat','statModelMat','crdMat','optLst','-v7.3')
+    save(saveMatFile,'outMat','statMat','statModelMat','statSelfMat','crdMat','optLst','-v7.3')
 else
     saveMatFile=[rootOut,filesep,saveName,'_stat.mat'];
-    save(saveMatFile,'statMat','statModelMat','crdMat','optLst')
+    save(saveMatFile,'statMat','statModelMat','statSelfMat','crdMat','optLst')
 end
     
 
