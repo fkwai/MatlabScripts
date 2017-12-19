@@ -6,7 +6,7 @@
 %% read data
 global kPath
 matfileFolder='/mnt/sdb1/Kuai/rnnSMAP_outputs/MatFile/';
-nHucLst=[1];
+nHucLst=[1:6];
 for kHuc=1:length(nHucLst)
     nHuc=nHucLst(kHuc);
     nHuc
@@ -51,8 +51,8 @@ for kHuc=1:length(nHucLst)
     
     %% plot
     subplot(2,3,kHuc)
-    a=distModel(:)./stdModelHuc(:);
-    b=statLSTM(:);
+    a=distModel(:);
+    b=statLSTM(:)./stdModelHuc(:);
     plot(a,b,'bo');hold on
     lsline
     ylabel(stat1)
