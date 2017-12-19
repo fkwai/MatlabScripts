@@ -1,6 +1,6 @@
 % Time.csv is wrong for all database. Copy updated one into them. 
 
-dirDB='/mnt/sdb1/Kuai/rnnSMAP_inputs/hucv2n6/';
+dirDB='/mnt/sdb/Kuai/rnnSMAP_inputs/hucv2n2/';
 timeFile=[kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv'];
 
 subDirDB=dir(dirDB);

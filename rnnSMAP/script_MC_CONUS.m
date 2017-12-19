@@ -3,9 +3,9 @@ global kPath
 
 %% load ensemble - temporal
 
-% outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
+outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
 % dataName='hucv2n1_15';
-outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+%outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
 dataName='CONUSv2f1';
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/ensemble_CONUS/';
 
