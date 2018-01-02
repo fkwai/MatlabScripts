@@ -21,7 +21,7 @@ varLst=textread(varFile,'%s');
 varConstLst=textread(varConstFile,'%s');
 
 %% time series variable
-for k=1:length(varLst)
+parfor k=1:length(varLst)
     disp([subsetName,' ',varLst{k}])
     tic
     subsetSplit(varLst{k},subsetName,'dirRoot',dirRoot)

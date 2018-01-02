@@ -20,16 +20,17 @@ for i=1:length(nHucLst)
     if nHUC~=4
         jobHead=['hucv2n',num2str(nHUC)];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'rmStd',rmStd);
+            'rmStd',rmStd,'saveTS',0);
     else
         jobHead=['huc2_'];
         postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'saveName','hucv2n4','rmStd',rmStd);
+            'saveName','hucv2n4','rmStd',rmStd,'saveTS',0);
     end
 end
 
 
 %% plot cases - temporal
+nHucLst=[1,2,4];
 global kPath
 
 statLst={'rmse','nash','rsq','bias'};
@@ -107,15 +108,15 @@ for iR=1:length(rmStdLst)
                         title(['nHUC = ',num2str(nHUC), ' non-continuous']);
                     end
                 end
-            end
-        end
+            end            
+        end           
         
         
-        figFolder=['E:\Kuai\rnnSMAP_result\regional\'];
+        figFolder=['E:\Kuai\rnnSMAP_result\temporal\'];
         if ~exist(figFolder,'dir')
             mkdir(figFolder);
         end
-        figName=[figFolder,'huc_',stat,'_','rmStd',num2str(rmStd)];
+        figName=[figFolder,'huc_',stat,'_','rmStd',num2str(rmStd),'_new'];
         savefig(f,figName)
         close(f)
     end

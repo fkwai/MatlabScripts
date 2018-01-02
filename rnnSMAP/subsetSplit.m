@@ -4,13 +4,14 @@ function subsetSplit(varName,subsetName,varargin)
 
 % write a subset database for given subset index and variable name
 
-global kPath
+%global kPath
 pnames={'dirRoot'};
-dflts={kPath.DBSMAP_L3};
+%dflts={kPath.DBSMAP_L3};
+dflts={[]};
 [dirRoot]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% read subset index
-subsetFile=[dirRoot,'Subset',kPath.s,subsetName,'.csv'];
+subsetFile=[dirRoot,'Subset',filesep,subsetName,'.csv'];
 fid=fopen(subsetFile);
 C = textscan(fid,'%s',1);
 rootName=C{1}{1};
@@ -19,7 +20,7 @@ indSub=C{1};
 fclose(fid);
 
 %% pick data by indSub
-rootFolder=[dirRoot,rootName,kPath.s];
+rootFolder=[dirRoot,rootName,filesep];
 dataFileRoot=[rootFolder,varName,'.csv'];
 crdFileRoot=[rootFolder,'crd.csv'];
 data=csvread(dataFileRoot);
@@ -28,7 +29,7 @@ dataSub=data(indSub,:);
 crdSub=crd(indSub,:);
 
 %% save data
-saveFolder=[dirRoot,subsetName,kPath.s];
+saveFolder=[dirRoot,subsetName,filesep];
 if ~isdir(saveFolder)
     mkdir(saveFolder)
 end

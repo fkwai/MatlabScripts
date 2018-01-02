@@ -3,9 +3,9 @@ global kPath
 
 %% load ensemble - temporal
 
-% outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
+outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
 % dataName='hucv2n1_15';
-outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+%outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
 dataName='CONUSv2f1';
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/ensemble_CONUS/';
 
@@ -25,6 +25,7 @@ end
 
 
 %% plotTS
+%{
 ind=randi([1,size(outMat{1,1}.yLSTM,2)]);
 t=[1:732]';
 for iOut=1:2
@@ -48,7 +49,7 @@ for iOut=1:2
     plot(t,vSMAP,'ro');hold on
     plot([366,366],[0,0.3]);hold off
 end
-
+%}
 
 %% compare std of model vs non-model
 for iOut=1:2
@@ -65,7 +66,7 @@ savefig(f,[figFolder,filesep,'stdBox.fig'])
 close(f)
 
 %% compare std of model vs non-model, 121 plot
-
+%{
 tStrLst={'train','test'};
 outStrLst={'Noah','NoModel'};
 statLst={'bias','varRes'};
@@ -84,6 +85,7 @@ for iS=1:length(statLst)
         title([tStrLst{iT},' ',statLst{iS}])
     end
 end
+%}
 
 
 %% plot std vs error
@@ -104,7 +106,7 @@ for iOut=1:length(outStrLst)
         else
             a=statMat{iOut,iT}.(statLst{iS});
         end
-        b=mean(tsStatMat{iOut,iT}.var)';
+        b=mean(tsStatMat{iOut,iT}.std)';
         subplot(length(statLst),length(outStrLst),k);
         plot(a,b,'b*')
         h=lsline;
@@ -112,7 +114,7 @@ for iOut=1:length(outStrLst)
         titleStr=[titleStr, 'R=',num2str(corr(a,b),'%.2f')];
         title(titleStr)
         xlim([0,0.1])
-        ylim([0,0.0015])
+        ylim([0.01,0.04])
         %xlabel(statLst{iS})
         xlabel('RMSE')
         ylabel('Ensemble std')
