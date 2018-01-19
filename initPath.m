@@ -56,10 +56,11 @@ end
 if strcmp(pcStr,'workstation')
 	kPath.s='\';
     kPath.SMAP='H:\Kuai\Data\SMAP\';
+    kPath.SMAP_VAL='E:\Kuai\SMAP_VAL\';
+
     kPath.DBSMAP_L3='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\';
     kPath.DBSMAP_L3_CONUS='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\CONUS\';
     kPath.OutSMAP_L3='H:\Kuai\rnnSMAP\output_SMAPgrid\';
-
     
     kPath.SCAN='H:\Kuai\Data\SoilMoisture\SCAN\';
     kPath.OutSCAN='H:\Kuai\rnnGAGE\outputSCAN\';

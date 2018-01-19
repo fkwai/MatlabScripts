@@ -17,7 +17,7 @@ between multiple runs of the same job.
 below
 % However, this rt does not concern the code inside the lua codes, which
 now need to be changed manually.
-
+/home/facadmin/torch/install/bin/th
 %rt  = '/mnt/sdd/rnnSMAP/Database_SMAPgrid/Daily/';
 rt = ''; % empty if using default settings on each machine
 action = [1 2];
@@ -30,8 +30,16 @@ diary('batchJobsLog.log')
 
 % Grabbing configurations from input
 nGPU = res.nGPU; nConc = res.nConc; 
-if ~isfield(res,'torchDir') || isempty(res.torchDir), 
-    res.torchDir= '/home/kxf227/torch/install/lib'; end
+if ~isfield(res,'torchDir') || isempty(res.torchDir)
+    if ~ispc
+        % torchDir field does not exist and it's on linux. use what is
+        % returned by "which th"
+        [status,res.torchDir]=system('which th');
+    else
+        res.torchDir= '/home/kxf227/torch/install/lib';
+    end
+end
+%res.torchDir
 jobHead = prob.jobHead; hs = prob.hs; temporalTest = prob.temporalTest; varFile = prob.varFile;
 epoch = prob.epoch; if isfield(prob,'varCFile'),varCFile = prob.varCFile; else, varCFile='varConstLst_Noah';  end
 if isfield(prob,'namePadd'), namePadd = prob.namePadd; else, namePadd=''; end
@@ -53,7 +61,7 @@ if isfield(res,'rt') && ~isempty(res.rt)
 else
     if ispc
         rt ='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily';
-    elseif strcmp(strip(hostname),'CE-406SACKXF227')
+    elseif strcmp(strip(hostname),'ce-406chsh11')
         rt = '/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily/';
     elseif strcmp(strip(hostname),'ce406c-kuai')
         rt = '/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
@@ -114,7 +122,7 @@ nMultiple = nConc/nGPU;
 % the following files are prepared in case we cannot run matlab on the
 % target machine
 fid = fopen(['allJobs_',jobN,'.sh'],'wt');
-queueHeadGPU(fid,res,jobN,'xstream');
+%queueHeadGPU(fid,res,jobN,'xstream');
 k = 0;
 for i=1:nGPU
     for j=1:nMultiple
@@ -144,9 +152,9 @@ nm = ceil(nM/nConc);
 % turning M into a 2D matrix of [nConc,nm]. each spmd run goes through nm
 % nConc will be further decomposed to [nGPU,nMultiple]
 cid = -1;
-%spmd
-%id = labindex;
-for id=1:nConc % for debugging or writting scripts for clusters, comment out two lines above and
+spmd
+id = labindex;
+%for id=1:nConc % for debugging or writting scripts for clusters, comment out two lines above and
     %uncomment this line
     for is = 1:nm % "is" is the index inside a concurrent process
         ii = (is-1)*nConc+id; % job id in the entire sequence
@@ -172,7 +180,12 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                     jobScriptFile = [ff,'.sh'];
                     if exist(jobScriptFile,'file'), mode='at'; else, mode='wt'; end
                     cid= fopen(jobScriptFile,mode);
-                    fprintf(cid,'%s\n',['export LD_LIBRARY_PATH=',res.torchDir]);
+                    if isfield(res,'torchMod')
+                        % on XSEDE, it is load a torch module
+                        fprintf(cid,'%s\n',['module load ',res.torchMod]);
+                    else
+                        fprintf(cid,'%s\n',['export LD_LIBRARY_PATH=',res.torchDir]);
+                    end
                     %fprintf(fid,'%s\n',['. ',CFILE{i,j},' > ',ff,'.log &']);
                 end
                 %ID=kk0(1); j=kk0(2); kk=kk0(3);
@@ -190,8 +203,8 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 for k=1:length(R)
                     obj = R{k}; % it will work either the field is on prob or res
                     % prob will overwrite the one in res if they conflict
-                    for i=1:length(AddFields)
-                        f = AddFields{i};
+                    for ii=1:length(AddFields)
+                        f = AddFields{ii};
                         if isfield(obj,f)
                             trainCMD = [trainCMD, ' -',f,' ',obj.(f)];
                         end
@@ -207,7 +220,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                                 
                 trainCMD = strrep(trainCMD, 'XX_out', od);
                 if any(action==1)
-                    runCmdInScript(trainCMD,jobN,i,1,testRun,cid);
+                    runCmdInScript(trainCMD,jobN,i,1,testRun,cid,res.torchDir);
                 end
                 
                 %ID = mod(i-1,nGPU);
@@ -223,8 +236,8 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 for k=1:length(R)
                     obj = R{k}; % it will work either the field is on prob or res
                     % prob will overwrite the one in res if they conflict
-                    for i=1:length(AddFields)
-                        f = AddFields{i};
+                    for ii=1:length(AddFields)
+                        f = AddFields{ii};
                         if isfield(obj,f)
                             if isnumeric(obj.(f)), obj.(f)=num2str(obj.(f)); end
                             trainCMD = [trainCMD, ' -',f,' ',obj.(f)];
@@ -235,7 +248,7 @@ for id=1:nConc % for debugging or writting scripts for clusters, comment out two
                 trainCMD2 = strrep(trainCMD, strTime, ['-timeOpt ',num2str(3)]);
                 
                 if any(action==2)
-                    runCmdInScript(trainCMD,jobN,nk,2,testRun,cid);
+                    runCmdInScript(trainCMD,jobN,nk,2,testRun,cid,res.torchDir);
                     %runCmdInScript(trainCMD2,jobHead,nk,2,testRun,cid);
                 end
             end
@@ -251,7 +264,7 @@ end
 %     fclose(CID(i));
 % end
 
-function runCmdInScript(cmd,jobHead,i,act,testRun,cid)
+function runCmdInScript(cmd,jobHead,i,act,testRun,cid,torchDir)
 %testRun = 0;
 % two files: a script file is for each individual job, to be used by Matlab
 % parfor
@@ -272,7 +285,14 @@ file = [sD,sF];
 % between Matlab and Scripts
 fid = fopen(file,'wt');
 fprintf(fid,'%s\n','. ~/.bashrc');
-fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
+[status,cmdout] =system('which th');
+if isempty(cmdout)
+    error('no torch is found?')
+else
+    strrep(cmdout,'/bin/th','/install/lib')
+end
+%fprintf(fid,'%s\n','export LD_LIBRARY_PATH=/home/kxf227/torch/install/lib');
+fprintf(fid,'%s\n',['export LD_LIBRARY_PATH=',torchDir]);
 % Above is what is causing problems with a simple Matlab launch
 fprintf(fid,'%s\r\n',cmd);
 fclose(fid);
@@ -284,7 +304,7 @@ else
     suffix = ' >/dev/null'; % standard device for discarding screen output
     % lua already has output logs in each directory
 end
-%trainCMD = ['. ',file,suffix];
+trainCMD = ['. ',file,suffix];
 if ispc || testRun
 %     if verb>1
 %         disp('*******************************************')
@@ -366,8 +386,8 @@ switch c
         rt = ''; action = [1 2]; % empty if using default settings on each machine
         jobID = 1;
         res = struct('nGPU',nGPU,'nConc',nMultiple*nGPU,'rt',rt,...
-            'saveEpoch','50','torchDir','~/torch/lib','rootDB',['$WORK/rnnSMAP/Database_SMAPgrid/',jobHead],...
-            'rootOut',['$WORK/rnnSMAP/'],'t','47:00:00','memMB','2000');
+            'saveEpoch','50','torchMod','torch','rootDB',['$WORK/rnnSMAP/Database_SMAPgrid/',jobHead],...
+            'rootOut',['$WORK/rnnSMAP/Output_SMAPgrid/',jobHead],'t','47:00:00','memMB','2000');
         % 2000 means each job requires 2 GB. This number will be multiplied
         % by the nConc/nGPU, which is what is needed on each CPU
         prob = struct('jobHead',jobHead,'varFile','varLst_Noah','epoch',epoch,...
