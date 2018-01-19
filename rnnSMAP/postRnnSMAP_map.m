@@ -13,7 +13,7 @@ postRnnSMAP_map(outName,dataName)
 global kPath
 
 pnames={'rootOut','rootDB','mapTime','tsTime','epoch','stat','colorRange','drBatch','stdLst','itemLst'};
-dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,2,[1,2],0,'rmse',[0,0.05],0,1,{'Model','LSTM','SMAP'}};
+dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,2,2,0,'rmse',[0,0.05],0,1,{'Model','LSTM','SMAP'}};
 [rootOut,rootDB,mapTime,tsTime,epoch,stat,colorRange,drBatch,stdLst,itemLst]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
@@ -54,7 +54,14 @@ for iT=1:length(tsTime)
             'rootOut',rootOut,'rootDB',rootDB,'drBatch',drBatch);
     end
 end
-tIndLst={1:366; 367:732; 1:732};
+switch tsTime
+    case 1
+        tnumTS=tnum(1:366);
+    case 2
+        tnumTS=tnum(367:732);
+    case 0
+        tnumTS=tnum;
+end
 
 %% add plot items
 % A reference table. hard coded. Add more if needed. will be plotted in order.
@@ -71,7 +78,7 @@ for k=1:length(itemLst)
     end
     [gridTemp,xx,yy] = data2grid3d(tsData',crd(:,2),crd(:,1));
     tsStr(k).grid=gridTemp;
-    tsStr(k).t=tnum;
+    tsStr(k).t=tnumTS;
     tsStr(k).symb=symLst{ind};
     tsStr(k).legendStr=itemLst{k};
 end
@@ -98,7 +105,7 @@ if ~isempty(stdLst) && drBatch~=0
         tsStrFill(k).t=tnum;
         tsStrFill(k).color=colorLst(k,:);
         tsStrFill(k).legendStr=['std*',num2str(k)];
-    end    
+    end
 end
 
 showMap( gridStatLSTM,yy,xx,'colorRange',colorRange,...
