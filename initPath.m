@@ -16,6 +16,7 @@ end
 
 if strcmp(pcStr,'server')
 	kPath.s='/';
+    kPath.workDir='/mnt/sdb1/Kuai/';
 
 	kPath.SMAP='/mnt/sdb1/Database/SMAP/';
 	kPath.SMAP_L2='/mnt/sdb1/Database/SMAP/SPL2SMP.004/';
@@ -55,6 +56,8 @@ end
 
 if strcmp(pcStr,'workstation')
 	kPath.s='\';
+    kPath.workDir='E:\Kuai\';
+    
     kPath.SMAP='H:\Kuai\Data\SMAP\';
     kPath.SMAP_VAL='E:\Kuai\SMAP_VAL\';
 
