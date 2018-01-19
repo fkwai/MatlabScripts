@@ -17,8 +17,6 @@ if nHuc==4
     jobHead=['huc2_'];
     saveName='hucv2n4';
 end
-%postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'testName',testName,'timeOpt',[1,2],'saveName',saveName);
-%postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,'timeOpt',[1,2],'saveName',saveName);
 saveMatFile=[rootOut,filesep,saveName,'_',testName,'.mat'];
 matCONUS=load(saveMatFile);
 saveMatFile=[rootOut,filesep,saveName,'.mat'];

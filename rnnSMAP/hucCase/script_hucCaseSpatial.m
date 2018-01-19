@@ -3,37 +3,13 @@
 % HUCs. Want to show CONUS model vs HUC models of n HUCs and bias-picked /
 % unbias-picked.
 
-
-%% read data and save matfile
-
+%% plot cases - spatial
 global kPath
-nHucLst=[1:6];
-rmStd=0;
-
-for i=1:length(nHucLst)
-    nHUC=nHucLst(i);
-    rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHUC),filesep];
-    %rootDB=['E:\Kuai\rnnSMAP_inputs\hucv2n',num2str(nHUC),filesep];
-    rootDB=kPath.DBSMAP_L3;
-    if nHUC~=4
-        jobHead=['hucv2n',num2str(nHUC)];
-        postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'rmStd',rmStd,'testName','CONUSv2f1','saveTS',0);
-    else
-        jobHead=['huc2_'];
-        postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'saveName','hucv2n4','rmStd',rmStd,'testName','CONUSv2f1','saveTS',0);
-    end
-end
-
-%% plot cases - temporal
-global kPath
-
 statLst={'rmse','nash','rsq','bias'};
 yRangeLst=[0,0.2;-2,1;0.2,1;-0.1,0.1];
-nHucLst=[1,2,3,4,5];
+nHucLst=[1,2,3,4,5,6];
 rmStdLst=[0];
-timeOpt=2;
+timeOpt=1;
 
 testName='CONUSv2f1';
 crdCONUSFile=[kPath.DBSMAP_L3,filesep,testName,filesep,'crd.csv'];

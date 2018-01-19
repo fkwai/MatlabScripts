@@ -1,4 +1,4 @@
-function site = readSMAP_coresite(siteID)
+function site = readCoreSite(siteID)
 
 % read SMAP core validation sites of SMAP. Database from a friend. This
 % function will read a station in one core validation site.

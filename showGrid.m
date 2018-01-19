@@ -99,8 +99,7 @@ while(~isempty(tsStr))
             end
             ind=~isnan(v);
             plot(t(ind),v(ind),tsStr(k).symb);hold on
-        end
-        
+        end       
         
         ylim(yRange);
         datetick('x');

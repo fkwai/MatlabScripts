@@ -16,15 +16,15 @@ nash=zeros(nInd,1)*nan;
 rsq=zeros(nInd,1)*nan;
 bias=zeros(nInd,1)*nan;
 rmse=zeros(nInd,1)*nan;
+ubrmse=zeros(nInd,1)*nan;
 mse=zeros(nInd,1)*nan;
 varRes=zeros(nInd,1)*nan;
 
 if rmStd~=0
-    lb=nanmean(x)-rmStd*std(x);
-    ub=nanmean(x)-rmStd*std(x);
-    indRm=find(x>lb&x<ub);
-    x(:,indRm)=nan;
-    y(:,indRm)=nan;
+    lb=nanmean(y)-rmStd*nanstd(y);
+    ub=nanmean(y)+rmStd*nanstd(y);
+    x(y>lb&y<ub)=nan;
+    y(y>lb&y<ub)=nan;
 end
 
 %indV=find(sum(isnan(x),1)./nt<0.1); % leave NaN when nan in x >10%. 

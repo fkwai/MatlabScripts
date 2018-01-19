@@ -8,9 +8,12 @@ maskFile=[kPath.SMAP,'maskSMAP_CONUS_L4.mat'];
 maskMat=load(maskFile);
 
 %% initial Database and NLDAS
-dbNameLst={'85-95','95-05','05-15','CONUS'};
-sdLst={19850401,19950401,20050401,20150401};
-edLst={19950401,20050401,20150401,20170401};
+% dbNameLst={'85-95','95-05','05-15','CONUS'};
+% sdLst={19850401,19950401,20050401,20150401};
+% edLst={19950401,20050401,20150401,20170401};
+dbNameLst={'8590','9095','9500','0005','0510','1015'};
+sdLst={19850301,19900301,19950301,20000301,20050301,20100301};
+edLst={19900401,19950401,20000401,20050401,20100401,20150401};
 
 for kk=4:length(dbNameLst)
     if strcmp(dbNameLst{kk},'CONUS')
@@ -91,6 +94,7 @@ for k=1:height(flagTab)
     end
 end
 
+%{
 %% NDVI
 NDVIFile='/mnt/sdb1/Database/GIMMS/avg.tif';
 [gridNDVI,refNDVI]=geotiffread(NDVIFile);
@@ -117,15 +121,4 @@ gridIrri(gridIrri<0)=0;
 vq=interpGridArea(lonIrri,latIrri,gridIrri,maskMat.lon,maskMat.lat,'mean');
 grid2csvDB(vq,0,dirDatabase,maskMat.mask,'Irri')
 grid2csvDB(vq.^0.5,0,dirDatabase,maskMat.mask,'IrriSq')
-
-
-
-
-
-
-
-
-
-
-
-
+%}

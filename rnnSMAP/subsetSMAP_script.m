@@ -19,19 +19,25 @@ end
 global kPath
 vecV=[4];
 vecF=[1];
-%dbNameLst={'LongTerm_85-95','LongTerm_95-05','LongTerm_05-15'};
-dbNameLst={'CONUS'}
+dbNameLst={'LongTerm8595','LongTerm9505','LongTerm0515'};
+%dbNameLst={'CONUS'}
 
 for k=1:length(vecV)
     interval=vecV(k);
     offset=vecF(k);
     for kk=1:length(dbNameLst)
         dbName=dbNameLst{kk};
-        %subsetSMAP_interval(interval,offset,...
-        %    'mask',kPath.maskSMAPL4_CONUS,'dirRoot',kPath.DBSMAP_L4,'subsetRoot',dbName);
+%         subsetSMAP_interval(interval,offset,...
+%             'mask',kPath.maskSMAPL4_CONUS,'dirRoot',kPath.DBSMAP_L4,'subsetRoot',dbName);
         subsetSplit_All([dbName,'v',num2str(interval),'f',num2str(offset)],'dirRoot',kPath.DBSMAP_L4);
     end
 end
+
+% core validation site of L4 - see dataset/script_findSiteL4.m
+subsetSplit('CONUSsite','dirRoot',kPath.DBSMAP_L4);
+subsetSplit('LongTerm8595site','dirRoot',kPath.DBSMAP_L4,'varLst','varLst_noTarget');
+subsetSplit('LongTerm9505site','dirRoot',kPath.DBSMAP_L4,'varLst','varLst_noTarget');
+subsetSplit('LongTerm0515site','dirRoot',kPath.DBSMAP_L4,'varLst','varLst_noTarget');
 
 
 %% HUC - write indFile

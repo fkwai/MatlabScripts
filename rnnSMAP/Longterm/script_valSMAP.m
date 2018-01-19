@@ -4,16 +4,16 @@ dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 
 %% read SMAP and LSTM
 tic
-% SMAP.v=readDatabaseSMAP('CONUS','SMAP');
-% SMAP.t=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv']);
-% LSTM1.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_85-95',500,0);
-% LSTM1.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_85-95',filesep,'time.csv']);
-% LSTM2.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_95-05',500,0);
-% LSTM2.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_95-05',filesep,'time.csv']);
-% LSTM3.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_05-15',500,0);
-% LSTM3.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_05-15',filesep,'time.csv']);
-% LSTM.v=readRnnPred('fullCONUS_Noah2yr','CONUS',500,3);
-% LSTM.t=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv']);
+SMAP.v=readDatabaseSMAP('CONUS','SMAP');
+SMAP.t=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv']);
+LSTM1.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_85-95',500,0);
+LSTM1.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_85-95',filesep,'time.csv']);
+LSTM2.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_95-05',500,0);
+LSTM2.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_95-05',filesep,'time.csv']);
+LSTM3.v=readRnnPred('fullCONUS_Noah2yr','LongTerm_05-15',500,0);
+LSTM3.t=csvread([kPath.DBSMAP_L3,filesep,'LongTerm_05-15',filesep,'time.csv']);
+LSTM.v=readRnnPred('fullCONUS_Noah2yr','CONUS',500,3);
+LSTM.t=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv']);
 toc
 
 %% start

@@ -1,6 +1,4 @@
 
-
-
 global kPath
 dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 siteIDLst=[1601,0401,0901,1603,1602,1607,1606,1604,2701,4801, 0902 2601];
@@ -8,9 +6,10 @@ maskSMAP=load(kPath.maskSMAPL4_CONUS);
 lonSMAP=maskSMAP.lon;
 latSMAP=maskSMAP.lat;
 indSMAPLst=[];
+
 %% read coordinate of site
 for kk=1:length(siteIDLst)
-    siteID=siteIDLst(kk);
+    siteID=siteIDLst(kk)
     siteIDstr=sprintf('%04d',siteID);
     dirSiteInfo=dir([dirCoreSite,'coresiteinfo',filesep,siteIDstr(1:2),'*']);
     folderSiteInfo=[dirCoreSite,'coresiteinfo',filesep,dirSiteInfo.name,filesep];

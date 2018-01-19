@@ -9,7 +9,7 @@ function [grid,xx,yy] = data2grid( data,x,y, varargin)
 %   -9999 stands for nan values. 
 
 yOrder= 'descend';
-if length(varargin)>0
+if ~isempty(varargin)
     yOrder = varargin{1};
 end
 

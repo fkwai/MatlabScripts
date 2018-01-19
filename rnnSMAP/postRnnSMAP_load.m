@@ -31,7 +31,7 @@ end
 
 %% read SMAP
 if readSMAP
-    disp(['read SMAP in ',outName])
+    %disp(['read SMAP in ',outName])
     [ySMAP,ySMAPStat] = readDatabaseSMAP(dataName,'SMAP',rootDB);
     ySMAP=ySMAP(tData,:);
     out.ySMAP=ySMAP;
@@ -53,7 +53,7 @@ if readModel
 end
 
 %% read LSTM
-disp(['read LSTM of ',outName])
+%disp(['read LSTM of ',outName])
 yLSTM=readRnnPred(outName,dataName,epoch,timeOpt,'rootOut',rootOut);
 out.yLSTM=yLSTM;
 if drBatch~=0
@@ -61,6 +61,12 @@ if drBatch~=0
     out.yLSTM_batch=yLSTM_batch;
 end
 
+%% read time and crd
+crd=csvread([rootDB,filesep,dataName,filesep,'crd.csv']);
+timeAll=csvread([rootDB,filesep,dataName,filesep,'time.csv']);
+tnum=timeAll(tData);
+out.crd=crd;
+out.tnum=tnum;
 
 
 

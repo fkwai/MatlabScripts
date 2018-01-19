@@ -15,11 +15,13 @@ function f=plotBoxSMAP( statMat,labelX,labelY,varargin )
 % plotBoxSMAP_example
 
 
-pnames={'newFig','yRange','title'};
-dflts={1,[],[]};
-[newFig,yRange,titleStr]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'newFig','yRange','title','xColor'};
+dflts={1,[],[],[]};
+[newFig,yRange,titleStr,xColor]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
-cLst='rkbg';
+if isempty(xColor)
+    xColor='rkbg';
+end
 if newFig
     f=figure;
 else
@@ -50,7 +52,7 @@ end
 
 %% plot
 bh=boxplot(dataLst, {labelLst2,labelLst1},'colorgroup',labelLst1,...
-    'factorgap',9,'factorseparator',1,'color',cLst(1:nx),'Symbol','','Widths',0.75);
+    'factorgap',9,'factorseparator',1,'color',xColor(1:nx),'Symbol','','Widths',0.75);
 
 if ~isempty(yRange)
     ylim(yRange)
@@ -61,7 +63,7 @@ set(gca,'xtick',xTick(2:2:end))
 set(gca,'xticklabel',labelY)
 set(bh,'LineWidth',2)
 box_vars = findall(gca,'Tag','Box');
-hLegend = legend(box_vars([2,1]), labelX,'location','best');
+hLegend = legend(box_vars([nx:-1:1]), labelX,'location','best');
 if ~isempty(titleStr)
     title(titleStr)
 end

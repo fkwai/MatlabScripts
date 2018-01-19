@@ -27,6 +27,7 @@ if strcmp(pcStr,'server')
     kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
     
     kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4/';
+    kPath.OutSMAP_L4='/mnt/sdb1/rnnSMAP/output_SMAPL4grid/';
 
     
     kPath.SCAN='/mnt/sdb1/Database/SCAN/';

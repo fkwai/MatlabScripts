@@ -13,7 +13,7 @@ postRnnSMAP_map(outName,dataName)
 global kPath
 
 pnames={'rootOut','rootDB','mapTime','tsTime','epoch','stat','colorRange','drBatch','stdLst','itemLst'};
-dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,2,[1,2],0,'rmse',[],0,1,{'Model','LSTM','SMAP'}};
+dflts={kPath.OutSMAP_L3,kPath.DBSMAP_L3,2,[1,2],0,'rmse',[0,0.05],0,1,{'Model','LSTM','SMAP'}};
 [rootOut,rootDB,mapTime,tsTime,epoch,stat,colorRange,drBatch,stdLst,itemLst]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
@@ -98,14 +98,10 @@ if ~isempty(stdLst) && drBatch~=0
         tsStrFill(k).t=tnum;
         tsStrFill(k).color=colorLst(k,:);
         tsStrFill(k).legendStr=['std*',num2str(k)];
-    end
-    
+    end    
 end
 
-yIn=[length(yy):-1:1]';
-xIn=1:length(xx);
-
-showGrid( gridStatLSTM,yIn,xIn,1,'colorRange',colorRange,'yRange',[0,0.5],...
+showMap( gridStatLSTM,yy,xx,'colorRange',colorRange,...
     'tsStr',tsStr,'tsStrFill',tsStrFill)
 end
 

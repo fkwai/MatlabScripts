@@ -3,9 +3,9 @@ function dataOut= readRnnPred(outName,dataName,epoch,timeOpt,varargin)
 
 global kPath
 
-pnames={'rootOut','drBatch'};
-dflts={kPath.OutSMAP_L3,0};
-[rootOut,drBatch]=...
+pnames={'rootOut','drBatch','rootDB','target'};
+dflts={kPath.OutSMAP_L3,0,kPath.DBSMAP_L3,'SMAP'};
+[rootOut,drBatch,rootDB,target]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 if drBatch==0
@@ -34,7 +34,7 @@ else
 end
 
 %% transfer back
-statFile=[kPath.DBSMAP_L3_CONUS,filesep,'SMAP_stat.csv'];
+statFile=[rootDB,'CONUS',filesep,target,'_stat.csv'];
 statSMAP=csvread(statFile);
 meanSMAP=statSMAP(3);
 stdSMAP=statSMAP(4);    

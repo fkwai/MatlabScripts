@@ -5,8 +5,8 @@ global kPath
 
 outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
 dataName='hucv2n1_15';
-outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
-dataName='CONUSv2f1';
+% outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+% dataName='CONUSv2f1';
 
 outMat=cell(2,2);
 tsStatMat=cell(2,2);

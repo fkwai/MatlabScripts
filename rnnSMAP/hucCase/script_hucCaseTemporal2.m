@@ -3,33 +3,6 @@
 % HUCs. Want to show CONUS model vs HUC models of n HUCs and bias-picked /
 % unbias-picked.
 
-
-%% read data and save matfile
-%{
-global kPath
-nHucLst=[6];
-rmStd=0;
-
-postRnnSMAP_jobHead('CONUSv2f1','rmStd',rmStd);
-
-for i=1:length(nHucLst)
-    nHUC=nHucLst(i);
-    rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHUC),filesep];
-    rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/hucv2n',num2str(nHUC),filesep];
-    
-    if nHUC~=4
-        jobHead=['hucv2n',num2str(nHUC)];
-        postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'rmStd',rmStd);
-    else
-        jobHead=['huc2_'];
-        postRnnSMAP_jobHead(jobHead,'rootOut',rootOut,'rootDB',rootDB,...
-            'saveName','hucv2n4','rmStd',rmStd);
-    end
-end
-%}
-
-
 %% plot cases - temporal
 global kPath
 
