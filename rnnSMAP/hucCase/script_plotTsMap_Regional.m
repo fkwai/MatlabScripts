@@ -2,12 +2,13 @@
 % load LSTM prediction from local model with/without model, CONUS model
 % with/without model, and plot ts map.
 
+global kPath
 nHuc=4;
 hucIdStr='05071015';
 
 %% load local model
-rootOut=['/mnt/sdb1/Kuai/rnnSMAP_outputs/hucv2n',num2str(nHuc),filesep];
-rootDB=['/mnt/sdb1/Kuai/rnnSMAP_inputs/hucv2n',num2str(nHuc),filesep];
+rootOut=[kPath.workDir,'rnnSMAP_outputs',filesep,'hucv2n',num2str(nHuc),filesep];
+rootDB=[kPath.workDir,'rnnSMAP_inputs',filesep,'hucv2n',num2str(nHuc),filesep];
 if nHuc==4
     outName1=['huc2_',hucIdStr,'_hS256_VFvarLst_Noah'];
     outName2=['huc2_',hucIdStr,'_hS256_VFvarLst_NoModel'];
