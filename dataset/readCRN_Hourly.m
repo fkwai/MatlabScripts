@@ -1,4 +1,4 @@
-function CRNmat=readCRN(sd,ed,varargin)
+function CRNmat=readCRN_Hourly(sd,ed,varargin)
 % read CRN site data (U.S. Climate Reference Network)
 % https://www.ncdc.noaa.gov/crn/
 

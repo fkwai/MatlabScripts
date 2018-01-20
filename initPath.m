@@ -30,7 +30,7 @@ if strcmp(pcStr,'server')
     kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4/';
     kPath.OutSMAP_L4='/mnt/sdb1/rnnSMAP/output_SMAPL4grid/';
 
-    
+    kPath.CRN='/mnt/sdb1/Database/CRN/';
     kPath.SCAN='/mnt/sdb1/Database/SCAN/';
     kPath.OutSCAN='/mnt/sdb1/rnnGAGE/outputSCAN/';
     kPath.DBSCAN='/mnt/sdb1/rnnGAGE/databaseSCAN/';
