@@ -42,8 +42,9 @@ for j=1:nInd
     varResTemp(j)=var(xx(ind)-yy(ind));
 end
 
-meanX=repmat(nanmean(x,1),[nt,1]);
-meanY=repmat(nanmean(y,1),[nt,1]);
+indY=find(~isnan(y)&~isnan(x));
+meanX=repmat(nanmean(x(indY),1),[nt,1]);
+meanY=repmat(nanmean(y(indY),1),[nt,1]);
 nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
 biasTemp=nanmean(x-y)';
 ubrmseTemp=sqrt(nanmean(((x-meanX)-(y-meanY)).^2))';

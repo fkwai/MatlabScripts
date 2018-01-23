@@ -139,3 +139,11 @@ for depth=[-1,50,100]
 end
 
 
+%%
+plot(outMat(:,4),outMat(:,5),'*')
+axis equal
+plot121Line
+xlabel('slope site')
+ylabel('slope LSTM')
+
+

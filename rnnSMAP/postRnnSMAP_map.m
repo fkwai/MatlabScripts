@@ -102,7 +102,7 @@ if ~isempty(stdLst) && drBatch~=0
         [gridTemp2,xx,yy] = data2grid3d(temp2',crd(:,2),crd(:,1));
         tsStrFill(k).grid1=gridTemp1;
         tsStrFill(k).grid2=gridTemp2;
-        tsStrFill(k).t=tnum;
+        tsStrFill(k).t=tnumTS;
         tsStrFill(k).color=colorLst(k,:);
         tsStrFill(k).legendStr=['std*',num2str(k)];
     end
