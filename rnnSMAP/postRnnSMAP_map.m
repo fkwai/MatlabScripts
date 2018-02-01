@@ -33,7 +33,7 @@ end
 outMap=postRnnSMAP_load(outName,dataName,mapTime,'epoch',epoch,...
     'rootOut',rootOut,'rootDB',rootDB,'drBatch',drBatch);
 if drBatch~=0
-    statLSTM=statCal(outMap.yLSTM,outMap.ySMAP,'batch',outMap.yLSTM_batch);
+    statLSTM=statCal(outMap.yLSTM,outMap.ySMAP);
     if strcmp(stat,'std')
         statB=statBatch(outMap.yLSTM_batch);
         statLSTM.std=mean(statB.std,1)';
@@ -43,6 +43,14 @@ else
 end
 
 [gridStatLSTM,xx,yy] = data2grid(statLSTM.(stat),crd(:,2),crd(:,1));
+[gridIndex,xx,yy] = data2grid(1:length(statLSTM.(stat)),crd(:,2),crd(:,1));
+% index cell grid as title
+tsTitleGrid=cell(size(gridIndex));
+for j=1:length(yy)
+    for i=1:length(xx)
+        tsTitleGrid{j,i}=['Index ',num2str(gridIndex(j,i))];
+    end
+end
 
 %% read timeseries data and transfer to grid
 outTS=cell([length(tsTime),1]);
@@ -109,6 +117,6 @@ if ~isempty(stdLst) && drBatch~=0
 end
 
 showMap( gridStatLSTM,yy,xx,'colorRange',colorRange,...
-    'tsStr',tsStr,'tsStrFill',tsStrFill)
+    'tsStr',tsStr,'tsStrFill',tsStrFill,'tsTitleGrid',tsTitleGrid)
 end
 

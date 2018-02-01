@@ -100,7 +100,135 @@ for k=1:nSite
     indTest(k)=indTemp;
 end
 
-%% plot time series
+%% calculate stats
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/L3/';
+rateLst=[0,0.25,0.5,0.75,1];
+outAll=[];
+for j=1:length(rateLst)
+    rate=rateLst(j);
+    siteIDvec=[];
+    out=struct('rmse',[],'bias',[],'rsq',[],'ubrmse',[]);
+    fieldLst=fieldnames(out);
+    for k=1:nSite
+        ind=indTest(k);
+        tsSite.v=sitePixel(k).v(:,1);
+        tsSite.r=sitePixel(k).r(:,1);
+        tsSite.t=sitePixel(k).t;
+        tsSite.v(tsSite.r<rate)=nan;
+        tsLSTM.v=LSTM.v(:,ind);
+        tsLSTM.t=LSTM.t;
+        tsSMAP.v=SMAP.v(:,ind);
+        tsSMAP.t=SMAP.t;
+        temp = statCal_hindcast( tsSite,tsLSTM,tsSMAP);
+        for i=1:length(fieldLst)
+            out.(fieldLst{i})=[out.(fieldLst{i});temp.(fieldLst{i})];
+        end
+    end
+    outAll=[outAll;out];
+end
+
+%pick site and rate
+pSite=[1;3;6;9;13;18;22;23;26];
+pRate=[1;3;1;1;3;1;3;3;3];
+pLabel={{'Reynolds';'Creek'},'Carman',{'Walnut';'Gulch'},...
+    {'Little';'Washita'},{'Fort';'Cobb'},{'Little';'River'},...
+    {'St.';'Josephs'},{'South';'Fork'},'TxSON'};
+pName={'Reynolds Creek','Carman','Walnut Gulch',...
+    'Little Washita','Fort Cobb','Little River',...
+    'St. Josephs','South Fork','TxSON'};
+
+
+%% plot stat in bar plot
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
+barMat=zeros(length(pSite),3);
+xLabel=cell(length(pSite),1);
+statLst={'rmse','rsq','ubrmse'};
+titleStrLst={'RMSE','Correlation','Unbiased RMSE'}
+for i=1:length(statLst)
+    stat=statLst{i};
+    f=figure('Position',[1,1,1000,500]);
+    for k=1:length(pSite)
+        indSite=pSite(k);
+        indR=pRate(k);
+        barMat(k,:)=outAll(indR).(stat)(indSite,:);
+    end
+    clr=[1,0,0;...
+        0,1,0.5;...
+        0,0,1];
+    colormap(clr)
+    bar(barMat)
+    legend('hindcast LSTM vs in-situ',...
+        'training LSTM vs in-situ',...
+        'training SMAP vs in-situ','location','best')
+    title(titleStrLst{i});
+    xTickText(1:length(pSite),pLabel,'fontsize',16);
+    fixFigure
+    saveas(f,[figFolder,'barPlot_',stat,'_L3.fig'])
+end
+
+%% plot time series - picked
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/L3_pick/';
+for k=1:length(pSite)
+    f=figure('Position',[1,1,1500,400]);
+    lineW=2;
+    indSite=pSite(k);
+    ind=indTest(indSite);    
+    sdTrain=SMAP.t(1);
+    sdSite=sitePixel(indSite).t(1);
+    sdLSTM=find(LSTM.t==sdSite);
+    
+    % site
+    rate=sitePixel(indSite).r(:,1);
+    siteV=sitePixel(indSite).v(:,1);
+    siteV(rate<rateLst(pRate(k)))=nan;
+    hold on
+    plot(sitePixel(indSite).t,siteV,'-r','LineWidth',lineW);    
+    plot(LSTM.t(sdLSTM:end),LSTM.v(sdLSTM:end,ind),'-b','LineWidth',lineW);
+    plot(SMAP.t,SMAP.v(:,ind),'ko','LineWidth',lineW);
+    plot([sdTrain,sdTrain], ylim,'k-','LineWidth',lineW);
+    hold off
+    datetick('x','yy/mm')
+    xlim([sdSite,SMAP.t(end)])
+    title(['Hindcast of site: ', pName{k},' ',sitePixel(indSite).ID(1:4)])
+    legend('in-situ','LSTM','SMAP')
+    fixFigure
+    saveas(f,[figFolder,sitePixel(indSite).ID(1:4),'.fig'])    
+    close(f)
+end
+
+%% for 1640
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/L3_pick/';
+k=6
+f=figure('Position',[1,1,1500,400]);
+lineW=2;
+indSite=pSite(k);
+ind=indTest(indSite);
+sdTrain=SMAP.t(1);
+sdSite=sitePixel(indSite).t(1);
+sdLSTM=find(LSTM.t==sdSite);
+
+tLSTM=LSTM.t(sdLSTM:end);
+vLSTM=LSTM.v(sdLSTM:end,ind);
+siteV2=siteV-nanmean(siteV)+nanmean(vLSTM);
+
+% site
+rate=sitePixel(indSite).r(:,1);
+siteV=sitePixel(indSite).v(:,1);
+siteV(rate<rateLst(pRate(k)))=nan;
+hold on
+plot(sitePixel(indSite).t,siteV2,'-r','LineWidth',lineW);
+plot(tLSTM,vLSTM,'-b','LineWidth',lineW);
+plot(SMAP.t,SMAP.v(:,ind),'ko','LineWidth',lineW);
+plot([sdTrain,sdTrain], ylim,'k-','LineWidth',lineW);
+hold off
+datetick('x','yy/mm')
+xlim([sdSite,SMAP.t(end)])
+title(['Hindcast of site: ', pName{k},' ',sitePixel(indSite).ID(1:4)])
+legend('in-situ','LSTM','SMAP')
+fixFigure
+saveas(f,[figFolder,sitePixel(indSite).ID(1:4),'_fix.fig'])
+
+%% plot time series - different rate
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/L3/';
 for k=1:nSite
     f=figure('Position',[1,1,1500,400]);
@@ -108,7 +236,7 @@ for k=1:nSite
     ind=indTest(k);
     sdTrain=SMAP.t(1);
     sdSite=sitePixel(k).t(1);
-        
+    
     % site
     rate=sitePixel(k).r(:,1);
     rateLst=[0,0.25,0.5,0.75,1];
@@ -122,7 +250,7 @@ for k=1:nSite
         else
             plot(sitePixel(k).t,siteV,'-','LineWidth',lineW,'Color',cLst(kk,:));
         end
-    end   
+    end
     
     plot(LSTM.t,LSTM.v(:,ind),'-b','LineWidth',lineW);
     plot(SMAP.t,SMAP.v(:,ind),'ko','LineWidth',lineW);
@@ -136,7 +264,7 @@ for k=1:nSite
     close(f)
 end
 
-%% sumarize stat to table
+%% sumarize stat to table -- need modify if need in paper
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/L3/';
 rateLst=[0,0.5,0.8,1];
 for j=1:length(rateLst)
@@ -186,7 +314,7 @@ for k=1:nSite
         t1=datenumMulti(20140401);
     elseif tSiteValid(1)<datenumMulti(20150401)
         t1=datenumMulti(20150401);
-    end    
+    end
     t2=tsSMAP.t(1);
     t3=min(tsLSTM.t(end),tsSite.t(end));
     vLSTM=tsLSTM.v(tsLSTM.t>=t1&tsLSTM.t<=t3);

@@ -3,9 +3,9 @@ global kPath
 
 %% load ensemble - temporal
 
-outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
+%outNameLst={'hucv2n1_15_Noah';'hucv2n1_15_NoModel'};
 % dataName='hucv2n1_15';
-%outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
+outNameLst={'CONUSv2f1_Noah';'CONUSv2f1_NoModel'};
 dataName='CONUSv2f1';
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/ensemble_CONUS/';
 
@@ -63,7 +63,6 @@ f=plotBoxSMAP( statStdMat,labelX,labelY);
 ylabel('Ensemble std')
 fixFigure(f)
 savefig(f,[figFolder,filesep,'stdBox.fig'])
-close(f)
 
 %% compare std of model vs non-model, 121 plot
 %{
@@ -91,21 +90,23 @@ end
 %% plot std vs error
 f=figure('Position',[1,1,1000,400])
 %statLst={'bias^2','mse','varRes'};
-statLst={'rmse'};
-tStrLst={'train','test'};
+statLst={'rmse','ubrmse','bias','rsq'};
+statStrLst={'RMSE','ubRMSE','Bias','Correlation'};
 outStrLst={'w/ Noah','w/o Noah'};
 k=0;
-for iOut=1:length(outStrLst)
-    for iS=1:length(statLst)
+
+for iS=1:length(statLst)
+    for iOut=1:length(outStrLst)
         titleStr=[];
         titleStr=[titleStr,outStrLst{iOut},'  '];
         iT=2;
         k=k+1;
-        if strcmp(statLst{iS},'bias^2')
-            a=(statMat{iOut,iT}.bias).^2;
-        else
-            a=statMat{iOut,iT}.(statLst{iS});
-        end
+        %         if strcmp(statLst{iS},'bias^2')
+        %             a=(statMat{iOut,iT}.bias).^2;
+        %         else
+        %             a=statMat{iOut,iT}.(statLst{iS});
+        %         end
+        a=statMat{iOut,iT}.(statLst{iS});
         b=mean(tsStatMat{iOut,iT}.std)';
         subplot(length(statLst),length(outStrLst),k);
         plot(a,b,'b*')
@@ -116,13 +117,12 @@ for iOut=1:length(outStrLst)
         xlim([0,0.1])
         ylim([0.01,0.04])
         %xlabel(statLst{iS})
-        xlabel('RMSE')
+        xlabel(statStrLst{iS})
         ylabel('Ensemble std')
-    end
+    end    
+    fixFigure(f)
+    savefig(f,[figFolder,filesep,'std_',stat,'.fig'])
 end
-fixFigure(f)
-savefig(f,[figFolder,filesep,'std2RMSE.fig'])
-close(f)
 
 
 

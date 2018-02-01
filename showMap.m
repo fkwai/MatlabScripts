@@ -6,11 +6,11 @@ function [f,cmap]=showMap(grid,y,x,varargin)
 % tsStr.symb: symbol of this ts
 
 pnames={'title','shapefile','colorRange','Position','lonLim','latLim',...
-    'newFig','nLevel','cmap','openEnds','tsStr','tsStrFill'};
-dflts={[],[],[],[100,100,800,500],[],[],1,10,[],[],[],[]};
+    'newFig','nLevel','cmap','openEnds','tsStr','tsStrFill','tsTitleGrid'};
+dflts={[],[],[],[100,100,800,500],[],[],1,10,[],[],[],[],[]};
 
 [strTitle,shapefile,colorRange,Position,lonLim,latLim,...
-    newFig,nLevel,cmap,openEnds,tsStr,tsStrFill]=...
+    newFig,nLevel,cmap,openEnds,tsStr,tsStrFill,tsTitleGrid]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -34,7 +34,7 @@ end
 if newFig==1
     f=figure('Position',Position);
 end
-axesm('MapProjection','eqdcylin','Frame','on','Grid','on', ...
+axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
     'MeridianLabel','on','ParallelLabel','on','MLabelParallel','south', ...
     'MapLatlimit', latLim, 'MapLonLimit', lonLim,'LabelFormat','none',...
     'MLineLocation',[-120:10:70],'PLineLocation',[25:5:50],...
@@ -89,15 +89,19 @@ set(gcf,'color','w');
 fc=[];
 while(~isempty(tsStr))
     figure(f)
-    pause(0.1)
+    pause(0.5)
     [py,px]=inputm(1);
     if isempty(px)
         tsStr=[];
         close(fc);
     else
         [dx,ix]=min(abs(px-x));
-        [dy,iy]=min(abs(py-y));        
-        strTitle=['lon=',num2str(x(ix)),'; lat=',num2str(y(iy)),'; '];
+        [dy,iy]=min(abs(py-y));  
+        if isempty(tsTitleGrid)
+            strTitle=['lon=',num2str(x(ix)),'; lat=',num2str(y(iy)),'; '];
+        else
+            strTitle=tsTitleGrid{iy,ix};
+        end
         if ~isnan(grid(iy,ix))
             fc= plotTsStr( iy,ix,tsStr,tsStrFill,'fc',fc,'strTitle',strTitle);        
         end

@@ -8,7 +8,7 @@ function w = d2w_rootzone( d )
 
 d=VectorDim(d,1);
 d1=[0;d(1:end-1)];
-d2=[d(2:end);100];
+d2=[d(2:end);1];
 b1=(d+d1)/2;
 b1(1)=0;
 b2=(d+d2)/2;
