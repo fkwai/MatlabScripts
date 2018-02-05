@@ -5,12 +5,16 @@ function [f,cmap]=showMap(grid,y,x,varargin)
 % tsStr.grid: a 3D grid with t in 3rd dimension
 % tsStr.symb: symbol of this ts
 
-pnames={'title','shapefile','colorRange','Position','lonLim','latLim',...
-    'newFig','nLevel','cmap','openEnds','tsStr','tsStrFill','tsTitleGrid'};
-dflts={[],[],[],[100,100,800,500],[],[],1,10,[],[],[],[],[]};
+pnames={'title','shapefile','newFig','Position','lonLim','latLim',...
+    'colorRange','nLevel','cmap','openEnds','insert0',...
+    'tsStr','tsStrFill','tsTitleGrid'};
+dflts={[],[],1,[100,100,800,500],[],[],...
+    [],10,[],[],[],...
+    [],[],[]};
 
-[strTitle,shapefile,colorRange,Position,lonLim,latLim,...
-    newFig,nLevel,cmap,openEnds,tsStr,tsStrFill,tsTitleGrid]=...
+[strTitle,shapefile,newFig,Position,lonLim,latLim,...
+    colorRange,nLevel,cmap,openEnds,insert0,...
+    tsStr,tsStrFill,tsTitleGrid]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 [lonmesh,latmesh]=meshgrid(x,y);
@@ -26,8 +30,10 @@ end
 if isempty(openEnds)
     if colorRange(1)*colorRange(2)<0
         openEnds=[1 1];
+        insert0=1;
     else
         openEnds=[0 0];
+        insert0=0;
     end
 end
 
@@ -44,7 +50,6 @@ set(objLabel,'VerticalAlignment','middle');
 
 tightmap
 
-insert0 = 1;
 [tickP2,tickV2,tickL2,Z,nColor] = colorBarRange(grid,colorRange,nLevel,openEnds,'insert0',insert0);
 sel=2;
 v= tickV2(1:sel:end);

@@ -5,19 +5,6 @@ dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 %% load site
 resStr='09';
 load([dirCoreSite,'siteMat',filesep,'sitePix_',resStr,'.mat']);
-indRM=[];
-for k=1:length(sitePixel)
-    if strcmp(sitePixel(k).ID(1:4),'2701') % 2701 is out of bound
-        indRM=[indRM,k];
-    end
-    if k>1
-        temp=sum(ismember({sitePixel(1:k-1).ID},sitePixel(k).ID));
-        if temp>0
-            sitePixel(k).ID=[sitePixel(k).ID,'0',num2str(temp+1)];
-        end
-    end
-end
-sitePixel(indRM)=[];
 
 %% calculate rootzone soil moisture
 errLst=[];

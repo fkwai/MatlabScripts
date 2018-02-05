@@ -4,7 +4,7 @@ global kPath
 %% read SMAP and LSTM
 outName='CONUSv4f1_rootzone';
 targetName='SMGP_rootzone';
-modelName='SOILM_0-10';
+modelName='SOILM_0-100';
 trainName='CONUSv4f1';
 rootOut=kPath.OutSMAP_L4;
 rootDB=kPath.DBSMAP_L4;
