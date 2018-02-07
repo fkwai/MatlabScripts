@@ -5,59 +5,20 @@ dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 %% load site
 resStr='09';
 load([dirCoreSite,'siteMat',filesep,'sitePix_',resStr,'.mat']);
-indRM=[];
-for k=1:length(sitePixel)
-    if strcmp(sitePixel(k).ID(1:4),'2701') % 2701 is out of bound
-        indRM=[indRM,k];
-    end
-    if k>1
-        temp=sum(ismember({sitePixel(1:k-1).ID},sitePixel(k).ID));
-        if temp>0
-            sitePixel(k).ID=[sitePixel(k).ID,'0',num2str(temp+1)];
-        end
-    end
-end
-sitePixel(indRM)=[];
 
 %% calculate rootzone soil moisture
+errLst=[];
 for k=1:length(sitePixel)
     depth=sitePixel(k).depth;
     if length(depth)==1 && depth==0.05
-        sitePixel(k).rootzone=[];
-        sitePixel(k).rootzoneR=[];
+        errLst=[errLst,k];
     else
-        verW=sitePixel(k).verW;
-        
-        % calculate verW if it is missing
-        if isempty(sitePixel(k).verW)
-            % find vertical weight from same site
-            bFindSite=0;
-            for i=1:length(sitePixel)
-                if i~=k...
-                        && strcmp(sitePixel(i).ID(1:4),sitePixel(k).ID(1:4))...
-                        && isequal(sitePixel(i).depth,sitePixel(k).depth)...
-                        && ~isempty(sitePixel(i).verW)
-                    verW=sitePixel(i).verW;
-                    bFindSite=1;
-                end
-            end
-            % if still can not find, calculate site weight from depth
-            if bFindSite==0
-                verW=zeros(length(depth),2);
-                verW(:,1)=depth;
-                verW(:,2)=depth./sum(depth);
-            end
-        end
-        
-        [C,indTemp,indDepth]=intersect(depth,verW(:,1),'stable');
-        if length(indDepth)~=length(depth)
-            error('deal with it')
-        end
-        w=verW(indDepth,2);
+        w=d2w_rootzone(depth);
         sitePixel(k).rootzone=sum(sitePixel(k).v*w,2);
         sitePixel(k).rootzoneR=sum(sitePixel(k).r*w,2);
     end
 end
+sitePixel(errLst)=[];
 
 
 %% fine SMAP CONUS index
@@ -138,6 +99,108 @@ for k=1:nSite
     indTest(k)=indTemp;
 end
 
+%% calculate stat
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/rootzone/';
+rateLst=[0,0.25,0.5,0.75,1];
+outAll=[];
+for j=1:length(rateLst)
+    rate=rateLst(j);
+    siteIDvec=[];
+    out=struct('rmse',[],'bias',[],'rsq',[],'ubrmse',[]);
+    fieldLst=fieldnames(out);
+    for k=1:nSite
+        if ~isempty(sitePixel(k).rootzone)
+            ind=indTest(k);
+            tsSite.v=sitePixel(k).rootzone;
+            tsSite.r=sitePixel(k).rootzoneR;
+            tsSite.t=sitePixel(k).t;
+            tsSite.v(tsSite.r<rate)=nan;
+            % drop first 10 days of data as there always an error
+            vInd=find(~isnan(tsSite.v));
+            tsSite.v(vInd:(vInd+10))=nan;
+            
+            tsLSTM.v=LSTM.v(:,ind);
+            tsLSTM.t=LSTM.t;
+            tsSMAP.v=SMAP.v(:,ind);
+            tsSMAP.t=SMAP.t;
+            temp = statCal_hindcast( tsSite,tsLSTM,tsSMAP);
+            for i=1:length(fieldLst)
+                out.(fieldLst{i})=[out.(fieldLst{i});temp.(fieldLst{i})];
+            end            
+        end
+    end
+    outAll=[outAll;out];
+end
+
+%pick site and rate
+pSite=[2,3,4,5];
+pRate=[1;1;1;1];
+pLabel={{'Little';'Washita';'0906'},{'Little';'River';'0904'},...
+    {'Little';'River';'0905'},{'South';'Fork';'0904'}};
+pName={'Little Washita 0906','Little River 0904',...
+    'Little River 0905','South Fork 0904'};
+
+
+%% plot stat in bar plot
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
+barMat=zeros(length(pSite),3);
+xLabel=cell(length(pSite),1);
+statLst={'rmse','rsq','ubrmse'};
+titleStrLst={'RMSE','Correlation','Unbiased RMSE'};
+for i=1:length(statLst)
+    stat=statLst{i};
+    f=figure('Position',[1,1,1000,500]);
+    for k=1:length(pSite)
+        indSite=pSite(k);
+        indR=pRate(k);
+        barMat(k,:)=outAll(indR).(stat)(indSite,:);
+        %xLabel{k}=sitePixel(indSite).ID(1:8);
+    end
+    clr=[1,0,0;...
+        0,1,0.5;...
+        0,0,1];
+    colormap(clr)
+    bar(barMat)
+    %set(gca,'XTickLabel',xLabel)
+    xTickText(1:length(pSite),pLabel,'fontsize',16);
+    legend('hindcast LSTM vs in-situ',...
+        'training LSTM vs in-situ',...
+        'training SMAP vs in-situ','location','best')
+    title(titleStrLst{i});
+    fixFigure
+    saveas(f,[figFolder,'barPlot_',stat,'_rootzone.fig'])
+end
+
+%% plot time series - picked
+figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/rootzone_pick/';
+for k=1:length(pSite)
+    f=figure('Position',[1,1,1500,400]);
+    lineW=2;
+    indSite=pSite(k);
+    ind=indTest(indSite);    
+    sdTrain=SMAP.t(1);
+    sdSite=sitePixel(indSite).t(1);
+    sdLSTM=find(LSTM.t==sdSite);
+    
+    % site
+    rate=sitePixel(indSite).rootzoneR(:,1);
+    siteV=sitePixel(indSite).rootzone(:,1);
+    siteV(rate<rateLst(pRate(k)))=nan;
+    hold on
+    plot(sitePixel(indSite).t,siteV,'-r','LineWidth',lineW);    
+    plot(LSTM.t(sdLSTM:end),LSTM.v(sdLSTM:end,ind),'-b','LineWidth',lineW);
+    plot(SMAP.t,SMAP.v(:,ind),'ko','LineWidth',lineW);
+    plot([sdTrain,sdTrain], ylim,'k-','LineWidth',lineW);
+    hold off
+    datetick('x','yy/mm')
+    xlim([sdSite,SMAP.t(end)])
+    title(['Rootzone Hindcast of site: ', pName{k},' ',sitePixel(indSite).ID(1:8)])
+    legend('in-situ','LSTM','SMAP')
+    fixFigure
+    saveas(f,[figFolder,sitePixel(indSite).ID(1:8),'.fig'])    
+    close(f)
+end
+
 %% plot time series
 figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/rootzone/';
 for k=1:nSite
@@ -191,6 +254,10 @@ for j=1:length(rateLst)
             tsSite.r=sitePixel(k).rootzoneR;
             tsSite.t=sitePixel(k).t;
             tsSite.v(tsSite.r<rate)=nan;
+            % drop first 10 days of data as there always an error
+            vInd=find(~isnan(tsSite.v));
+            tsSite.v(vInd:(vInd+10))=nan;
+            
             tsLSTM.v=LSTM.v(:,ind);
             tsLSTM.t=LSTM.t;
             tsSMAP.v=SMAP.v(:,ind);

@@ -15,6 +15,25 @@ for k=1:length(resStrLst)
         sitePixelTemp=coreSite2pixel(siteID, resStr);
         sitePixel=[sitePixel;sitePixelTemp];
     end
+    
+    %% remove 2701 and modify version
+    indRM=[];
+    versionLst=[];
+    for kk=1:length(sitePixel)
+        if strcmp(sitePixel(kk).ID(1:4),'2701') % 2701 is out of bound
+            indRM=[indRM,kk];
+        end
+        if kk>1
+            versionLst(kk)=sum(ismember({sitePixel(1:kk-1).ID},sitePixel(kk).ID));
+        end
+    end
+    for kk=1:length(sitePixel)
+        if versionLst(kk)>0
+            sitePixel(kk).ID=[sitePixel(kk).ID,'0',num2str(versionLst(kk)+1)];
+        end
+    end
+    sitePixel(indRM)=[];
+
     saveFile=[dirCoreSite,'siteMat',filesep,'sitePix_',resStr,'.mat'];
     save(saveFile,'sitePixel')
 end

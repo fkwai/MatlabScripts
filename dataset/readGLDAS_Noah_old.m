@@ -1,4 +1,4 @@
-function [ data,lat,lon,tnum,fieldLst ] = readGLDAS_NOAH( t,fieldind )
+function [ data,lat,lon,tnum,fieldLst ] = readGLDAS_Noah_old( t,fieldind )
 %read GLDAS NOAH (v1, 0.25 deg) data for given field number, which can be find from
 %wgrib.
 % hardcode to size 600,1440

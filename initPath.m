@@ -23,11 +23,12 @@ if strcmp(pcStr,'server')
 	kPath.SMAP_L3='/mnt/sdb1/Database/SMAP/SPL3SMP.004/';
     kPath.SMAP_VAL='/mnt/sdb1/Database/SMAP/SMAP_VAL/';
 
-    kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/';
-    kPath.DBSMAP_L3_CONUS='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily/CONUS/';
-    kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
+    kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L3_CONUS/';
+    kPath.DBSMAP_L3_Global='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L3/';       
+    kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4_CONUS/';
     
-    kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4/';
+    kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
+    kPath.OutSMAP_L3_L3_Global='/mnt/sdb1/rnnSMAP/output_SMAPgrid_global/';       
     kPath.OutSMAP_L4='/mnt/sdb1/rnnSMAP/output_SMAPL4grid/';
 
     kPath.CRN='/mnt/sdb1/Database/CRN/';
@@ -37,8 +38,7 @@ if strcmp(pcStr,'server')
     
 	kPath.GLDAS='/mnt/sdb1/Database/GLDAS/';
 	kPath.GLDAS_NOAH='/mnt/sdb1/Database/GLDAS/GLDAS_NOAH025_3H.2.1/';
-	kPath.GLDAS_MOS='/mnt/sdb1/Database/GLDAS/GLDAS_MOS025_3H.2.1/';
-	kPath.GLDAS_VIC='/mnt/sdb1/Database/GLDAS/GLDAS_VIC025_3H.2.1/';
+    kPath.GLDAS_NOAH_Mat='//mnt/sdb1/Database/GLDAS/GLDAS_Noah_Daily_Mat/';
 
 	kPath.NLDAS='/mnt/sdb1/Database/NLDAS/';
 	kPath.NLDAS_Daily='/mnt/sdb1/Database/NLDAS/NLDAS_Daily/';

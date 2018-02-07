@@ -3,6 +3,8 @@ function [ data,lat,lon ] = readSMAP(filename,version,varargin)
 % SMAP version 4 add _AM and _PM data.
 % varargin{1} - 0 will not read lat and lon; 1 will.
 
+% L3_PM data: Soil_Moisture_Retrieval_Data_PM/soil_moisture_pm
+
 %% initial field name by smap version - same as folder name from NSIDC
 switch version
     case 'SPL2SMP.004'
@@ -70,6 +72,9 @@ if readCrd
     lon(lon==fillvalue) = NaN;
     lat=lat';
     lon=lon';
+else 
+    lat=[];
+    lon=[];
 end
 
 %% Close and release resources.

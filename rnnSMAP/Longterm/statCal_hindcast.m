@@ -30,8 +30,9 @@ end
 
 function [outTemp]=statCalTemp(a,b)
 [nt,nInd]=size(a);
-meanA=repmat(nanmean(a,1),[nt,1]);
-meanB=repmat(nanmean(b,1),[nt,1]);
+ind=~isnan(a)&~isnan(b);
+meanA=repmat(nanmean(a(ind),1),[nt,1]);
+meanB=repmat(nanmean(b(ind),1),[nt,1]);
 ubrmse=sqrt(nanmean(((a-meanA)-(b-meanB)).^2))';
 rmse=sqrt(nanmean((a-b).^2));
 bias=nanmean(a-b);

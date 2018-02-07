@@ -4,7 +4,7 @@ global kPath
 siteName='CRN';
 
 %% load LSTM
-%{
+
 rootOut=kPath.OutSMAP_L4;
 rootDB=kPath.DBSMAP_L4;
 outName='CONUSv4f1_rootzone';
@@ -31,7 +31,7 @@ for k=1:length(testLst)
     toc
 end
 LSTM.crd=csvread([rootDB,testLst{1},filesep,'crd.csv']);
-%}
+
 
 %% load site
 maxDist=0.4;
@@ -59,10 +59,8 @@ indGrid(indGrid==0)=[];
 nSite=length(siteMat);
 
 %% calculate sens slope
-for depth=[-1,50,100]
-    
+for depth=[-1]
     outMat=[];
-    
     if depth==-1
         figFolder='/mnt/sdb1/Kuai/rnnSMAP_result/crn/rootzone/';
     else
@@ -108,23 +106,26 @@ for depth=[-1,50,100]
             if t1<t2
                 v2LSTM=vLSTM(tLSTM>=t1&tLSTM<=t2);
                 v2Site=vSite(tSite>=t1&tSite<=t2);
-                f=figure('Position',[1,1,1500,400]);
-                plot(t1:t2,v2LSTM,'b-');hold on
-                plot(t1:t2,v2Site,'r-');hold on
-                plot(tSMAP,vSMAP,'ko');hold on
-                sensLSTM=sensSlope(v2LSTM,[t1:t2]','doPlot',1,'color','b');hold on
-                sensSite=sensSlope(v2Site,[t1:t2]','doPlot',1,'color','r');hold off
-                slopeLSTM=sensLSTM.sen*365*100;
-                slopeSite=sensSite.sen*365*100;
-                outMat=[outMat;siteMat(k).ID,year(t1),year(t2),slopeSite,slopeLSTM];
-                
-                title(num2str(siteMat(k).ID,'%04d'))
-                legend(['LSTM ', num2str(slopeLSTM,'%0.3f')],...
-                    ['CRN ',num2str(slopeSite,'%0.3f')])
-                datetick('x','yy/mm')
-                
-                saveas(f,[figFolder,num2str(siteMat(k).ID,'%05d'),'.fig'])
-                close(f)
+                r2Site=length(find(~isnan(v2Site)))/length(v2Site);
+                if r2Site>0.8
+                    f=figure('Position',[1,1,1500,400]);
+                    plot(t1:t2,v2LSTM,'b-');hold on
+                    plot(t1:t2,v2Site,'r-');hold on
+                    plot(tSMAP,vSMAP,'ko');hold on
+                    sensLSTM=sensSlope(v2LSTM,[t1:t2]','doPlot',1,'color','b');hold on
+                    sensSite=sensSlope(v2Site,[t1:t2]','doPlot',1,'color','r');hold off
+                    slopeLSTM=sensLSTM.sen*365*100;
+                    slopeSite=sensSite.sen*365*100;
+                    outMat=[outMat;siteMat(k).ID,year(t1),year(t2),slopeSite,slopeLSTM];
+                    
+                    title(num2str(siteMat(k).ID,'%04d'))
+                    legend(['LSTM ', num2str(slopeLSTM,'%0.3f')],...
+                        ['CRN ',num2str(slopeSite,'%0.3f')])
+                    datetick('x','yy/mm')
+                    
+                    saveas(f,[figFolder,num2str(siteMat(k).ID,'%05d'),'.fig'])
+                    close(f)
+                end
             end
         end
         toc

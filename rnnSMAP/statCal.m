@@ -4,9 +4,9 @@ function stat=statCal(x,y,varargin)
 % y: [#time step * #points]
 % rmStd: remove points within [mean-n*std,mean+n*std]
 
-pnames={'rmStd','batch'};
-dflts={0,[]};
-[rmStd,xBatch]=...
+pnames={'rmStd'};
+dflts={0};
+[rmStd]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 
@@ -42,7 +42,7 @@ for j=1:nInd
     varResTemp(j)=var(xx(ind)-yy(ind));
 end
 
-indY=find(~isnan(y)&~isnan(x));
+indY=~isnan(y)&~isnan(x);
 meanX=repmat(nanmean(x(indY),1),[nt,1]);
 meanY=repmat(nanmean(y(indY),1),[nt,1]);
 nashTemp=[1-nansum((x-y).^2)./nansum((y-repmat(nanmean(y),[nt,1])).^2)]';
