@@ -58,25 +58,25 @@ if strcmp(pcStr,'workstation')
 	kPath.s='\';
     kPath.workDir='E:\Kuai\';
     
-    kPath.SMAP='H:\Kuai\Data\SMAP\';
+    kPath.SMAP='E:\Kuai\Data\SMAP\';
     kPath.SMAP_VAL='E:\Kuai\SMAP_VAL\';
 
-    kPath.DBSMAP_L3='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\';
-    kPath.DBSMAP_L3_CONUS='H:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\CONUS\';
-    kPath.OutSMAP_L3='H:\Kuai\rnnSMAP\output_SMAPgrid\';
+    kPath.DBSMAP_L3='E:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\';
+    kPath.DBSMAP_L3_CONUS='E:\Kuai\rnnSMAP\Database_SMAPgrid\Daily\CONUS\';
+    kPath.OutSMAP_L3='E:\Kuai\rnnSMAP\output_SMAPgrid\';
     
-    kPath.SCAN='H:\Kuai\Data\SoilMoisture\SCAN\';
-    kPath.OutSCAN='H:\Kuai\rnnGAGE\outputSCAN\';
-    kPath.DBSCAN='H:\Kuai\rnnGAGE\databaseSCAN\';
+    kPath.SCAN='E:\Kuai\Data\SoilMoisture\SCAN\';
+    kPath.OutSCAN='E:\Kuai\rnnGAGE\outputSCAN\';
+    kPath.DBSCAN='E:\Kuai\rnnGAGE\databaseSCAN\';
     
 	%kPath.SMAP_L2='Y:\SMAP\SPL3SMP.004\';
 	%kPath.SMAP_L3='Y:\SMAP\SPL3SMP.004\';
 	%kPath.GLDAS='Y:\GLDAS\data\GLDAS_V1\GLDAS_NOAH025SUBP_3H\';  
     kPath.NLDAS='Y:\NLDAS\';
-    kPath.DBNLDAS='H:\Kuai\rnnSMAP\Database_NLDASgrid\';
-    kPath.NLDAS_SCAN_Mat='H:\Kuai\Data\NLDAS\NLDAS_SCAN_Daily\';
+    kPath.DBNLDAS='E:\Kuai\rnnSMAP\Database_NLDASgrid\';
+    kPath.NLDAS_SCAN_Mat='E:\Kuai\Data\NLDAS\NLDAS_SCAN_Daily\';
     
-    kPath.maskSMAP_CONUS='H:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
+    kPath.maskSMAP_CONUS='E:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
 end
 
 if strcmp(pcStr,'pc-kuai')
