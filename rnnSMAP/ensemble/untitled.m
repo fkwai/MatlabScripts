@@ -1,5 +1,5 @@
 %out=postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2,'drBatch',5000);
-%postRnnSMAP_map('CONUSv4f1_test2','CONUSv4f1','drBatch',5000);
+postRnnSMAP_map('CONUSv4f1_test2','CONUSv4f1','drBatch',100);
 
 out1=postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2,'drBatch',100);
 out2=postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2,'drBatch',1000);
@@ -7,16 +7,27 @@ out3=postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2,'drBatch',5000);
 out4=postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2,'drBatch',101);
 
 
-out=out4
+out=out2
+
+f=figure('Position',[1,1,1600,500])
 %k=randi([1,412])
-k=242
+k=224
 statB=statBatch(out.yLSTM_batch);
-plot(1:366,permute(out.yLSTM_batch(:,k,:),[1,3,2]),'color',[0.8,0.8,0.8],'LineWidth',1);hold on
-plot(1:366,out.ySMAP(:,k),'ko','LineWidth',2);hold on
-plot(1:366,statB.mean(:,k),'b','LineWidth',2);hold on
-plot(1:366,statB.mean(:,k)+statB.std(:,k),'c','LineWidth',2);hold on
+h1=plot(1:366,permute(out.yLSTM_batch(:,k,:),[1,3,2]),'color',[0.8,0.8,0.8],'LineWidth',1);hold on
+h2=plot(1:366,out.ySMAP(:,k),'ko','LineWidth',2);hold on
+h3=plot(1:366,statB.mean(:,k),'b','LineWidth',2);hold on
+h4=plot(1:366,statB.mean(:,k)+statB.std(:,k),'c','LineWidth',2);hold on
 plot(1:366,statB.mean(:,k)-statB.std(:,k),'c','LineWidth',2);hold on
-plot(1:366,out.yLSTM(:,k),'r','LineWidth',2);hold off
+h5=plot(1:366,out.yLSTM(:,k),'r','LineWidth',2);hold off
+legend([h1(1),h2,h3,h4,h5],{'Ensemble','SMAP','Ensemble Mean','Ensemble Mean +/- Std','LSTM'})
+title(['pixel index ',num2str(k)])
+    fixFigure(f)
+
+savefig(['/mnt/sdb1/Kuai/rnnSMAP_result/ensemble/cases/pixel_',num2str(k),'.fig'])
+close(f)
+
+
+
 % 
 % kk=1
 % plot(1:366,out1.yLSTM_batch(:,k,kk),'r');hold on

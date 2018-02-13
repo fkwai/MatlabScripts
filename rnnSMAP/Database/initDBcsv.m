@@ -6,6 +6,7 @@ function initDBcsv( maskMat,dirDB,sd,ed )
 % dirDB - directory of database, Example: kPath.DBSMAP_L3_CONUS
 % sd - start date, yyyymmdd
 % ed - end date, yyyymmdd
+% if sd == ed -  constant database and will not write time.csv
 
 
 %% initial Database
@@ -20,8 +21,10 @@ dlmwrite(crdFile,crd,'precision',12);
 timeFile=[dirDB,'time.csv'];
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
-tnum=[sdn:edn]';
-dlmwrite(timeFile,tnum,'precision',12);
+if sdn~=edn 
+    tnum=[sdn:edn]';
+    dlmwrite(timeFile,tnum,'precision',12);
+end
 
 end
 

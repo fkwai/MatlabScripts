@@ -12,7 +12,7 @@ switch version
         DATAFIELD_NAME = [groupName,'/soil_moisture'];
         Lat_NAME=[groupName,'/latitude'];
         Lon_NAME=[groupName,'/longitude'];
-    case 'SPL3SMAP.004'
+    case 'SPL3SMP.004'
         groupName='Soil_Moisture_Retrieval_Data_AM';
         DATAFIELD_NAME = [groupName,'/soil_moisture'];
         Lat_NAME=[groupName,'/latitude'];

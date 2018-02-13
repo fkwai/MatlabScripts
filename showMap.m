@@ -78,7 +78,7 @@ shape.long = [landareas.Lon];
 geoshow(shape.lat, shape.long, 'Color', 'k')
 
 if ~isempty(strTitle)
-    title(strTitle)
+    title(strTitle,'fontSize',20)
 end
 if ~isempty(colorRange)
     %caxis auto

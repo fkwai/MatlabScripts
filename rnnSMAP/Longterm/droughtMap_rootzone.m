@@ -55,7 +55,7 @@ toc
 
 
 %% convert to weekly and monthly
-sd=20050401;
+sd=19850401;
 ed=20150401;
 indT=find(LSTM.t>=datenumMulti(sd,1)&LSTM.t<datenumMulti(ed,1));
 dataD=LSTM.v(indT,:);
@@ -130,7 +130,7 @@ end
 shapefile='/mnt/sdb1/Kuai/map/USA.shp';
 [outGrid,xx,yy] = data2grid3d(outMat',crd(:,2),crd(:,1));
 
-t=20100105;
+t=20141210;
 ind=find(dataT==datenumMulti(t));
 showMap(outGrid(:,:,ind),yy,xx,'nLevel',length(prcLst),'shapefile',shapefile,'title',num2str(t));
 
@@ -138,8 +138,7 @@ tsStr(1).grid=outGrid;
 tsStr(1).t=dataT;
 tsStr(1).symb='ok';
 tsStr(1).legendStr='prc level';
-showMap(outGrid(:,:,ind),yy,xx,'nLevel',length(prcLst)-1,'tsStr',tsStr)
-
+showMap(nanmean(outGrid,3),yy,xx,'nLevel',length(prcLst)-1,'tsStr',tsStr)
 
 [dataGrid,x1,y1] = data2grid3d(dataMat',crd(:,2),crd(:,1));
 tsStr(1).grid=dataGrid;

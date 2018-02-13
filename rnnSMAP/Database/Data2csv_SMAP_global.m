@@ -1,7 +1,6 @@
 
 % this script will write all data to csv of SMAP CONUS grid, Daily.
 
-
 global kPath
 % maskFile is created by dataset/datasetMask
 maskFile=[kPath.SMAP,'maskSMAP_L3.mat'];
@@ -17,19 +16,11 @@ if ~isdir(dirDB)
     mkdir(dirDB)
 end
 
-%% initial Database
-%{
-for k=1:length(yrLst)
-    yr=yrLst(k);
-    yrStr=num2str(yr);
-    sd=yr*10000+0401;
-    ed=(yr+1)*10000+0401;
-    dirDByear=[dirDB,yrStr,filesep];
-    initDBcsv( maskMat,dirDByear,sd,ed )
-end
-%}
+%% initial Database - each year from 0401 to 0401 next year
+initDBcsv_Year(dirDB,yrLst,0401,maskMat)
 
 %% GLDAS
+%{
 % initial all fields
 dirGLDAS=kPath.GLDAS_NOAH_Mat;
 fileGLDAS=dir([kPath.GLDAS_NOAH_Mat,'2016',filesep,'*.mat']);
@@ -70,6 +61,7 @@ for iField=1:length(fieldLst)
         dataCell{iY}=dataG(:,:,ind2);
     end
     
+    % write to database
     parObj=parpool(18);
     parfor iY=1:length(yrLst)
  		yr=yrLst(iY);
@@ -85,7 +77,37 @@ for iField=1:length(fieldLst)
     end
     delete(parObj)
 end
+%}
 
+%% SMAP
+matFileLst={[kPath.SMAP,'SMAP_L3_AM.mat'],[kPath.SMAP,'SMAP_L3_PM.mat']};
+varLst={'SMAP_AM','SMAP_PM'};
+for iD=1:length(matFileLst)
+    matSMAP=load(matFileLst{iD});
+    yrLstSMAP=[2015,2016];
+    for iY=1:length(yrLstSMAP)
+        dirDByear=[dirDB,num2str(yrLstSMAP(iY)),filesep];
+        grid2csvDB(matSMAP.data,matSMAP.tnum,dirDByear,mask,varLst{iD})
+    end
+end
+
+%% SMAP flags
+dirDBconst=[dirDB,'const',filesep];
+matFlag=load([kPath.SMAP,'SMAP_L3_flag_AM.mat']);
+%PM is same as AM except for vegDense
+%matFlag2=load([kPath.SMAP,'SMAP_L3_flag_PM.mat']); 
+for k=1:length(matFlag.fieldLst)
+    grid2csvDB(matFlag.data(:,:,k),0,dirDBconst,mask,matFlag.fieldLst{k})
+end
+
+
+%% calculate stat
+rootDB=kPath.DBSMAP_L3_Global;
+dataName='Global';
+yrLst=2015:2016;
+varWarning= statDBcsv_Year(rootDB,dataName,yrLst);
+
+%%
 %{
 %% write SMAP
 disp('SMAP')

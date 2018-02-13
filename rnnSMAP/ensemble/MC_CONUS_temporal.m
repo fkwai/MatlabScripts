@@ -108,16 +108,16 @@ for iS=1:length(statLst)
         %a=statMat{iOut,iT}.(stat);
         b=mean(tsStatMat{iOut}.std)';
         subplot(1,length(outStrLst),iOut);
-        plot(a,b,'b*')
+        plot(b,a,'b*')
         h=lsline;
         set(h(1),'color','r','LineWidth',2)
         titleStr=[titleStr, 'R=',num2str(corr(a,b),'%.2f')];
         title(titleStr)
         %xlim([0,0.1])
-        ylim([0.01,0.04])
+        %ylim([0.01,0.04])
         %xlabel(statLst{iS})
-        xlabel(statStrLst{iS})
-        ylabel('Ensemble std')
+        ylabel(statStrLst{iS})
+        xlabel('Ensemble std')
     end
     fixFigure(f)
     %savefig(f,[figFolder,filesep,'std_',stat,'_Noah.fig'])

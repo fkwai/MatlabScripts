@@ -8,8 +8,10 @@ function [ data ] = readSMAPflag(fileName,fieldName,version,varargin)
 switch version
     case 'SPL2SMP.004'
         groupName='Soil_Moisture_Retrieval_Data';
-    case 'SPL3SMAP.004'
+    case 'SPL3SMP.004'
         groupName='Soil_Moisture_Retrieval_Data_AM';
+    case 'SPL3SMP.004.PM'
+        groupName='Soil_Moisture_Retrieval_Data_PM';
     case 'SPL4SMGP.003'
         groupName='Geophysical_Data';
     case 'SPL4SMLM.003'

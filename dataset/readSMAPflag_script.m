@@ -1,6 +1,5 @@
 
 %% read all smap flag data - L3
-%{
 global kPath
 sd=20150331;
 ed=20170614;
@@ -10,34 +9,88 @@ tLst=sdn:edn;
 
 saveFolder=[kPath.SMAP,'SMAP_L3_flag',kPath.s];
 mkdir(saveFolder)    
-flagTab=readtable([kPath.SMAP,'SMAP_L3_flag.csv']);
+flagTab=readtable([kPath.SMAP,'flagTable_SMAP_L3.csv']);
 
-for k=1:height(flagTab)
-    fieldName=flagTab.Flag{k};
-    saveName=[saveFolder,flagTab.Filename{k},'.mat'];
-    layer=flagTab.Bit(k)+1;
-    
-    dataSMAP=zeros(406,964,length(tLst))*nan;
-    for iT=1:length(tLst)
-        t=tLst(iT);
-        disp([fieldName,' ',datestr(t)])
-        folder=[kPath.SMAP_L3,datestr(t,'yyyy.mm.dd'),kPath.s];
-        files = dir([folder,'*.h5']);
-		if length(files)~=0
-			fileName=[folder,files(1).name];       
-			dataTemp=readSMAPflag(fileName,fieldName,'AM');        
-			if layer~=0
-				dataSMAP(:,:,iT)=dataTemp(:,:,layer);
-			else
-				dataSMAP(:,:,iT)=dataTemp;
-			end
-		end
-    end
-    data=dataSMAP;
-    tnum=tLst;
-    save(saveName,'data','tnum','lat','lon','-v7.3')
+mLst={'AM','PM'};
+maskSMAP=cell(length(mLst),1);
+for iM=1:length(mLst)
+    matSMAP=load([kPath.SMAP,'SMAP_L3_',mLst{iM},'.mat']);
+    temp=zeros(size(matAM.data))*nan;
+    temp(~isnan(matSMAP.data))=1;
+    maskSMAP{iM}=temp;
 end
-%}
+lat=maskSMAP{1}.lat;
+lon=maskSMAP{1}.lon;
+
+for iM=1:length(mLst)
+    for k=1:height(flagTab)
+        tic
+        fieldName=flagTab.Flag{k};
+        saveName=[saveFolder,flagTab.Filename{k},'_',mLst{iM},'.mat'];
+        layer=flagTab.Bit(k)+1;
+        
+        dataSMAP=zeros(406,964,length(tLst))*nan;
+        parfor iT=1:length(tLst)
+            t=tLst(iT);
+            disp([fieldName,' ',datestr(t)])
+            folder=[kPath.SMAP_L3,datestr(t,'yyyy.mm.dd'),kPath.s];
+            files = dir([folder,'*.h5']);
+            if ~isempty(files)
+                fileName=[folder,files(1).name];
+                if strcmp(mLst{iM},'AM')
+                    dataTemp=readSMAPflag(fileName,fieldName,'SPL3SMP.004');
+                elseif strcmp(mLst{iM},'PM')
+                    fieldNamePM=['Soil_Moisture_Retrieval_Data_PM/',fieldName,'_pm'];
+                    dataTemp=readSMAPflag(fileName,fieldName,'SPL3SMP.004','DATAFIELD_NAME',fieldNamePM);
+                end
+                if layer~=0
+                    dataSMAP(:,:,iT)=dataTemp(:,:,layer);
+                else
+                    dataSMAP(:,:,iT)=dataTemp;
+                end
+            end
+        end
+        if iM==1
+            data=dataSMAP.*maskAM;
+        else
+            data=dataSMAP.*maskPM;
+        end
+        tnum=tLst;
+        save(saveName,'data','tnum','lat','lon','-v7.3')
+        toc
+    end
+end
+
+
+
+%% save constant flags to single matfile
+global kPath
+saveFolder=[kPath.SMAP,'SMAP_L3_flag',kPath.s];
+
+% pick out constant fields. vegDense is also picked as few of them are
+% different.
+fieldLst={'flag_albedo';'flag_coast';'flag_ice';...
+    'flag_landcover';'flag_mount';'flag_roughness';...
+    'flag_staWater';'flag_urban';'flag_waterbody';'flag_vegDense'};
+
+nF=length(fieldLst);
+data=zeros(406,964,nF)*nan;
+mLst={'AM','PM'};
+for iM=1:2
+    for k=1:nF
+        tic
+        mat=load([saveFolder,fieldLst{k},'_',mLst{iM},'.mat']);
+        temp=nanstd(mat.data,0,3);
+        if ~isempty(find(temp(~isnan(temp))~=0, 1))
+            disp(['look at ',fieldLst{k},' ',num2str(k)])
+        end
+        data(:,:,k)=nanmean(mat.data,3);
+        toc
+    end
+    save([kPath.SMAP,'SMAP_L3_flag_',mLst{iM},'.mat'],'data','fieldLst','lat','lon')
+end
+
+
 
 %% read all smap flag data - L4
 global kPath

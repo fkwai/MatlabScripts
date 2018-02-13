@@ -18,15 +18,11 @@ function grid2csvDB(data,tIn,dirDB,mask,varName,varargin)
 % example
 
 pnames={'doAnomaly','doStat'};
-dflts={0,1,0,0};
+dflts={0,1};
 [doAnomaly,doStat]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 tIn=VectorDim(tIn,1);
-
-timeFile=[dirDB,filesep,'time.csv'];
-tOut=csvread(timeFile);
-tOut=VectorDim(tOut,1);
 
 crdFile=[dirDB,filesep,'crd.csv'];
 crdOut=csvread(crdFile);
@@ -51,8 +47,11 @@ end
 %% find temporal index
 if tIn==0 % const field
     indTimeIn=1;
-    varName=['const_',varName];
+    %varName=['const_',varName];
 else
+    timeFile=[dirDB,filesep,'time.csv'];
+    tOut=csvread(timeFile);
+    tOut=VectorDim(tOut,1);
     [C,indTimeIn,indTimeOut]=intersect(tIn,tOut);
     if length(indTimeOut)~= length(tOut)
         error('time is not covered')
@@ -73,6 +72,9 @@ dlmwrite(dataFile,output,'precision',8);
 
 
 %% compute stat of SMAP
+% do not want to write stat in this function. Calculate stat for all data
+% in a seperate function
+%{
 if doStat==1
 	vecOutput=output(:);
 	vecOutput(vecOutput==-9999)=[];
@@ -92,6 +94,7 @@ else
     statFile=[dirDB,varName,'_Anomaly_stat.csv'];
 end
 dlmwrite(statFile, stat,'precision',8);
+%}
 
 end
 

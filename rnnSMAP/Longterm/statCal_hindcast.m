@@ -7,7 +7,9 @@ function out = statCal_hindcast( tsSite,tsLSTM,tsSMAP )
 % y axis - rmse, bias, rsq
 
 
-t1=tsSite.t(1);
+tSiteValid=tsSite.t(~isnan(tsSite.v));
+
+t1=max(tsLSTM.t(1),tSiteValid(1));
 t2=tsSMAP.t(1);
 t3=min(tsSMAP.t(end),tsSite.t(end));
 v1LSTM=tsLSTM.v(tsLSTM.t>=t1&tsLSTM.t<=t2);
@@ -16,15 +18,17 @@ v1Site=tsSite.v(tsSite.t>=t1&tsSite.t<=t2);
 v2Site=tsSite.v(tsSite.t>=t2&tsSite.t<=t3);
 v2SMAP=tsSMAP.v(tsSMAP.t>=t2&tsSMAP.t<=t3);
 
-temp=zeros(4,3)*nan;
-temp(:,1)=statCalTemp(v1LSTM,v1Site);
-temp(:,2)=statCalTemp(v2LSTM,v2Site);
-temp(:,3)=statCalTemp(v2SMAP,v2Site);
+temp=zeros(5,3)*nan;
+if t1<t2 && t2<t3
+    temp(:,1)=statCalTemp(v1LSTM,v1Site);
+    temp(:,2)=statCalTemp(v2LSTM,v2Site);
+    temp(:,3)=statCalTemp(v2SMAP,v2Site);
+end
 out.rmse=temp(1,:);
 out.bias=temp(2,:);
-out.rsq=temp(3,:);
-out.ubrmse=temp(4,:);
-
+out.ubrmse=temp(3,:);
+out.rho=temp(4,:);
+out.rhoS=temp(5,:);
 
 end
 
@@ -36,7 +40,16 @@ meanB=repmat(nanmean(b(ind),1),[nt,1]);
 ubrmse=sqrt(nanmean(((a-meanA)-(b-meanB)).^2))';
 rmse=sqrt(nanmean((a-b).^2));
 bias=nanmean(a-b);
-rsq=RsqCalculate(a,b,1);
 
-outTemp=[rmse;bias;rsq;ubrmse];
+aa=a(~isnan(a)&~isnan(b));
+bb=b(~isnan(a)&~isnan(b));
+if isempty(aa) || isempty(bb)
+    rho=nan;
+    rhoS=nan;
+else
+    rho=corr(aa,bb);
+    rhoS=corr(aa,bb,'type','Spearman');
+end
+
+outTemp=[rmse;bias;ubrmse;rho;rhoS];
 end

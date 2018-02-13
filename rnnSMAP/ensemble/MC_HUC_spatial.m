@@ -17,9 +17,9 @@ crdHUC=csvread(['/mnt/sdb1/Kuai/rnnSMAP_inputs/hucv2n4/huc2_',idHucStr,filesep,'
 indExt=[1:size(crdCONUS,1)]';
 indExt(indCONUS)=[];
  
-outMat=cell(2,2);
-tsStatMat=cell(2,2);
-statMat=cell(2,2);
+outMat=cell(2,1);
+tsStatMat=cell(2,1);
+statMat=cell(2,1);
 for iOut=1:2
     iT=1;
     outName=outNameLst{iOut};
@@ -27,7 +27,7 @@ for iOut=1:2
     outMat{iOut,iT}=temp;
     tsStatMat{iOut,iT}=statBatch(outMat{iOut,iT}.yLSTM_batch(:,indExt,:));
     statMat{iOut,iT}=statCal(outMat{iOut,iT}.yLSTM(:,indExt),outMat{iOut,iT}.ySMAP(:,indExt));
-    %statMatMean{iOut,iT}=statCal(tsStatMat{iOut,iT}.mean,outMat{iOut,iT}.ySMAP);
+    statMatMean{iOut,iT}=statCal(tsStatMat{iOut,iT}.mean(:,indExt),outMat{iOut,iT}.ySMAP(:,indExt));
 end
 
 
@@ -59,7 +59,7 @@ end
 %}
 
 %% compare std of model vs non-model
-statStdMat={};
+statStdMat=cell(2,1);
 for iOut=1:2
     iT=1;
     statStdMat{iOut,iT}=mean(tsStatMat{iOut,iT}.std)';    
@@ -96,16 +96,14 @@ end
 
 
 %% plot std vs error
-%statLst={'bias^2','mse','varRes'};
 statLst={'rmse','ubrmse','bias','rsq'};
 statStrLst={'RMSE','ubRMSE','abs(Bias)','Correlation'};
+
 outStrLst={'w/ Noah','w/o Noah'};
 for iS=1:length(statLst)
     %f=figure('Position',[1,1,800,600])
     f=figure('Position',[1,1,1000,400])
     for iOut=1:length(outStrLst)
-        titleStr=[];
-        titleStr=[titleStr,outStrLst{iOut},'  '];
         iT=1;
         if strcmp(statLst{iS},'bias')
             a=abs(statMat{iOut,iT}.bias);
@@ -115,16 +113,16 @@ for iS=1:length(statLst)
         stat=statLst{iS};
         b=mean(tsStatMat{iOut,iT}.std)';
         subplot(1,length(outStrLst),iOut);
-        plot(a,b,'b*')
+        plot(b,a,'b*')
         h=lsline;
         set(h(1),'color','r','LineWidth',2)
-        titleStr=[titleStr, 'R=',num2str(corr(a,b),'%.2f')];
+        titleStr=[outStrLst{iOut},'  ', 'R=',num2str(corr(a,b),'%.2f')];
         title(titleStr)
         %xlim([0,0.1])
         %ylim([0.01,0.04])
         %xlabel(statLst{iS})
-        xlabel(statStrLst{iS})
-        ylabel('Ensemble std')
+        ylabel(statStrLst{iS})
+        xlabel('Ensemble std')
     end
     fixFigure(f)
     %savefig(f,[figFolder,filesep,'std_',stat,'_Noah.fig'])
