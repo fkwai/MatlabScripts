@@ -16,16 +16,19 @@ end
 
 %%
 switch(field)
-    case {'Snowf_tavg','Rainf_tavg','Evap_tavg','Rainf_f_tavg'}
+    case {'Snowf_tavg','Rainf_tavg','Evap_tavg','Rainf_f_tavg'} % convert to m/day
         mF=60*60*24;
         aF=0;
-    case {'Qs_acc','Qsb_acc','Qsm_acc'}
+    case {'Qs_acc','Qsb_acc','Qsm_acc'}% convert to /day
         mF=8;
         aF=0;
+    case {'AvgSurfT_inst','SoilTMP0_10cm_inst','SoilTMP0_40cm_inst','SoilTMP0_100cm_inst','SoilTMP0_200cm_inst'} % convert to C
+        mF=1;
+        aF=-273.15;
     otherwise
         mF=1;
-        aF=-273.15;        
-end           
+        aF=0;
+end
 
 end
 

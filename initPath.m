@@ -47,6 +47,9 @@ if strcmp(pcStr,'server')
     
     kPath.maskSMAP_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS.mat';
     kPath.maskSMAPL4_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS_L4.mat';
+    
+    kPath.TRMM='/mnt/sdb1/Database/TRMM/TRMM_3B42.7/';
+    kPath.TRMM_daily='/mnt/sdb1/Database/TRMM/TRMM_3B42_Daily.7/';
 
 	% add path of nctoolbox
 	% addpath('/home/kxf227/install/nctoolbox-1.1.1/')

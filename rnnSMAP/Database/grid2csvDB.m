@@ -25,7 +25,12 @@ dflts={0,1};
 tIn=VectorDim(tIn,1);
 
 crdFile=[dirDB,filesep,'crd.csv'];
-crdOut=csvread(crdFile);
+if exist(crdFile,'file')
+    crdOut=csvread(crdFile);
+else
+    crdFile=[dirDB,filesep,'..',filesep,'crd.csv'];
+    crdOut=csvread(crdFile);
+end
 
 %% transfer to 2D mat 
 [ny,nx,nt]=size(data);

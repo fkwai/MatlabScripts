@@ -17,6 +17,11 @@ dflts={[],[],1,[100,100,800,500],[],[],...
     tsStr,tsStrFill,tsTitleGrid]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
+%% start
+if size(grid,1)~=length(y) || size(grid,2)~=length(x)
+    error('grid and crd do not match')
+end
+
 [lonmesh,latmesh]=meshgrid(x,y);
 if isempty(latLim)
     latLim=[min(y),max(y)];
@@ -47,7 +52,6 @@ axesm('MapProjection','eqdcylin','Frame','on','Grid','off', ...
     'MLabelLocation',[-120:10:70],'PLabelLocation',[25:5:50],'FontSize',16);
 objLabel=findobj('Tag','MLabel');
 set(objLabel,'VerticalAlignment','middle');
-
 tightmap
 
 [tickP2,tickV2,tickL2,Z,nColor] = colorBarRange(grid,colorRange,nLevel,openEnds,'insert0',insert0);
@@ -66,6 +70,8 @@ if isempty(cmap)
     cmap(1, :,:) = [1 1 1]; % for NaN converted 0's in Z
 end
 colormap(cmap);
+
+%% plot
 geoshow(latmesh,lonmesh,uint8(Z),cmap);
 
 if isempty(shapefile)

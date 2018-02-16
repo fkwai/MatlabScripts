@@ -9,7 +9,9 @@ dataTemp=reshape(matFlag.data,[ny*nx,nf]);
 data=dataTemp(indMask,:);
 
 % 1. pick 1/0 flags
-dataN=data(:,[2,3,5,7,8,10]);
+dataN=data(:,[2,3,5,7,8]);
+temp=round(dataN)*[1;10;100;1000;10000];
+tabulate(temp)
 %dataN(:,3)=(dataN(:,3)-8)./8;
 % nc=size(data,1);
 % dataMean=repmat(nanmean(data),[nc,1]);
@@ -29,3 +31,11 @@ tabulate(idx)
 
 [grid,xx,yy] = data2grid(idx,matMask.lon1D,matMask.lat1D);
 [f,cmap]=showMap(grid,yy,xx,'nLevel',nk);
+
+
+data2=data(:,[2,3,5,7,8]);
+data2=data2*[1;10;100;1000;10000];
+temp=zeros(size(data2));
+temp(data2==1001)=1;
+[grid,xx,yy] = data2grid(temp,matMask.lon1D,matMask.lat1D);
+[f,cmap]=showMap(grid,yy,xx,'nLevel',2);

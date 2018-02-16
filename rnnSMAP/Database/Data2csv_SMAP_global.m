@@ -8,24 +8,19 @@ yrLst=2000:2016;
 dirDB=[kPath.DBSMAP_L3_Global,'Global',filesep];
 
 maskMat=load(maskFile);
-lon=maskMat.lon;
-lat=maskMat.lat;
-mask=maskMat.mask;
-ny=length(yrLst);
+crd=[maskMat.lat1D,maskMat.lon1D];
+
+%% initial Database - each year from 0401 to 0401 next year
 if ~isdir(dirDB)
     mkdir(dirDB)
 end
-
-%% initial Database - each year from 0401 to 0401 next year
-initDBcsv_Year(dirDB,yrLst,0401,maskMat)
+initDBcsvGlobal(dirDB,yrLst,0401,crd)
 
 %% GLDAS
-%{
 % initial all fields
 dirGLDAS=kPath.GLDAS_NOAH_Mat;
 fileGLDAS=dir([kPath.GLDAS_NOAH_Mat,'2016',filesep,'*.mat']);
 fieldLst=cell(length(fileGLDAS),1);
-varLst=cell(length(fileGLDAS),1);
 for k=1:length(fieldLst)
     fieldName=fileGLDAS(k).name(1:end-4);
     fieldLst{k}=fieldName;
@@ -48,6 +43,9 @@ for iField=1:length(fieldLst)
     end
     lonG=matG.lon;
     latG=matG.lat;
+    lon=maskMat.lon;
+    lat=maskMat.lat;
+    mask=maskMat.mask;
     
     % intp to SMAP grid
     [varName,mF,aF]=fieldGLDAS(fieldName);    
@@ -77,7 +75,33 @@ for iField=1:length(fieldLst)
     end
     delete(parObj)
 end
-%}
+
+%% TRMM
+latTRMM=[-49.875:0.25:49.875]';
+lonTRMM=-179.875:0.25:179.875;
+dirTRMM=kPath.TRMM_daily;
+lon=maskMat.lon;
+lat=maskMat.lat;
+mask=maskMat.mask;
+parfor iY=1:length(yrLst)
+    yr=yrLst(iY);
+    yrStr=num2str(yr);        
+    dirDByear=[dirDB,yrStr,filesep];
+    tLst=csvread([dirDByear,'time.csv']);
+    data=zeros(length(latTRMM),length(lonTRMM),length(tLst));
+    disp(yrStr)
+    tic
+    for k=1:length(tLst)
+        t=tLst(k);
+        temp = readTRMM(t,'dirTRMM',dirTRMM);
+        data(:,:,k)=temp;
+    end
+    dataIntp=interpGridArea(lonTRMM,latTRMM,data,lon,lat);
+    grid2csvDB(dataIntp,tLst,dirDByear,mask,'TRMM');
+    toc
+end
+
+
 
 %% SMAP
 matFileLst={[kPath.SMAP,'SMAP_L3_AM.mat'],[kPath.SMAP,'SMAP_L3_PM.mat']};
@@ -93,66 +117,44 @@ end
 
 %% SMAP flags
 dirDBconst=[dirDB,'const',filesep];
-matFlag=load([kPath.SMAP,'SMAP_L3_flag_AM.mat']);
+flagMat=load([kPath.SMAP,'SMAP_L3_flag_AM.mat']);
 %PM is same as AM except for vegDense
 %matFlag2=load([kPath.SMAP,'SMAP_L3_flag_PM.mat']); 
-for k=1:length(matFlag.fieldLst)
-    grid2csvDB(matFlag.data(:,:,k),0,dirDBconst,mask,matFlag.fieldLst{k})
+
+% combine [coast, ice, mount, staWater,urban,vegDense]
+indComb=[2,3,5,7,8];
+dataTemp=flagMat.data(:,:,indComb);
+dataTemp=round(dataTemp);
+data=zeros(size(dataTemp,1),size(dataTemp,2));
+for k=1:length(indComb)
+    data(dataTemp(:,:,k)==1)=k;
+end
+data(sum(dataTemp,3)>1)=length(indComb)+1;
+grid2csvDB(data,0,dirDBconst,maskMat.mask,'flag_extraOrd')
+
+indSingle=1:size(flagMat.data,3);
+indSingle(indComb)=[];
+for k=1:length(indSingle)
+    ind=indSingle(k);
+    grid2csvDB(flagMat.data(:,:,ind),0,dirDBconst,maskMat.mask,flagMat.fieldLst{ind})
 end
 
-
-%% calculate stat
-rootDB=kPath.DBSMAP_L3_Global;
-dataName='Global';
-yrLst=2015:2016;
-varWarning= statDBcsv_Year(rootDB,dataName,yrLst);
-
-%%
-%{
-%% write SMAP
-disp('SMAP')
-dirDByear=[kPath.DBSMAP_L4,'CONUS',kPath.s];
-matFileLst={'SPL4SMGPv3_profile_CONUS','SPL4SMGPv3_surface_CONUS','SPL4SMGPv3_rootzone_CONUS'};
-fieldLst={'SMGP_profile','SMGP_surface','SMGP_rootzone'};
-for k=1:length(fieldLst)
+%% other constant
+% Soil
+soilMat=load('/mnt/sdb1/Database/SoilGlobal/wise5by5min_v1b/soilMap.mat');
+dirDBconst=[dirDB,'const',filesep];
+field={'Sand','Silt','Clay','Capa','Bulk'};
+for k=1:length(field)
+    k
     tic
-    SMAPFile=[kPath.SMAP,matFileLst{k},'.mat'];
-    SMAPmat=load(SMAPFile);
-    % shrink global to CONUS
-    [C,indTemp,indY]=intersect(maskMat.lat,SMAPmat.lat,'stable');
-    [C,indTemp,indX]=intersect(maskMat.lon,SMAPmat.lon,'stable');
-    dataG=SMAPmat.data(indY,indX,:);
-    tIn=SMAPmat.tnum;
-    
-    grid2csvDB(dataG,tIn,dirDByear,maskMat.mask,fieldLst{k})
-    grid2csvDB(dataG,tIn,dirDByear,maskMat.mask,fieldLst{k},'doAnomaly',1)
+    data=soilMat.(field{k})(:,:,1);
+    dataIntp=interpGridArea(soilMat.lon,soilMat.lat,data,maskMat.lon,maskMat.lat,'mean');
+    grid2csvDB(dataIntp,0,dirDBconst,maskMat.mask,field{k})
     toc
 end
 
-%% SMAP model constant - see readSMAPflag_script.m
-flagTab=readtable([kPath.SMAP,'SMAP_L4_modelConst.csv']);
-dirDByear=[kPath.DBSMAP_L4,'CONUS',kPath.s];
-
-for k=1:height(flagTab)
-    fieldName=flagTab.DataFieldName{k};
-    disp(fieldName)
-    if flagTab.Pick(k)==1
-        tic
-        flagFile=[kPath.SMAP,'SMAP_L4_modelConst',kPath.s,fieldName,'.mat'];
-        flagMat=load(flagFile);
-        % shrink global to CONUS
-        [C,indTemp,indY]=intersect(maskMat.lat,flagMat.lat,'stable');
-        [C,indTemp,indX]=intersect(maskMat.lon,flagMat.lon,'stable');
-        dataG=flagMat.data(indY,indX,:);
-        grid2csvDB(dataG,0,dirDByear,maskMat.mask,fieldName)
-        toc
-    end
-end
-%}
-
-
-%{
-%% NDVI
+% NDVI
+tic
 NDVIFile='/mnt/sdb1/Database/GIMMS/avg.tif';
 [gridNDVI,refNDVI]=geotiffread(NDVIFile);
 lonNDVI=refNDVI.LongitudeLimits(1)+refNDVI.CellExtentInLongitude/2:...
@@ -161,21 +163,21 @@ lonNDVI=refNDVI.LongitudeLimits(1)+refNDVI.CellExtentInLongitude/2:...
 latNDVI=[refNDVI.LatitudeLimits(2)-refNDVI.CellExtentInLatitude/2:...
     -refNDVI.CellExtentInLatitude:...
     refNDVI.LatitudeLimits(1)+refNDVI.CellExtentInLatitude/2]';
-gridNDVI_int=interp2(lonNDVI,latNDVI,gridNDVI,maskMat.lon,maskMat.lat);
-grid2csvDB(gridNDVI_int,0,dirDatabase,maskMat.mask,'NDVI')
+dataIntp=interpGridArea(lonNDVI,latNDVI,gridNDVI,maskMat.lon,maskMat.lat,'mean');
+grid2csvDB(dataIntp,0,dirDBconst,maskMat.mask,'NDVI')
+toc
 
-%% irrigation
-irriFile='/mnt/sdb1/Database/UScrop/cropIrrigation.tif';
-[gridIrri,refIrri]=geotiffread(irriFile);
-lonIrri=refIrri.LongitudeLimits(1)+refIrri.CellExtentInLongitude/2:...
-    refIrri.CellExtentInLongitude:...
-    refIrri.LongitudeLimits(2)-refIrri.CellExtentInLongitude/2;
-latIrri=[refIrri.LatitudeLimits(2)-refIrri.CellExtentInLatitude/2:...
-    -refIrri.CellExtentInLatitude:...
-    refIrri.LatitudeLimits(1)+refIrri.CellExtentInLatitude/2]';
-gridIrri=double(gridIrri);
-gridIrri(gridIrri<0)=0;
-vq=interpGridArea(lonIrri,latIrri,gridIrri,maskMat.lon,maskMat.lat,'mean');
-grid2csvDB(vq,0,dirDatabase,maskMat.mask,'Irri')
-grid2csvDB(vq.^0.5,0,dirDatabase,maskMat.mask,'IrriSq')
-%}
+
+%% calculate stat
+rootDB=kPath.DBSMAP_L3_Global;
+dataName='Global';
+yrLst=2015:2016;
+varWarning= statDBcsv_Year(rootDB,dataName,yrLst);
+
+%% scan database
+rootDB=kPath.DBSMAP_L3_Global;
+dataName='Global';
+outVar=scanDatabaseGlobal(dataName,1,'dirRoot',rootDB);
+
+
+

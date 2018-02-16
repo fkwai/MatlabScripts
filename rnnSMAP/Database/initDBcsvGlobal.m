@@ -1,4 +1,4 @@
-function initDBcsv_Year(dirDB,yrLst,yrSD,maskMat)
+function initDBcsvGlobal(dirDB,yrLst,yrSD,crd)
 % initlize yearly database for global dataset
 % will create database has one folder for each year from yrSD to next
 % year yrSD. 
@@ -8,6 +8,10 @@ function initDBcsv_Year(dirDB,yrLst,yrSD,maskMat)
 % yrLst=2000:2016;
 % yrSD=0401;
 
+%% write crd
+crdFile=[dirDB,'crd.csv'];
+dlmwrite(crdFile,crd,'precision',12);
+
 %% year database
 for k=1:length(yrLst)
     yr=yrLst(k);
@@ -15,11 +19,22 @@ for k=1:length(yrLst)
     sd=yr*10000+yrSD;
     ed=(yr+1)*10000+yrSD;
     dirDByear=[dirDB,yrStr,filesep];
-    initDBcsv( maskMat,dirDByear,sd,ed )
-end
+    
+    
+    if ~isdir(dirDByear)
+        mkdir(dirDByear)
+    end
 
+    timeFile=[dirDByear,'time.csv'];
+    sdn=datenumMulti(sd,1);
+    edn=datenumMulti(ed,1);
+    tnum=[sdn:edn]';
+    dlmwrite(timeFile,tnum,'precision',12);
+end
+        
 %% const database
-initDBcsv(maskMat,[dirDB,'const',filesep],1,1)
+dirDBconst=[dirDB,'const',filesep];
+mkdir(dirDBconst)
 
 end
 

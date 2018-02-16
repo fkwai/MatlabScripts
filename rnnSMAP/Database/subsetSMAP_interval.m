@@ -2,13 +2,13 @@ function indSub=subsetSMAP_interval(interval,offset,varargin)
 %split dataset from CONUS for given interval and offset
 
 global kPath
-pnames={'mask','dirRoot','subsetRoot'};
+pnames={'mask','rootDB','subsetRoot'};
 dflts={kPath.maskSMAP_CONUS,kPath.DBSMAP_L3,'CONUS'};
-[maskFile,dirRoot,subsetRoot]=...
+[maskFile,rootDB,subsetRoot]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 maskMat=load(maskFile);
-dirSubset=[dirRoot,filesep,'Subset',filesep];
+dirSubset=[rootDB,filesep,'Subset',filesep];
 
 %% pick grid by interval
 maskIndSub=maskMat.maskInd(offset:interval:end,offset:interval:end);

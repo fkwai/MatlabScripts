@@ -7,7 +7,7 @@ function subsetSplit(subsetName,varargin)
 global kPath
 if isempty(kPath)
     initPath workstation
-end    
+end
 
 pnames={'dirRoot','varLst','varConstLst'};
 dflts={kPath.DBSMAP_L3,'varLst','varConstLst'};
@@ -15,10 +15,19 @@ dflts={kPath.DBSMAP_L3,'varLst','varConstLst'};
 
 
 %% read variable list
-varFile=[dirRoot,'Variable',kPath.s,varLstName,'.csv'];
-varConstFile=[dirRoot,'Variable',kPath.s,varConstLstName,'.csv'];
-varLst=textread(varFile,'%s');
-varConstLst=textread(varConstFile,'%s');
+if iscell(varLstName)
+    varLst=varLstName;
+elseif ischar(varLstName)
+    varFile=[dirRoot,'Variable',kPath.s,varLstName,'.csv'];
+    varLst=textread(varFile,'%s');
+end
+
+if iscell(varConstLstName)
+    varConstLst=varConstLstName;
+elseif ischar(varConstLstName)
+    varConstFile=[dirRoot,'Variable',kPath.s,varConstLstName,'.csv'];
+    varConstLst=textread(varConstFile,'%s');
+end
 
 %% read subset index
 subsetFile=[dirRoot,'Subset',filesep,subsetName,'.csv'];
@@ -28,6 +37,9 @@ rootName=C{1}{1};
 C = textscan(fid,'%f');
 indSub=C{1};
 fclose(fid);
+if indSub==-1
+    error('read crd and find subset index -- will do')
+end
 
 %% write crd and time
 rootFolder=[dirRoot,rootName,filesep];
