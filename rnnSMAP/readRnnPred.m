@@ -3,17 +3,47 @@ function dataOut= readRnnPred(outName,dataName,epoch,timeOpt,varargin)
 
 global kPath
 
-pnames={'rootOut','drBatch','rootDB','target'};
-dflts={kPath.OutSMAP_L3,0,kPath.DBSMAP_L3,'SMAP'};
-[rootOut,drBatch,rootDB,target]=...
+pnames={'rootOut','drBatch','target'};
+dflts={[],0,[]};
+[rootOut,drBatch,target]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
+%% deal with global database or conus database
+if length(timeOpt)==1
+    doGlobal=0;
+    if isempty(rootOut)
+        rootOut=kPath.OutSMAP_L3;
+    end
+    if isempty(target)
+        target='SMAP';
+    end
+else
+    doGlobal=1;
+    syr=timeOpt(1);
+    eyr=timeOpt(2);
+    if isempty(rootOut)
+        rootOut=kPath.OutSMAP_L3_Global;
+    end
+    if isempty(target)
+        target='SMAP_AM';
+    end
+end
+
+%% start
 if drBatch==0
-    dataFile=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
+    if doGlobal
+        dataFile=['test_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'.csv'];
+    else
+        dataFile=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
+    end
     data=csvread([rootOut,outName,filesep,dataFile]);
 else
     disp('read LSTM dropout batch')
-    batchName=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'_drM',num2str(drBatch)];
+    if doGlobal
+        batchName=['test_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'_drM',num2str(drBatch)];
+    else
+        batchName=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'_drM',num2str(drBatch)];
+    end
     batchMatFile=[rootOut,outName,filesep,batchName,'.mat'];
     if exist([rootOut,outName,filesep,batchName,'.mat'],'file')
         batchMat=load(batchMatFile);
@@ -35,10 +65,15 @@ else
 end
 
 %% transfer back
-statFile=[rootDB,'CONUS',filesep,target,'_stat.csv'];
+if doGlobal
+    statFile=[kPath.DBSMAP_L3_Global,'Statistics',filesep,target,'_stat.csv'];
+else
+    statFile=[kPath.DBSMAP_L3,'CONUS',filesep,target,'_stat.csv'];
+end
 statSMAP=csvread(statFile);
+
 meanSMAP=statSMAP(3);
-stdSMAP=statSMAP(4);    
+stdSMAP=statSMAP(4);
 dataOut=(data).*stdSMAP+meanSMAP;
 
 end

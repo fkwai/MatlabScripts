@@ -18,12 +18,16 @@ if ~isempty(varargin)
 else
     oper='mean';
 end
+yq=VectorDim(yq,1);
+y=VectorDim(y,1);
+xq=VectorDim(xq,2);
+x=VectorDim(x,2);
+
 the=0.2;
 nyq=length(yq);
 nxq=length(xq);
 nt=size(v,3);
 vq=zeros(nyq,nxq,nt)*nan;
-
 
 % m,n - new data; x,y - target grid
 [x1,x2,y1,y2]=gridbound(yq,xq);

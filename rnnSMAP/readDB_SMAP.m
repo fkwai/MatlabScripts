@@ -1,4 +1,4 @@
-function [xData,xStat,xDataNorm] = readDatabaseSMAP(dataName,varName,varargin)
+function [xData,xStat,xDataNorm] = readDB_SMAP(dataName,varName,varargin)
 %read new SMAP database of given varName. Read time series variables only.
 % varargin{1} - root Database Folder,,default to be kPath.DBSMAP_L3
 

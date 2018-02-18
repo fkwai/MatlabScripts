@@ -1,4 +1,4 @@
-function [xData,xStat,xDataNorm] = readDatabaseNLDAS(dataName,varName)
+function [xData,xStat,xDataNorm] = readDB_NLDAS(dataName,varName)
 
 dirDB='H:\Kuai\rnnSMAP\Database_NLDASgrid\';
 

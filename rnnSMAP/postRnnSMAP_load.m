@@ -32,7 +32,7 @@ end
 %% read SMAP
 if readSMAP
     %disp(['read SMAP in ',outName])
-    [ySMAP,ySMAPStat] = readDatabaseSMAP(dataName,'SMAP',rootDB);
+    [ySMAP,~] = readDatabaseSMAP(dataName,'SMAP',rootDB);
     ySMAP=ySMAP(tData,:);
     out.ySMAP=ySMAP;
 end
@@ -47,7 +47,7 @@ if readModel
         otherwise
             error('unseen model')
     end
-    [xSoilm,xSoilmStat] = readDatabaseSMAP(dataName,modelField,rootDB);
+    [xSoilm,~] = readDatabaseSMAP(dataName,modelField,rootDB);
     yGLDAS=xSoilm(tData,:)/100;
     out.yGLDAS=yGLDAS;
 end

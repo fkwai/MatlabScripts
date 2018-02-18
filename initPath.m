@@ -28,7 +28,7 @@ if strcmp(pcStr,'server')
     kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4_CONUS/';
     
     kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
-    kPath.OutSMAP_L3_L3_Global='/mnt/sdb1/rnnSMAP/output_SMAPgrid_global/';       
+    kPath.OutSMAP_L3_Global='/mnt/sdb1/rnnSMAP/output_SMAPgrid_global/';       
     kPath.OutSMAP_L4='/mnt/sdb1/rnnSMAP/output_SMAPL4grid/';
 
     kPath.CRN='/mnt/sdb1/Database/CRN/';

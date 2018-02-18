@@ -77,8 +77,13 @@ for iField=1:length(fieldLst)
 end
 
 %% TRMM
-latTRMM=[-49.875:0.25:49.875]';
+latTRMM=[49.875:-0.25:-49.875]';
 lonTRMM=-179.875:0.25:179.875;
+
+% test code 
+% dd=readTRMM(20160229);
+% [f,cmap]=showMap(dd,latTRMM,lonTRMM,'colorRange',[0,100]);
+
 dirTRMM=kPath.TRMM_daily;
 lon=maskMat.lon;
 lat=maskMat.lat;
@@ -172,7 +177,8 @@ toc
 rootDB=kPath.DBSMAP_L3_Global;
 dataName='Global';
 yrLst=2015:2016;
-varWarning= statDBcsv_Year(rootDB,dataName,yrLst);
+varWarning= statDBcsvGlobal(rootDB,dataName,yrLst);
+
 
 %% scan database
 rootDB=kPath.DBSMAP_L3_Global;

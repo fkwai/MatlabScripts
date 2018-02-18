@@ -1,4 +1,4 @@
-function data = readTRMM(t,varargin)
+function [data,lat,lon] = readTRMM(t,varargin)
 % read TRMM daily data for given date
 
 % latTRMM=[-49.875:0.25:49.875]';
@@ -22,9 +22,10 @@ dStr=datestr(tnum,'yyyymmdd');
 fileName=[dirTRMM,filesep,yStr,filesep,mStr,filesep,'3B42_Daily.',dStr,'.7.nc4'];
 data = ncread(fileName,fieldName);
 
-% lat=-49.875:0.25:49.875;
-% lon=-179.875:0.25:179.875;
+lat=[49.875:-0.25:-49.875]';
+lon=-179.875:0.25:179.875;
 data(data<0)=nan;
+data=flipud(data);
 
 end
 

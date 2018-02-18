@@ -14,6 +14,6 @@ for k=1:length(vecV)
     subsetSMAP_interval(interval,offset,'mask',maskFile,'rootDB',rootDB,'subsetRoot',dbName);
     subsetName=[dbName,'v',num2str(interval),'f',num2str(offset)];
     %subsetSplitGlobal(subsetName)
-    subsetSplitGlobal(subsetName,'varLst',{'TRMM'},'varConstLst',{})
+    subsetSplitGlobal(subsetName,'varLst',{'TRMM'},'varConstLst','varConstLst')
 end
 
