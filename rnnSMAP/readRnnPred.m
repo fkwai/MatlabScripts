@@ -3,9 +3,9 @@ function dataOut= readRnnPred(outName,dataName,epoch,timeOpt,varargin)
 
 global kPath
 
-pnames={'rootOut','drBatch','target'};
-dflts={[],0,[]};
-[rootOut,drBatch,target]=...
+pnames={'rootOut','rootDB','drBatch','targetName'};
+dflts={[],[],0,[]};
+[rootOut,rootDB,drBatch,targetName]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 %% deal with global database or conus database
@@ -14,8 +14,11 @@ if length(timeOpt)==1
     if isempty(rootOut)
         rootOut=kPath.OutSMAP_L3;
     end
-    if isempty(target)
-        target='SMAP';
+    if isempty(rootDB)
+        rootDB=kPath.DBSMAP_L3;
+    end
+    if isempty(targetName)
+        targetName='SMAP';
     end
 else
     doGlobal=1;
@@ -24,8 +27,11 @@ else
     if isempty(rootOut)
         rootOut=kPath.OutSMAP_L3_Global;
     end
-    if isempty(target)
-        target='SMAP_AM';
+    if isempty(rootDB)
+        rootDB=kPath.DBSMAP_L3_Global;
+    end
+    if isempty(targetName)
+        targetName='SMAP_AM';
     end
 end
 
@@ -66,9 +72,9 @@ end
 
 %% transfer back
 if doGlobal
-    statFile=[kPath.DBSMAP_L3_Global,'Statistics',filesep,target,'_stat.csv'];
+    statFile=[rootDB,'Statistics',filesep,targetName,'_stat.csv'];
 else
-    statFile=[kPath.DBSMAP_L3,'CONUS',filesep,target,'_stat.csv'];
+    statFile=[rootDB,'CONUS',filesep,targetName,'_stat.csv'];
 end
 statSMAP=csvread(statFile);
 

@@ -4,7 +4,7 @@
 global kPath
 % maskFile is created by dataset/datasetMask
 maskFile=[kPath.SMAP,'maskSMAP_L3.mat'];
-yrLst=2000:2016;
+yrLst=2014:2016;
 dirDB=[kPath.DBSMAP_L3_Global,'Global',filesep];
 
 maskMat=load(maskFile);
@@ -106,6 +106,33 @@ parfor iY=1:length(yrLst)
     toc
 end
 
+%% GPM
+latGPM=[89.95:-0.1:-89.95]';
+lonGPM=-179.95:0.1:179.95;
+
+dirGPM=kPath.GPM;
+lon=maskMat.lon;
+lat=maskMat.lat;
+mask=maskMat.mask;
+parfor iY=1:length(yrLst)
+    yr=yrLst(iY);
+    yrStr=num2str(yr);        
+    dirDByear=[dirDB,yrStr,filesep];
+    tLst=csvread([dirDByear,'time.csv']);
+    data=zeros(length(latGPM),length(lonGPM),length(tLst));
+    disp(yrStr)
+    tic
+    for k=1:length(tLst)
+        t=tLst(k);
+        temp = readGPM(t,'dirGPM',dirGPM);
+        data(:,:,k)=temp;
+    end
+    dataIntp=interpGridArea(lonGPM,latGPM,data,lon,lat);
+    grid2csvDB(dataIntp,tLst,dirDByear,mask,'GPM');
+    toc
+end
+
+
 
 
 %% SMAP
@@ -176,8 +203,10 @@ toc
 %% calculate stat
 rootDB=kPath.DBSMAP_L3_Global;
 dataName='Global';
-yrLst=2015:2016;
-varWarning= statDBcsvGlobal(rootDB,dataName,yrLst);
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2016);
+
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2016,'varLst',{'GPM'});
+
 
 
 %% scan database

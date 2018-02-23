@@ -11,7 +11,7 @@ dflts={'precipitation',[]};
 
 if isempty(dirTRMM)
     global kPath
-    dirTRMM=kPath.TRMM_daily;
+    dirTRMM=kPath.TRMM;
 end
 
 tnum=datenumMulti(t);

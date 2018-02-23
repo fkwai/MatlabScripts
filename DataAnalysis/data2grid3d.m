@@ -9,6 +9,9 @@ function [grid,xx,yy] = data2grid3d( data,x,y )
 %   -9999 stands for nan values. 
 
 [nc,nt]=size(data);
+if nc~=length(x) && nc~=length(y)
+    error('size mismatch')
+end
 xx=VectorDim(sort(unique(x)),2);
 yy=VectorDim(sort(unique(y),'descend'),1);
 nx=length(xx);
@@ -18,9 +21,9 @@ data(data==-9999)=nan;
 
 grid=ones(ny,nx,nt).*nan;
 
-for i=1:nc
-	iy=find(y(i)==yy);
-	ix=find(x(i)==xx);
+for i=1:nc    
+	iy= y(i)==yy;
+	ix= x(i)==xx;
 	grid(iy,ix,:)=data(i,:);
 end
 
