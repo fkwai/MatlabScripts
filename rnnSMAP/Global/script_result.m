@@ -2,12 +2,12 @@
 %% new test
 rootOut=kPath.OutSMAP_L3_Global;
 rootDB=kPath.DBSMAP_L3_Global;
-% outName1='Globalv8f1_Forcing';
-% outName2='Globalv8f1_Noah';
-% dataName='Globalv8f1';
-outName1='CONUSv4f4_Forcing_GPM';
-outName2='CONUSv4f4_Noah_GPM';
-dataName='CONUSv4f4';
+outName1='Globalv8f1_Forcing';
+outName2='Globalv8f1_Noah';
+dataName='Globalv8f1';
+% outName1='CONUSv4f4_Forcing_GPM';
+% outName2='CONUSv4f4_Noah_GPM';
+% dataName='CONUSv4f4';
 
 postRnnGlobal_map(outName2,dataName)
 

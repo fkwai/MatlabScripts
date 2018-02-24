@@ -4,7 +4,7 @@
 global kPath
 % maskFile is created by dataset/datasetMask
 maskFile=[kPath.SMAP,'maskSMAP_L3.mat'];
-yrLst=2014:2016;
+yrLst=2000:2016;
 dirDB=[kPath.DBSMAP_L3_Global,'Global',filesep];
 
 maskMat=load(maskFile);
@@ -79,11 +79,9 @@ end
 %% TRMM
 latTRMM=[49.875:-0.25:-49.875]';
 lonTRMM=-179.875:0.25:179.875;
-
 % test code 
 % dd=readTRMM(20160229);
 % [f,cmap]=showMap(dd,latTRMM,lonTRMM,'colorRange',[0,100]);
-
 dirTRMM=kPath.TRMM_daily;
 lon=maskMat.lon;
 lat=maskMat.lat;
@@ -107,15 +105,15 @@ parfor iY=1:length(yrLst)
 end
 
 %% GPM
+yrLstGPM=2014:2016;
 latGPM=[89.95:-0.1:-89.95]';
 lonGPM=-179.95:0.1:179.95;
-
 dirGPM=kPath.GPM;
 lon=maskMat.lon;
 lat=maskMat.lat;
 mask=maskMat.mask;
-parfor iY=1:length(yrLst)
-    yr=yrLst(iY);
+parfor iY=1:length(yrLstGPM)
+    yr=yrLstGPM(iY);
     yrStr=num2str(yr);        
     dirDByear=[dirDB,yrStr,filesep];
     tLst=csvread([dirDByear,'time.csv']);
@@ -132,8 +130,26 @@ parfor iY=1:length(yrLst)
     toc
 end
 
+%% combine TRMM and GLDAS prcp
+dirDB=[kPath.DBSMAP_L3_Global,'Global',filesep];
+yrLstP=2000:2014;
+crd=csvread([dirDB,'crd.csv']);
+ind0=find(abs(crd(:,1))>=50);
+ind1=find(abs(crd(:,1))<50);
 
-
+parfor k=1:length(yrLstP)
+    tic
+    yr=yrLstP(k);
+    yrStr=num2str(yr);
+    dirDByear=[dirDB,yrStr,filesep];
+    dataTRMM=csvread([dirDByear,'TRMM.csv']);
+    dataGLDAS=csvread([dirDByear,'Prcp.csv']);
+    dataC=dataTRMM;
+    dataC(ind0,:)=dataGLDAS(ind0,:);
+    dataFile=[dirDByear,'GPM.csv'];
+    dlmwrite(dataFile,dataC,'precision',8);
+    disp([yrStr,': ',num2str(toc)])
+end
 
 %% SMAP
 matFileLst={[kPath.SMAP,'SMAP_L3_AM.mat'],[kPath.SMAP,'SMAP_L3_PM.mat']};
@@ -204,7 +220,6 @@ toc
 rootDB=kPath.DBSMAP_L3_Global;
 dataName='Global';
 varWarning= statDBcsvGlobal(rootDB,dataName,2015:2016);
-
 varWarning= statDBcsvGlobal(rootDB,dataName,2015:2016,'varLst',{'GPM'});
 
 

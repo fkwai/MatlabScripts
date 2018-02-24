@@ -32,7 +32,7 @@ plot(crd1(:,2),crd1(:,1),'ro');hold on
 plot(crd2(:,2),crd2(:,1),'b*');hold off
 
 %% single variable
-msg1=subsetSplitGlobal('Globalv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2014:2016);
-msg2=subsetSplitGlobal('CONUSv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2014:2016);
+msg1=subsetSplitGlobal('Globalv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2000:2016);
+msg2=subsetSplitGlobal('CONUSv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2000:2016);
 
 CUDA_VISIBLE_DEVICES=0 th trainLSTM.lua -var varLst_Noah -out Globalv8f1_Noah_GPM -train Globalv8f1

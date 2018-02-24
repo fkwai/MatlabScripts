@@ -1,4 +1,4 @@
-function [ data,lat,lon,tnum,fieldLst ] = readNLDAS_Hourly(productName,t,fieldind)
+function [ data,lat,lon,tnum,fieldLst ] = readNLDAS_Hourly(productName,t,fieldind,varargin)
 %read NLDASH data for given field number, which can be find from
 %wgrib.
 
@@ -9,28 +9,32 @@ function [ data,lat,lon,tnum,fieldLst ] = readNLDAS_Hourly(productName,t,fieldin
 % data - grid output [ny,nx,nt,nfield]
 % lat,lon,tnum - 1d vector for lat, lon and time (hour, min, second)
 
-global kPath
-if isempty(kPath), initPath; end
+if isempty(varargin)
+    global kPath    
+    dirNLDAS=kPath.NLDAS;
+else
+    dirNLDAS=varargin{1};
+end
 switch productName
 	case 'FORA'
-		NLDASdir=[kPath.NLDAS,'NLDAS_FORA0125_H.002',kPath.s];
-        ParamTable=[kPath.NLDAS,'gribtab_NLDAS_FORA_hourly.002.txt'];        
+		NLDASdir=[dirNLDAS,'NLDAS_FORA0125_H.002',filesep];
+        ParamTable=[dirNLDAS,'gribtab_NLDAS_FORA_hourly.002.txt'];        
         nField=11;
     case 'FORB'
-        NLDASdir=[kPath.NLDAS,'NLDAS_FORB0125_H.002',kPath.s];
-        ParamTable=[kPath.NLDAS,'gribtab_NLDAS_FORB_hourly.002.txt'];
+        NLDASdir=[dirNLDAS,'NLDAS_FORB0125_H.002',filesep];
+        ParamTable=[dirNLDAS,'gribtab_NLDAS_FORB_hourly.002.txt'];
         nField=10;
     case 'NOAH'
-        NLDASdir=[kPath.NLDAS,'NLDAS_NOAH0125_H.002',kPath.s];
-        ParamTable=[kPath.NLDAS,'gribtab_NLDAS_NOAH.002.txt'];
+        NLDASdir=[dirNLDAS,'NLDAS_NOAH0125_H.002',filesep];
+        ParamTable=[dirNLDAS,'gribtab_NLDAS_NOAH.002.txt'];
         nField=52;
     case 'VIC'
-        NLDASdir=[kPath.NLDAS,'NLDAS_VIC0125_H.002',kPath.s];
-        ParamTable=[kPath.NLDAS,'gribtab_NLDAS_VIC.002.txt'];
+        NLDASdir=[dirNLDAS,'NLDAS_VIC0125_H.002',filesep];
+        ParamTable=[dirNLDAS,'gribtab_NLDAS_VIC.002.txt'];
         nField=43;
     case 'MOS'
-        NLDASdir=[kPath.NLDAS,'NLDAS_MOS0125_H.002',kPath.s];
-        ParamTable=[kPath.NLDAS,'gribtab_NLDAS_MOS.002.txt'];
+        NLDASdir=[dirNLDAS,'NLDAS_MOS0125_H.002',filesep];
+        ParamTable=[dirNLDAS,'gribtab_NLDAS_MOS.002.txt'];
         nField=37;
 end
 
@@ -43,7 +47,7 @@ Y=year(dn);
 d1=datenumMulti(Y*10000+101,1);
 D=dn-d1+1;
 
-folder=[NLDASdir,num2str(Y),kPath.s,sprintf('%3.3d',D),kPath.s];
+folder=[NLDASdir,num2str(Y),filesep,sprintf('%3.3d',D),filesep];
 files = dir([folder,'*.grb']);
 nfiles=length(files);
 tnum=zeros(nfiles,1);
