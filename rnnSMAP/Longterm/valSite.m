@@ -4,7 +4,7 @@ global kPath
 siteName='CRN';
 productName='rootzone';
 
-%% load LSTM
+%% load LSTM,m SMAP and Noah
 if strcmp(productName,'L3')
     rootOut=kPath.OutSMAP_L3;
     rootDB=kPath.DBSMAP_L3;
@@ -12,6 +12,7 @@ if strcmp(productName,'L3')
     target='SMAP';
     dataName='CONUS';
     testLst={'LongTerm8595','LongTerm9505','LongTerm0515','CONUS'};
+    modelName='SOILM_0-10';
 elseif strcmp(productName,'rootzone')
     rootOut=kPath.OutSMAP_L4;
     rootDB=kPath.DBSMAP_L4;
@@ -19,28 +20,55 @@ elseif strcmp(productName,'rootzone')
     target='SMGP_rootzone';
     dataName='CONUSv4f1';
     testLst={'LongTerm8595v4f1','LongTerm9505v4f1','LongTerm0515v4f1','CONUSv4f1'};
+    modelName='SOILM_0-100';
 end
 
-SMAP.v=readDatabaseSMAP(dataName,target,rootDB);
+% read SMAP
+SMAP.v=readDB_SMAP(dataName,target,rootDB);
 SMAP.t=csvread([rootDB,dataName,filesep,'time.csv']);
 SMAP.crd=csvread([rootDB,dataName,filesep,'crd.csv']);
+
 % read LSTM
 LSTM.v=[];
 LSTM.t=[];
+LSTM.crd=csvread([rootDB,testLst{1},filesep,'crd.csv']);
 for k=1:length(testLst)
     tic
     vTemp=readRnnPred(outName,testLst{k},500,0,'rootOut',rootOut,'rootDB',rootDB,'target',target);
     tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
     if k>1
         LSTM.v=[LSTM.v;vTemp(2:end,:)];
-        LSTM.t=[LSTM.t;tTemp(2:end,:)];
+        LSTM.t=[LSTM.t;tTemp(2:end)];
     else
         LSTM.v=vTemp;
         LSTM.t=tTemp;
     end
     toc
 end
-LSTM.crd=csvread([rootDB,testLst{1},filesep,'crd.csv']);
+
+% Model
+Noah.v=[];
+Noah.t=[];
+Noah.crd=csvread([rootDB,testLst{end},filesep,'crd.csv']);
+for k=1:length(testLst)
+    tic
+    vTemp=readDB_SMAP(testLst{k},modelName,rootDB);
+    if strcmp(productName,'L3')
+        vTemp=vTemp./100;
+    elseif strcmp(productName,'rootzone')
+        vTemp=vTemp./1000;
+    end
+    tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
+    if k>1
+        Noah.v=[Noah.v;vTemp(2:end,1:size(Noah.crd,1))];
+        Noah.t=[Noah.t;tTemp(2:end)];
+    else
+        Noah.v=vTemp;
+        Noah.t=tTemp;
+    end
+    toc
+end
+
 
 %% load site
 maxDist=0.4;
@@ -87,32 +115,28 @@ for k=1:nSite
     tic
     ind=indGrid(k);
     if strcmp(productName,'L3')
-        vSite=siteMat(k).soilM(:,1);
+        tsSite.v=siteMat(k).soilM(:,1);
     elseif strcmp(productName,'rootzone')
         weight=d2w_rootzone(siteMat(k).depth);
         weight=VectorDim(weight,1);
-        vSite=siteMat(k).soilM*weight;
+        tsSite.v=siteMat(k).soilM*weight;
     end
+    tsSite.t=siteMat(k).tnum;
+    tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
+    tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
+    tsNoah.t=Noah.t; tsNoah.v=Noah.v(:,ind);
     
-    tSite=siteMat(k).tnum;
-    tSiteValid=tSite(~isnan(vSite));
-    if ~isempty(tSiteValid)
-        sdSite=tSiteValid(1);
-        sindSite=find(tSite==sdSite);
-        vSite=vSite(sindSite:end);
-        tSite=tSite(sindSite:end);
-        sindLSTM=find(LSTM.t==sdSite);
-        vLSTM=LSTM.v(sindLSTM:end,ind);
-        tLSTM=LSTM.t(sindLSTM:end);
-        vSMAP=SMAP.v(:,ind);
-        tSMAP=SMAP.t;
-        
+    [outLSTM,outSite,outSMAP] = findTsOverlap(tsLSTM,tsSite,tsSMAP);
+    [outNoah,~,~] = findTsOverlap(tsNoah,tsSite,tsSMAP);
+    
+    if ~isempty(outLSTM)
         f=figure('Position',[1,1,1500,400]);
-        plot(tLSTM,vLSTM,'b-');hold on
-        plot(tSite,vSite,'r-');hold on
-        plot(tSMAP,vSMAP,'ko');hold off
+        plot(outLSTM.t,outLSTM.v,'b-');hold on
+        plot(outSite.t,outSite.v,'r-');hold on
+        plot(outNoah.t,outNoah.v,'g-');hold on
+        plot(outSMAP.t,outSMAP.v,'ko');hold off
         title([productName,' ',num2str(siteMat(k).ID,'%05d')])
-        legend('LSTM','In-situ','SMAP')
+        legend('LSTM','In-situ','Noah','SMAP')
         datetick('x','yy/mm')
         figFolder=['/mnt/sdb1/Kuai/rnnSMAP_result/crn/',productName,'/'];
         saveas(f,[figFolder,num2str(siteMat(k).ID,'%05d'),'.fig'])
@@ -121,7 +145,47 @@ for k=1:nSite
     toc
 end
 
+%% calculate drought percentile for sites
+ind=indGrid(k);
+if strcmp(productName,'L3')
+    tsSite.v=siteMat(k).soilM(:,1);
+elseif strcmp(productName,'rootzone')
+    weight=d2w_rootzone(siteMat(k).depth);
+    weight=VectorDim(weight,1);
+    tsSite.v=siteMat(k).soilM*weight;
+end
+tsSite.t=siteMat(k).tnum;
+tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
+tsSMAP.t=SMAP.t; tsSMAP.v=LSTM.v(:,ind);
+tsNoah.t=Noah.t; tsNoah.v=Noah.v(:,ind);
+
+[outLSTM,outSite,outSMAP] = findTsOverlap(tsLSTM,tsSite,tsSMAP);
+[outNoah,~,~] = findTsOverlap(tsNoah,tsSite,tsSMAP);
+
+if ~isempty(outLSTM)    
+    [dtLSTM,dtT]=droughtCal( outLSTM.v,outLSTM.t);
+    [dtSite,~]=droughtCal( outSite.v,outLSTM.t);
+    %[dtNoah,~]=droughtCal( outNoah.v,outLSTM.t);
+    figure
+    dtLSTM(dtLSTM>0.3)=nan;
+    dtSite(dtSite>0.3)=nan;
+    plot(dtT,dtLSTM,'b*-');hold on
+    plot(dtT,dtSite,'r-*');hold off
+    datetick('x','yy/mm')
+    
+    figure
+    plot(outLSTM.t,outLSTM.v,'b-');hold on
+    plot(outSite.t,outSite.v,'r-');hold off
+    datetick('x','yy/mm')
+end
+
+%plot(dtT,dtNoah,'g-');hold off
+
+corr(dtLSTM,dtSite)
+
+
 %% calculate and plot sens slope for each site
+%{
 slopeMat=zeros(nSite,2)*nan;
 yearMat=zeros(nSite,2)*nan;
 doPlot=0;
@@ -200,9 +264,10 @@ plot121Line
 xlabel('Sens Slope of Site')
 ylabel('Sens Slope of LSTM')
 saveas(f,[figFolder,'sensSlope','_',productName,'.fig'])
+%}
 
-
-%% spearman correlation 
+%% spearman correlation
+%{
 rhoLst=zeros(nSite,3)*nan;
 rhoSLst=zeros(nSite,3)*nan;
 doPlot=0;
@@ -254,7 +319,7 @@ for k=1:nSite
                 v1Site_week=nanmean(v1Site_temp,2);
                 v2LSTM_week=nanmean(v2LSTM_temp,2);
                 v2SMAP_week=nanmean(v2SMAP_temp,2);
-                v2Site_week=nanmean(v2Site_temp,2);                
+                v2Site_week=nanmean(v2Site_temp,2);
                 aLst={v1LSTM_week,v2LSTM_week,v2SMAP_week};
                 bLst={v1Site_week,v2Site_week,v2Site_week};
             else
@@ -279,10 +344,10 @@ for k=1:nSite
                     plot121Line
                     title([titleLst{kk},' corr=',num2str(r,'%0.2f')]);
                 end
-                figFolder=['/mnt/sdb1/Kuai/rnnSMAP_result/crn/',productName,'/'];                
+                figFolder=['/mnt/sdb1/Kuai/rnnSMAP_result/crn/',productName,'/'];
                 saveas(f,[figFolder,num2str(siteMat(k).ID,'%05d'),'_rank.fig'])
                 close(f)
-            else                
+            else
                 for kk=1:3
                     a=aLst{kk};
                     b=bLst{kk};
@@ -320,3 +385,4 @@ else
     saveas(f,[figFolder,'boxCorr','_',productName,'.fig'])
     close(f)
 end
+%}

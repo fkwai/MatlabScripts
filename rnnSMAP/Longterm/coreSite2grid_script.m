@@ -12,7 +12,7 @@ for k=1:length(resStrLst)
     sitePixel=[];
     for kk=1:length(siteIDLst)
         siteID=siteIDLst(kk);
-        sitePixelTemp=coreSite2pixel(siteID, resStr);
+        sitePixelTemp=coreSite2grid(siteID, resStr);
         sitePixel=[sitePixel;sitePixelTemp];
     end
     

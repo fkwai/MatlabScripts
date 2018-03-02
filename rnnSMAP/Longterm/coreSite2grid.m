@@ -1,4 +1,4 @@
-function sitePixel = coreSite2pixel( siteID, resStr )
+function sitePixel = coreSite2grid( siteID, resStr )
 % read all voroni in coresite and combine stations
 
 sitePixel=struct('v',[],'t',[],'r',[],'ID','','depth',[],'crdC',[],'verW',[]);
@@ -138,11 +138,11 @@ for k=1:nPixel
                 C=strsplit(tline,{',','\n'});
                 layerD(i)=str2num(C{1});
             end
-            fclose(fid);
             sitePixel(k,1).verW=[layerD;layerW]';
         else
             sitePixel(k,1).verW=[];
         end
+        fclose(fid);
     end
 end
 %% if no voroni file found return empty
