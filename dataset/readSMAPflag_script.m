@@ -15,15 +15,14 @@ mLst={'AM','PM'};
 maskSMAP=cell(length(mLst),1);
 for iM=1:length(mLst)
     matSMAP=load([kPath.SMAP,'SMAP_L3_',mLst{iM},'.mat']);
-    temp=zeros(size(matAM.data))*nan;
+    temp=zeros(size(matSMAP.data))*nan;
     temp(~isnan(matSMAP.data))=1;
     maskSMAP{iM}=temp;
 end
-lat=maskSMAP{1}.lat;
-lon=maskSMAP{1}.lon;
 
 for iM=1:length(mLst)
-    for k=1:height(flagTab)
+    %for k=1:height(flagTab)
+    for k=8:8
         tic
         fieldName=flagTab.Flag{k};
         saveName=[saveFolder,flagTab.Filename{k},'_',mLst{iM},'.mat'];
@@ -50,11 +49,7 @@ for iM=1:length(mLst)
                 end
             end
         end
-        if iM==1
-            data=dataSMAP.*maskAM;
-        else
-            data=dataSMAP.*maskPM;
-        end
+        data=dataSMAP.*maskSMAP{iM};        
         tnum=tLst;
         save(saveName,'data','tnum','lat','lon','-v7.3')
         toc

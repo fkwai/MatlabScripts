@@ -10,12 +10,11 @@ dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 dirSiteInfo=dir([dirCoreSite,'coresiteinfo',filesep,siteIDstr(1:2),'*']);
 folderSiteInfo=[dirCoreSite,'coresiteinfo',filesep,dirSiteInfo.name,filesep];
 
-refpix=struct('id',[],'idstr',[],'staW',[],'layerD',[],'layerW',[]);
-
 %% read refpix file
 fileRefpix=[folderSiteInfo,'refpix','_',pIDstr,'.txt'];
 
 if exist(fileRefpix,'file')==2
+    refpix=struct('id',[],'idstr',[],'staW',[],'layerD',[],'layerW',[]);
     fid=fopen(fileRefpix);
     tline='%';
     while strcmp(tline(1),'%')
@@ -37,9 +36,10 @@ if exist(fileRefpix,'file')==2
         C=strsplit(tline,{',','\n'});
         refpix(i).layerD=str2num(C{1});
         refpix(i).staW=cellfun(@str2num,C(2:nSta+1));
-    end
-    
+    end    
     fclose(fid);
+else
+    refpix=[];
 end
 
 

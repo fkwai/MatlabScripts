@@ -1,6 +1,7 @@
 
 global kPath
 dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
+productName='surface';
 
 %% load site
 resStr='36';

@@ -37,25 +37,34 @@ rootName=C{1}{1};
 C = textscan(fid,'%f');
 indSub=C{1};
 fclose(fid);
-if indSub==-1
-    error('read crd and find subset index -- will do')
+
+if indSub==-1    
+    rootFolder=[dirRoot,'CONUS',filesep];
+    saveFolder=[dirRoot,subsetName,filesep];
+    inCrd=csvread([dirRoot,'CONUS',filesep,'crd.csv']);
+    outCrd=csvread([dirRoot,subsetName,filesep,'crd.csv']);
+    [outInd,inInd] = intersectCrd(nDigit(outCrd,3),nDigit(inCrd,3));
+    if length(inInd)~=size(outCrd,1)
+        error('check here')
+    end
+    indSub=inInd;    
+else
+    %% write crd and time
+    rootFolder=[dirRoot,rootName,filesep];
+    saveFolder=[dirRoot,subsetName,filesep];
+    if ~isdir(saveFolder)
+        mkdir(saveFolder)
+    end
+    
+    crdFileRoot=[rootFolder,'crd.csv'];
+    crd=csvread(crdFileRoot);
+    crdSub=crd(indSub,:);
+    crdFile=[saveFolder,'crd.csv'];
+    dlmwrite(crdFile,crdSub,'precision',12);
+    
+    timeFile=[saveFolder,'time.csv'];
+    copyfile([rootFolder,'time.csv'],timeFile);
 end
-
-%% write crd and time
-rootFolder=[dirRoot,rootName,filesep];
-saveFolder=[dirRoot,subsetName,filesep];
-if ~isdir(saveFolder)
-    mkdir(saveFolder)
-end
-
-crdFileRoot=[rootFolder,'crd.csv'];
-crd=csvread(crdFileRoot);
-crdSub=crd(indSub,:);
-crdFile=[saveFolder,'crd.csv'];
-dlmwrite(crdFile,crdSub,'precision',8);
-
-timeFile=[saveFolder,'time.csv'];
-copyfile([rootFolder,'time.csv'],timeFile);
 
 %% time series variable
 parfor k=1:length(varLst)

@@ -7,7 +7,7 @@ dirSave=[dirCoreSite,'siteMat',filesep];
 
 %% pixels
 pidLstSurf=[04013602,...
-    09013602,09013603,...
+    09013602,09013610,...
     16013604,...
     16023603,...
     16033603,16033604,...
@@ -46,13 +46,12 @@ pidLstRootSf=[04010907,04010910,04010911,...
 
 shiftLst=csvread([dirSave,'shiftLst.csv']);
 pidLstAll={pidLstSurf,pidLstSurfSf,pidLstRoot,pidLstRootSf};
-saveNameLst={'sitePixel_surf','sitePixel_surf_shifted','sitePixel_root','sitePixel_root_shifted'};
-plotNameLst={'plotPixel_surf','plotPixel_surf_shifted','plotPixel_root','plotPixel_root_shifted'};
-doVorLst=[2,2,2,2];
+saveNameLst={'sitePixel_surf_unshift','sitePixel_surf_shift','sitePixel_root_unshift','sitePixel_root_shift'};
+plotNameLst={'plotPixel_surf_unshift','plotPixel_surf_shift','plotPixel_root_unshift','plotPixel_root_shift'};
+doVorLst=[0,0,0,0];
 
 %% read all sites
-%for kk=1:length(1:length(pidLstAll))
-for kk=2:2
+for kk=1:length(1:length(pidLstAll))
     sitePixel=[];
     msg=[];
     pidLst=pidLstAll{kk};
@@ -84,6 +83,16 @@ for k=1:length(sitePixel)
     disp(num2str(sitePixel(k).ID));
     disp([VectorDim(temp.wHor,1),VectorDim(temp.wHorCal,1)]);
 end
+
+%% merge shift and non-shift mat, and name them
+idLst=[0401,0901,1601,1602,1603,1604,1606,1607,4801];
+labelLst={{'Reynolds';'Creek'},'Carman',{'Walnut';'Gulch'},...
+    {'Little';'Washita'},{'Fort';'Cobb'},{'Little';'River'},...
+    {'St.';'Josephs'},{'South';'Fork'},'TxSON'};
+nameLst={'Reynolds Creek','Carman','Walnut Gulch',...
+    'Little Washita','Fort Cobb','Little River',...
+    'St. Josephs','South Fork','TxSON'};
+
 
 
 

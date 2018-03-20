@@ -1,101 +1,35 @@
-% compare SMAP long term hindcast and SCAN
+% compare SMAP long term hindcast and insitu network
 
 global kPath
 siteName='CRN';
-productName='rootzone';
+productName='rootzonev4f1';
 
-%% load LSTM,m SMAP and Noah
-if strcmp(productName,'L3')
-    rootOut=kPath.OutSMAP_L3;
-    rootDB=kPath.DBSMAP_L3;
-    outName='fullCONUS_Noah2yr';
-    target='SMAP';
-    dataName='CONUS';
-    testLst={'LongTerm8595','LongTerm9505','LongTerm0515','CONUS'};
-    modelName='SOILM_0-10';
-elseif strcmp(productName,'rootzone')
-    rootOut=kPath.OutSMAP_L4;
-    rootDB=kPath.DBSMAP_L4;
-    outName='CONUSv4f1_rootzone';
-    target='SMGP_rootzone';
-    dataName='CONUSv4f1';
-    testLst={'LongTerm8595v4f1','LongTerm9505v4f1','LongTerm0515v4f1','CONUSv4f1'};
-    modelName='SOILM_0-100';
-end
-
-% read SMAP
-SMAP.v=readDB_SMAP(dataName,target,rootDB);
-SMAP.t=csvread([rootDB,dataName,filesep,'time.csv']);
-SMAP.crd=csvread([rootDB,dataName,filesep,'crd.csv']);
-
-% read LSTM
-LSTM.v=[];
-LSTM.t=[];
-LSTM.crd=csvread([rootDB,testLst{1},filesep,'crd.csv']);
-for k=1:length(testLst)
-    tic
-    vTemp=readRnnPred(outName,testLst{k},500,0,'rootOut',rootOut,'rootDB',rootDB,'target',target);
-    tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
-    if k>1
-        LSTM.v=[LSTM.v;vTemp(2:end,:)];
-        LSTM.t=[LSTM.t;tTemp(2:end)];
-    else
-        LSTM.v=vTemp;
-        LSTM.t=tTemp;
-    end
-    toc
-end
-
-% Model
-Noah.v=[];
-Noah.t=[];
-Noah.crd=csvread([rootDB,testLst{end},filesep,'crd.csv']);
-for k=1:length(testLst)
-    tic
-    vTemp=readDB_SMAP(testLst{k},modelName,rootDB);
-    if strcmp(productName,'L3')
-        vTemp=vTemp./100;
-    elseif strcmp(productName,'rootzone')
-        vTemp=vTemp./1000;
-    end
-    tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
-    if k>1
-        Noah.v=[Noah.v;vTemp(2:end,1:size(Noah.crd,1))];
-        Noah.t=[Noah.t;tTemp(2:end)];
-    else
-        Noah.v=vTemp;
-        Noah.t=tTemp;
-    end
-    toc
-end
-
-
-%% load site
-maxDist=0.4;
+%% load data
 if strcmp(siteName,'CRN')
-    matCRN=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
-    siteMat=matCRN.siteCRN;
+    temp=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
+    siteMat=temp.siteCRN;
+    saveFolder='/mnt/sdb1/Kuai/rnnSMAP_result/crn/';
 end
+%[SMAP,LSTM,Noah]=readHindcastCONUS(productName,'readModel',1);
+%[SMAP,LSTM,Noah] = readHindcastSite( siteName,productName,'pred',{'SOILM_0-100'});
+[SMAP,LSTM,Noah] = readHindcastSite( siteName,productName,'pred',{'APCP'});
 
-% find index of smap and LSTM
+
+
+%% find index of SMAP and LSTM
 indGrid=zeros(length(siteMat),1);
 dist=zeros(length(siteMat),1);
 for k=1:length(siteMat)
     [C,indTemp]=min(sum(abs(SMAP.crd-[siteMat(k).lat,siteMat(k).lon]),2));
-    if C>maxDist
-        indGrid(k)=0;
-    else
-        indGrid(k)=indTemp;
-    end
+    indGrid(k)=indTemp;
     dist(k)=C;
 end
+indRM=find(dist>1);
+siteMat(indRM)=[];
+indGrid(indRM)=[];
+dist(indRM)=[];
 
-% remove out of bound sites
-siteMat=siteMat(indGrid~=0);
-indGrid(indGrid==0)=[];
-nSite=length(siteMat);
-
-%% plot site map
+% plot site map
 %{
 shapeUS=shaperead('/mnt/sdb1/Kuai/map/USA.shp');
 for k=1:length(shapeUS)
@@ -105,29 +39,30 @@ for k=1:nSite
     plot(siteMat(k).lon,siteMat(k).lat,'r*');hold on
     text(siteMat(k).lon+0.1,siteMat(k).lat+0.1,num2str(siteMat(k).ID,'%05d'),'fontsize',12);hold on
 end
+plot(SMAP.crd(:,2),SMAP.crd(:,1),'b.')
 hold off
 daspect([1,1,1])
 %}
 
 %% plot time series for each sites
-for k=1:nSite
+for k=1:length(siteMat)
     k
     tic
     ind=indGrid(k);
-    if strcmp(productName,'L3')
+    if strcmp(productName,'surface')
         tsSite.v=siteMat(k).soilM(:,1);
-    elseif strcmp(productName,'rootzone')
-        weight=d2w_rootzone(siteMat(k).depth);
+    elseif strcmp(productName,'rootzone') || strcmp(productName,'rootzonev4f1')
+        weight=d2w_rootzone(siteMat(k).depth./100);
         weight=VectorDim(weight,1);
         tsSite.v=siteMat(k).soilM*weight;
     end
     tsSite.t=siteMat(k).tnum;
     tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
     tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
-    tsNoah.t=Noah.t; tsNoah.v=Noah.v(:,ind);
+    tsNoah.t=Noah.t; tsNoah.v=Noah.v(:,ind)./1000;
     
-    [outLSTM,outSite,outSMAP] = findTsOverlap(tsLSTM,tsSite,tsSMAP);
-    [outNoah,~,~] = findTsOverlap(tsNoah,tsSite,tsSMAP);
+    [outSite,outLSTM,outSMAP ] = splitSiteTS(tsSite,tsLSTM,tsSMAP);
+    [~,outNoah,~] = splitSiteTS(tsSite,tsNoah,tsSMAP);
     
     if ~isempty(outLSTM)
         f=figure('Position',[1,1,1500,400]);
@@ -145,7 +80,35 @@ for k=1:nSite
     toc
 end
 
+%% calculate stat
+initMat=zeros(length(siteMat),3)*nan;
+statStr=struct('bias',initMat,'rmse',initMat,'ubrmse',initMat,'rho',initMat);
+fieldLst=fieldnames(statStr);
+for k=1:length(siteMat)
+    if strcmp(productName,'surface')
+        tsSite.v=siteMat(k).soilM(:,1);
+    elseif strcmp(productName,'rootzone') || strcmp(productName,'rootzonev4f1')
+        weight=d2w_rootzone(siteMat(k).depth./100);
+        weight=VectorDim(weight,1);
+        tsSite.v=siteMat(k).soilM*weight;
+    end
+    tsSite.t=siteMat(k).tnum;
+    
+    ind=indGrid(k);
+    tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
+    tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
+    
+    out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
+    if ~isempty(out)
+        for j=1:length(fieldLst)
+            field=fieldLst{j};
+            statStr.(field)(k,:)=[out.(field)];
+        end
+    end
+end
+
 %% calculate drought percentile for sites
+%{
 ind=indGrid(k);
 if strcmp(productName,'L3')
     tsSite.v=siteMat(k).soilM(:,1);
@@ -162,7 +125,7 @@ tsNoah.t=Noah.t; tsNoah.v=Noah.v(:,ind);
 [outLSTM,outSite,outSMAP] = findTsOverlap(tsLSTM,tsSite,tsSMAP);
 [outNoah,~,~] = findTsOverlap(tsNoah,tsSite,tsSMAP);
 
-if ~isempty(outLSTM)    
+if ~isempty(outLSTM)
     [dtLSTM,dtT]=droughtCal( outLSTM.v,outLSTM.t);
     [dtSite,~]=droughtCal( outSite.v,outLSTM.t);
     %[dtNoah,~]=droughtCal( outNoah.v,outLSTM.t);
@@ -182,21 +145,53 @@ end
 %plot(dtT,dtNoah,'g-');hold off
 
 corr(dtLSTM,dtSite)
+%}
+
+%% map of sites
+shapeUS=shaperead('/mnt/sdb1/Kuai/map/USA.shp');
+statLst={'bias','rmse','ubrmse','rho'};
+statStrLst={'Bias','RMSE','Unbiased RMSE','Pearson Correlation'};
+titleLst={'hindcast LSTM vs in-situ','training LSTM vs in-situ','training SMAP vs in-situ'};
+yRangeLst=[-0.3,0.3;0,0.2;0,0.1;0,1];
+
+f=figure('Position',[1,1,1800,1000])
+for i=1:length(statLst)
+    for j=1:3
+        subplot(4,3,(i-1)*3+j)
+        for k=1:length(shapeUS)
+            plot(shapeUS(k).X,shapeUS(k).Y,'k-');hold on
+        end
+        colormap jet
+        scatter([siteMat.lon],[siteMat.lat],80,statStr.(statLst{i})(:,j),'filled')
+        colorbar
+        caxis(yRangeLst(i,:))
+        xlim([-126,-66])
+        ylim([25,50])
+        title([statStrLst{i},' of ',titleLst{j}])
+        hold off
+        daspect([1,1,1])
+    end
+end
+fixFigure
+saveas(f,[saveFolder,'mapStat_',productName,'.fig'])
+
 
 
 %% calculate and plot sens slope for each site
-%{
+nSite=length(siteMat);
 slopeMat=zeros(nSite,2)*nan;
 yearMat=zeros(nSite,2)*nan;
+siteIdLst=zeros(nSite,1)*nan;
+rateLst=zeros(nSite,1)*nan;
 doPlot=0;
 for k=1:nSite
     k
     tic
     ind=indGrid(k);
-    if strcmp(productName,'L3')
+    if strcmp(productName,'surface')
         vSite=siteMat(k).soilM(:,1);
-    elseif strcmp(productName,'rootzone')
-        weight=d2w_rootzone(siteMat(k).depth);
+    elseif strcmp(productName,'rootzone')  || strcmp(productName,'rootzonev4f1')
+        weight=d2w_rootzone(siteMat(k).depth./100);
         weight=VectorDim(weight,1);
         vSite=siteMat(k).soilM*weight;
     end
@@ -209,21 +204,24 @@ for k=1:nSite
     tSMAP=SMAP.t;
     
     if ~isempty(tSiteValid)
-        tt1=datenumMulti(year(tSiteValid(1))*10000+401);
-        if tSiteValid(1)<=tt1
-            t1=tt1;
+        t1=tSiteValid(1);
+        nd=t1-datenum(year(t1),1,1);
+        eYr=year(tSiteValid(end));
+        tt2=datenum(eYr,1,1)+nd;
+        if tSiteValid(end)<tt2
+            eYr=eYr-1;
+            t2=datenum(eYr,1,1)+nd;
         else
-            t1=datenumMulti((year(tSiteValid(1))+1)*10000+401);
-        end
-        tt2=datenumMulti(year(tSiteValid(end))*10000+401);
-        if tSiteValid(end)>=tt2
             t2=tt2;
-        else
-            t2=datenumMulti((year(tSiteValid(end))-1)*10000+401);
+        end
+        while(t2>tLSTM(end))
+            eYr=eYr-1;
+            t2=datenum(eYr,1,1)+nd;
         end
         if t1<t2
             v2LSTM=vLSTM(tLSTM>=t1&tLSTM<=t2);
             v2Site=vSite(tSite>=t1&tSite<=t2);
+            rSite=sum(~isnan(v2Site))./length(v2Site);
             if doPlot==1
                 f=figure('Position',[1,1,1500,400]);
                 plot(t1:t2,v2LSTM,'b-');hold on
@@ -235,7 +233,7 @@ for k=1:nSite
                 legend(['LSTM ', num2str(sensLSTM.sen*365*100,'%0.3f')],...
                     ['CRN ', num2str(sensSite.sen*365*100,'%0.3f')])
                 datetick('x','yy/mm')
-                figFolder=['/mnt/sdb1/Kuai/rnnSMAP_result/crn/',productName,'/'];
+                figFolder=[saveFolder,filesep,productName,'/'];
                 saveas(f,[figFolder,num2str(siteMat(k).ID,'%05d'),'_sensSlope.fig'])
                 close(f)
             else
@@ -246,25 +244,33 @@ for k=1:nSite
             slopeSite=sensSite.sen*365*100;
             slopeMat(k,:)=[slopeSite,slopeLSTM];
             yearMat(k,:)=[year(t1),year(t2)];
+            siteIdLst(k)=[siteMat(k).ID];
+            rateLst(k)=rSite;
         end
     end
     toc
 end
-siteIdLst=[siteMat.ID]';
-outMat=[siteIdLst,yearMat,slopeMat];
 saveFolder='/mnt/sdb1/Kuai/rnnSMAP_result/crn/';
-dlmwrite([saveFolder,'sensSlope_',productName,'.csv'],outMat,'precision',5)
+save([saveFolder,'sensSlope_',productName,'.mat'],'siteIdLst','yearMat','slopeMat','rateLst')
 
-outMat=csvread([saveFolder,'sensSlope_',productName,'.csv']);
-slopeSite=outMat(:,4);
-slopeLSTM=outMat(:,5);
 f=figure();
-plot(outMat(:,4),outMat(:,5),'*')
-plot121Line
+%indPick=find(rateLst>0.9 & abs(slopeMat(:,1))>0.5);
+indPick=find(rateLst>0.9);
+%plot(slopeMat(indPick,1),slopeMat(indPick,2),'*')
+scatter(slopeMat(indPick,1),slopeMat(indPick,2),80,statStr.ubrmse(indPick,3),'fill')
+
+corr(slopeMat(indPick,1),slopeMat(indPick,2))
 xlabel('Sens Slope of Site')
 ylabel('Sens Slope of LSTM')
-saveas(f,[figFolder,'sensSlope','_',productName,'.fig'])
-%}
+xlim([-4,3])
+ylim([-4,3])
+plot121Line
+saveas(f,[saveFolder,'sensSlope','_',productName,'.fig'])
+
+[a,b]=min(abs(slopeMat(:,1)--2.207))
+siteIdLst(b)
+dist(b)
+
 
 %% spearman correlation
 %{

@@ -15,9 +15,9 @@ function f=plotBoxSMAP( statMat,labelX,labelY,varargin )
 % plotBoxSMAP_example
 
 
-pnames={'newFig','yRange','title','xColor'};
-dflts={1,[],[],[]};
-[newFig,yRange,titleStr,xColor]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+pnames={'newFig','yRange','title','xColor','doLegend'};
+dflts={1,[],[],[],1};
+[newFig,yRange,titleStr,xColor,doLegend]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 if isempty(xColor)
     xColor='rkbg';
@@ -63,7 +63,9 @@ set(gca,'xtick',xTick(2:2:end))
 set(gca,'xticklabel',labelY)
 set(bh,'LineWidth',2)
 box_vars = findall(gca,'Tag','Box');
-hLegend = legend(box_vars([nx:-1:1]), labelX,'location','best');
+if doLegend
+    legend(box_vars([nx:-1:1]), labelX,'location','best');
+end
 if ~isempty(titleStr)
     title(titleStr)
 end

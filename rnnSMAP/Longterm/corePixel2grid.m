@@ -2,11 +2,11 @@ function [sitePixel,msg] = corePixel2grid( pID,varargin)
 % read site and siteinfo and combine to surface and rootzone observation
 
 % doVor - if use stations and weights given by voronoi file.
-% if doVor ==2 will let the code decide (use if it exists)
+% optWeight - 1: use voronoi; 2: use refpix; 3: calculate; 0: find best (1>2>3)
 
 global kPath
-varinTab={'figFolder',[];'doVor',2;'shiftPixel',[0,0]};
-[figFolder,doVor,shiftPixel]=internal.stats.parseArgs(varinTab(:,1),varinTab(:,2), varargin{:});
+varinTab={'figFolder',[];'optWeight',0;'shiftPixel',[0,0]};
+[figFolder,optWeight,shiftPixel]=internal.stats.parseArgs(varinTab(:,1),varinTab(:,2), varargin{:});
 
 pIDstr=sprintf('%08d',pID);
 siteIDstr=pIDstr(1:4);
@@ -33,23 +33,38 @@ crd = readCoreInfo_crd(siteID);
 refpix = readCoreInfo_refpix(pID);
 vor=readCoreInfo_voronoi(pID);
 
-if doVor==2
-    if isempty(vor)
-        doVor=0;
+% fix refpix file
+if ~isempty(refpix)
+    idRefpix=refpix(1).id;
+    for k=2:length(refpix)
+        if ~isequal(idRefpix,refpix(1).id)
+            msg=[msg,newline,'refpix different layers has different stations.'];
+            [idRefPix,~,~]=intersect(idRefpix,refpix(1).id);
+            % not finished
+        end
+    end
+end
+
+for k=1:length(refpix)
+    if unique(refpix(k).staW)==1
+        refpix(k).staW=[];
+    elseif sum(refpix(k).staW)>=95&&sum(sum(refpix(k).staW))<=100
+        refpix(k).staW=refpix(k).staW./100;
+    end
+end
+
+%% report message
+if optWeight==0
+    if ~isempty(vor)
+        optWeight=1;
+    elseif ~isempty(refpix) && ~isempty(refpix(1).staW)
+        optWeight=2;
     else
-        doVor=1;
+        optWeight=3;
     end
 end
 
-idRefpix=refpix(1).id;
-for k=2:length(refpix)
-    if ~isequal(idRefpix,refpix(1).id)
-        msg=[msg,newline,'refpix different layers has different stations.'];
-        [idRefPix,~,~]=intersect(idRefpix,refpix(1).id);
-    end
-end
-
-if doVor==1
+if optWeight==1
     if isempty(vor)
         msg=[msg,newline,'Failed! doVor=1 but no vor file.'];
         sitePixel=[];
@@ -57,11 +72,13 @@ if doVor==1
         return
     else
         idRef=vor(end).id;
-        if ~isequal(vor(end).id,refpix(1).id)
+        if isempty(refpix)
+            msg=[msg,newline,'used voronoi file but no refpix file'];
+        elseif ~isequal(vor(end).id,refpix(1).id)
             msg=[msg,newline,'conflict between refpix and voronoi file'];
         end
     end
-elseif doVor==0
+else
     idRef=refpix(1).id;
     idRef=unique(idRef);
 end
@@ -73,7 +90,7 @@ end
 crdSite=[crd.lat(indCrdSta),crd.lon(indCrdSta)];
 
 if size(unique(crdSite,'rows'),1)~=size(crdSite,1)
-    if doVor==1
+    if optWeight~=3
         msg=[msg,newline,'repeated crd! Check voronoi file'];
     else
         msg=[msg,newline,'Failed! Repeated crd and no voronoi file.'];
@@ -112,7 +129,7 @@ temp=find(yy<y0);y1=yy(temp(1));
 temp=find(yy>y0);y2=yy(temp(end));
 
 bb=[x1,y1;x2,y2];
-if ~isequal(shiftPixel,[0,0])    
+if ~isequal(shiftPixel,[0,0])
     while x1<a(1),a=[a(1)*2-a(2),a];end
     while x2>a(end),a=[a,a(end)*2-a(end-1)];end
     while y2>b(1),b=[b(1)*2-b(2);b];end
@@ -126,7 +143,7 @@ if ~isequal(shiftPixel,[0,0])
     [~,temp]=min(abs(b-y2));    y2=b(temp+shiftPixel(2));
     
     bb=[x1,y1;x2,y2];
-
+    
 end
 wHorCal=voronoiRec(crdSite(:,2),crdSite(:,1),bb);
 
@@ -152,20 +169,26 @@ if ~isempty(figFolder)
     close(f)
     
     folderVor=[folderSiteInfo,'voronoi',filesep];
-    dirVor=dir([folderVor,'voronoi_',pIDstr,'*.png']);    
+    dirVor=dir([folderVor,'voronoi_',pIDstr,'*.png']);
     if ~isempty(dirVor)
         copyfile([folderVor,dirVor(end).name],[figFolder,pIDstr,'_voronoi.png'])
     end
     
     dirSiteFigure=dir([folderSiteInfo,pIDstr,'*CLAY*.png']);
     copyfile([folderSiteInfo,dirSiteFigure(end).name],[figFolder,pIDstr,'_site.png'])
-
+    
 end
 
-if doVor==1
+if optWeight==1
     wHor=vor(end).staW;
-elseif doVor==0
+elseif optWeight==2
+    wHor=refpix(1).staW;
+elseif optWeight==3
     wHor=wHorCal;
+end
+
+if sum(wHor)<0.95&&sum(wHor)>1
+    error('Check weight. Our of range.')
 end
 
 %% extract stations
@@ -183,7 +206,7 @@ for k=1:nLayer
     if sdt<sd,  sd=sdt; end
     if edt>ed,  ed=edt; end
 end
-tnum=sd:ed;
+tnum=[sd:ed]';
 nt=length(tnum);
 dataRaw=zeros(nt,nSta,nLayer)*nan;
 
@@ -208,28 +231,37 @@ dataRawSurf=dataRaw(:,:,1);
 validMat=~isnan(dataRawSurf);
 rSurf=sum(validMat.*wHorMat,2);
 vSurf=nansum(dataRawSurf.*wHorMat,2)./sum(validMat.*wHorMat,2);
-ind=find(rSurf~=0);
+indValid=find(rSurf~=0);
+ind=indValid(1):indValid(end);
 tSurf=tnum(ind);
 vSurf=vSurf(ind);
 rSurf=rSurf(ind);
 
 % rootzone
-wVer=d2w_rootzone(depth);
-wVerMat=repmat(permute(wVer,[2,3,1]),[nt,nSta,1]);
-dataRawRoot=sum(dataRaw.*wVerMat,3);
-validMat=~isnan(dataRawRoot);
-rRoot=sum(validMat.*wHorMat,2);
-vRoot=nansum(dataRawRoot.*wHorMat,2)./sum(validMat.*wHorMat,2);
-ind=find(rRoot~=0);
-tRoot=tnum(ind);
-vRoot=vRoot(ind);
-rRoot=rRoot(ind);
+if length(depth)>1
+    wVer=d2w_rootzone(depth);
+    wVerMat=repmat(permute(wVer,[2,3,1]),[nt,nSta,1]);
+    dataRawRoot=sum(dataRaw.*wVerMat,3);
+    validMat=~isnan(dataRawRoot);
+    rRoot=sum(validMat.*wHorMat,2);
+    vRoot=nansum(dataRawRoot.*wHorMat,2)./sum(validMat.*wHorMat,2);
+    indValid=find(rRoot~=0);
+    ind=indValid(1):indValid(end);
+    tRoot=tnum(ind);
+    vRoot=vRoot(ind);
+    rRoot=rRoot(ind);
+else
+    tRoot=[];
+    vRoot=[];
+    rRoot=[];
+    wVer=[];
+end
 
 
-sitePixel=struct('ID',pID,'depth',depth,'crdC',[y0,x0],'BoundingBox',bb,...
+sitePixel=struct('ID',pID,'IDstr',pIDstr,'depth',depth,'crdC',[y0,x0],'BoundingBox',bb,...
     'vSurf',vSurf,'vRoot',vRoot,'rSurf',rSurf,'rRoot',rRoot,'tSurf',tSurf,'tRoot',tRoot,...
     'wVer',wVer,'wHor',wHor,'wHorCal',wHorCal,'dataRaw',dataRaw,...
-    'crd',crd,'refpix',refpix,'vor',vor);
+    'crd',crd,'refpix',refpix,'vor',vor,'optWeight',optWeight);
 
 if ~isempty(msg)
     msg=['pixel ',pIDstr,msg];
