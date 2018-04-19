@@ -1,4 +1,4 @@
-function dataOut= readRnnPred(outName,dataName,epoch,timeOpt,varargin)
+function [dataPred,dataSig]= readRnnPred_Uncer(outName,dataName,epoch,timeOpt,varargin)
 % read prediction from testRnnSMAP.lua into a matrix
 
 global kPath
@@ -40,9 +40,11 @@ if drBatch==0
     if doGlobal
         dataFile=['test_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'.csv'];
     else
-        dataFile=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
+        dataFile1=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
+        dataFile2=['testSigma_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
     end
-    data=csvread([rootOut,outName,filesep,dataFile]);
+    data1=csvread([rootOut,outName,filesep,dataFile1]);
+    data2=csvread([rootOut,outName,filesep,dataFile2]);
 else
     disp('read LSTM dropout batch')
     if doGlobal
@@ -53,20 +55,29 @@ else
     batchMatFile=[rootOut,outName,filesep,batchName,'.mat'];
     if exist([rootOut,outName,filesep,batchName,'.mat'],'file')
         batchMat=load(batchMatFile);
-        data=batchMat.yLSTM_batch;
+        data1=batchMat.yLSTM_batch;
+        data2=batchMat.sigLSTM_batch;
     else
         disp('--> one by one for the first time')
-        dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_1.csv'];
-        temp=csvread(dataFile);
-        data=zeros([size(temp),drBatch]);
-        data(:,:,1)=temp;
+        dataFile1=[rootOut,outName,filesep,batchName,filesep,'drEm_1.csv'];
+        temp1=csvread(dataFile1);
+        data1=zeros([size(temp1),drBatch]);
+        data1(:,:,1)=temp1;
+        dataFile2=[rootOut,outName,filesep,batchName,filesep,'drEmSigma_1.csv'];
+        temp2=csvread(dataFile2);
+        data2=zeros([size(temp2),drBatch]);
+        data2(:,:,1)=temp2;
         for k=2:drBatch
-            dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_',num2str(k),'.csv'];
-            temp=csvread(dataFile);
-            data(:,:,k)=temp;
+            dataFile1=[rootOut,outName,filesep,batchName,filesep,'drEm_',num2str(k),'.csv'];
+            temp1=csvread(dataFile1);
+            data1(:,:,k)=temp1;
+            dataFile2=[rootOut,outName,filesep,batchName,filesep,'drEmSigma_',num2str(k),'.csv'];
+            temp2=csvread(dataFile2);
+            data2(:,:,k)=temp2;
         end
-        yLSTM_batch=data;
-        save(batchMatFile,'yLSTM_batch','-v7.3')
+        yLSTM_batch=data1;
+        sigLSTM_batch=data2;
+        save(batchMatFile,'yLSTM_batch','sigLSTM_batch','-v7.3')
     end
 end
 
@@ -80,7 +91,8 @@ statSMAP=csvread(statFile);
 
 meanSMAP=statSMAP(3);
 stdSMAP=statSMAP(4);
-dataOut=(data).*stdSMAP+meanSMAP;
+dataPred=(data1).*stdSMAP+meanSMAP;
+dataSig=data2;
 
 end
 

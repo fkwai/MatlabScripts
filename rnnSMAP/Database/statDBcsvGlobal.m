@@ -47,7 +47,7 @@ if ischar(varLst)
 end
 
 %% calculate stat for each time series variables
-for k=1:length(varLst)
+parfor k=1:length(varLst)
     data=[];
     var=varLst{k};
     statFile=[rootDB,'Statistics',filesep,var,'_stat.csv'];

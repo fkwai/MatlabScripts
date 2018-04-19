@@ -6,12 +6,12 @@ global kPath
 maskFile=[kPath.SMAP,'maskSMAP_L3.mat'];
 rootDB=[kPath.DBSMAP_L3_Global];
 dbName='Global';
- vecV=[8];
- vecF=[1];
+ vecV=[4];
+ vecF=[4];
 for k=1:length(vecV)
     interval=vecV(k);
     offset=vecF(k);
-    subsetSMAP_interval(interval,offset,1);
+    subsetSMAP_interval(interval,offset,'Global_L3');
     subsetName=[dbName,'v',num2str(interval),'f',num2str(offset)];
     msg=subsetSplitGlobal(subsetName);
 end
@@ -35,4 +35,4 @@ plot(crd2(:,2),crd2(:,1),'b*');hold off
 msg1=subsetSplitGlobal('Globalv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2000:2016);
 msg2=subsetSplitGlobal('CONUSv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2000:2016);
 
-CUDA_VISIBLE_DEVICES=0 th trainLSTM.lua -var varLst_Noah -out Globalv8f1_Noah_GPM -train Globalv8f1
+% CUDA_VISIBLE_DEVICES=0 th trainLSTM.lua -var varLst_Noah -out Globalv8f1_Noah_GPM -train Globalv8f1

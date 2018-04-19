@@ -4,7 +4,9 @@ outLSTM=[];
 outSite=[];
 outSMAP=[];
 tSiteValid=tsSite.t(~isnan(tsSite.v));
-if ~isempty(tSiteValid)
+tLSTMValid=tsLSTM.t(~isnan(tsLSTM.v));
+
+if ~isempty(tSiteValid) && ~isempty(tLSTMValid)
     
     t1=max(tSiteValid(1),tsLSTM.t(1));
     t2=max(tsSMAP.t(1));

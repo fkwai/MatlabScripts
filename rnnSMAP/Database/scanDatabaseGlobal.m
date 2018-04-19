@@ -3,9 +3,9 @@ function [varLst,varConstLst]=scanDatabaseGlobal(dbName,writeVar,varargin)
 
 global kPath
 
-pnames={'dirRoot','doLog','doZero'};
+pnames={'dirRoot','doLog','stdB'};
 dflts={kPath.DBSMAP_L3_Global,0,0};
-[dirRoot,doLog,doZero]=...
+[dirRoot,doLog,stdB]=...
     internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 dirDB=[dirRoot,dbName,filesep];
@@ -61,5 +61,28 @@ if writeVar==1
     fclose(fid);
 end
 
+%% set std lower bound
+if stdB>0
+    dirStat=[dirRoot,'Statistics',filesep];
+    for k=1:length(varLst)
+        varName=varLst{k};
+        statFile=[dirStat,varName,'_stat.csv'];
+        stat=csvread(statFile);
+        if stat(4)<stdB            
+            copyfile(statFile,[dirStat,varName,'_stat_',date,'.csv'])
+            stat(4)=1;
+            dlmwrite(statFile, stat,'precision',8);
+        end
+    end
+    for k=1:length(varConstLst)
+        varName=varConstLst{k};
+        statFile=[dirStat,'const_',varName,'_stat.csv'];
+        stat=csvread(statFile);
+        if stat(4)<stdB
+            copyfile(statFile,[dirStat,'const_',varName,'_stat_',date,'.csv'])
+            stat(4)=1;
+            dlmwrite(statFile, stat,'precision',8);
+        end
+    end
 end
 

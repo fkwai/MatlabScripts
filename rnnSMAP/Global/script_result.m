@@ -1,13 +1,15 @@
 
+global kPath
 %% new test
 rootOut=kPath.OutSMAP_L3_Global;
 rootDB=kPath.DBSMAP_L3_Global;
-outName1='Globalv8f1_Forcing';
-outName2='Globalv8f1_Noah';
-dataName='Globalv8f1';
 % outName1='CONUSv4f4_Forcing_GPM';
 % outName2='CONUSv4f4_Noah_GPM';
 % dataName='CONUSv4f4';
+
+outName1='Globalv4f4_Forcing';
+outName2='Globalv4f4_Noah';
+dataName='Globalv4f4';
 
 postRnnGlobal_map(outName2,dataName)
 
@@ -30,21 +32,22 @@ labelX={'train','test'};
 labelY={'Forcing','Noah'};
 f=plotBoxSMAP( boxMat,labelX,labelY,'yRange',[0,0.1])
 
-%% pick out CONUS cells
-bb=[-125,-66;25,50];
-crd=out{1,1}.crd;
-indPick=find(crd(:,1)>bb(2,1)&crd(:,1)<bb(2,2)&crd(:,2)>bb(1,1)&crd(:,2)<bb(1,2));
+%% Compare with previous CONUS result
+
+outCONUS{1}= postRnnSMAP_load('CONUSv4f1_test1','CONUSv4f1',2);
+outCONUS{2}= postRnnSMAP_load('CONUSv4f1_test2','CONUSv4f1',2);
+[indCONUS,indGlobal]=intersectCrd(nDigit(outCONUS{1}.crd,3),nDigit(out{1,1}.crd,3));
 
 stat={};
 boxMat={};
 for j=1:2
-    for i=1:2
-        stat{j,i}=statCal(out{j,i}.yLSTM(:,indPick),out{j,i}.ySMAP(:,indPick));
-        boxMat{j,i}=stat{j,i}.rmse;
-    end
+    stat{j,1}=statCal(outCONUS{j}.yLSTM(:,indCONUS),outCONUS{j}.ySMAP(:,indCONUS));
+    stat{j,2}=statCal(out{j,2}.yLSTM(:,indGlobal),out{j,2}.ySMAP(:,indGlobal));
+    boxMat{j,1}=stat{j,1}.rmse;
+    boxMat{j,2}=stat{j,2}.rmse;
 end
 
-labelX={'train','test'};
+labelX={'CONUS','Global'};
 labelY={'Forcing','Noah'};
 f=plotBoxSMAP( boxMat,labelX,labelY,'yRange',[0,0.1])
 

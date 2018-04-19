@@ -6,19 +6,19 @@ siteName='CRN';
 productNameLst={'surface','rootzone'};
 
 %for iP=1:length(productNameLst)
-for iP=1:2
+for iP=1:1
     productName=productNameLst{iP};
     if strcmp(productName,'surface')        
-        modelName1={'LSOIL_0-10'};
-        modelName2={'SOILM_0-10'};
+        modelName1={'LSOIL_0-10_NOAH'};
+        modelName2={'SOILM_0-10_NOAH'};
         modelFactor=100;
     elseif strcmp(productName,'rootzone')
-        modelName1={'LSOIL_0-10','LSOIL_10-40','LSOIL_40-100'};
-        modelName2={'SOILM_0-100'};
+        modelName1={'LSOIL_0-10_NOAH','LSOIL_10-40_NOAH','LSOIL_40-100_NOAH'};
+        modelName2={'SOILM_0-100_NOAH'};
         modelFactor=1000;
     end    
-    [SMAP,LSTM,ModelTemp1]=readHindcastSite( 'CRN',productName,'pred',modelName1);
-    [~,~,Model2]=readHindcastSite( 'CRN',productName,'pred',modelName2);    
+    [SMAP,LSTM,ModelTemp1]=readHindcastSite2( 'CRN',productName,'pred',modelName1);
+    [~,~,Model2]=readHindcastSite2( 'CRN',productName,'pred',modelName2);    
     Model1=struct('v',[],'t',ModelTemp1(1).t);    
     for k=1:length(ModelTemp1)
         Model1.v=cat(3,Model1.v,ModelTemp1(k).v);
@@ -26,22 +26,7 @@ for iP=1:2
     Model1.v=sum(Model1.v,3)./modelFactor;
     Model2.v=sum(Model2.v,3)./modelFactor;   
     
-    %% load no model prediction
-    if strcmp(productName,'surface')
-        LSTM_noModel.v=readRnnPred('fullCONUS_NoModel2yr','LongTerm_CRN',400,0);
-    elseif strcmp(productName,'rootzone')
-        LSTM_noModel.v=readRnnPred('CONUSv4f1wSite_noModel','LongTerm_CRN',500,0,...
-            'rootOut',kPath.OutSMAP_L4,'rootDB',kPath.DBSMAP_L4,'targetName','SMGP_rootzone');
-    end
-    LSTM_noModel.t=LSTM.t;
-    
-     %% remove frozen
-%     maskFrozen=abs(Model1.v-Model2.v)>0.001;
-%     LSTM.v(maskFrozen)=nan;
-%     LSTM_noModel.v(maskFrozen)=nan;
-%     Model1.v(maskFrozen)=nan;
-%     Model2.v(maskFrozen)=nan;
-    
+
     %% load site
     if strcmp(siteName,'CRN')
         temp=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
@@ -90,16 +75,14 @@ for iP=1:2
         tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
         tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
         tsModel.t=Model2.t; tsModel.v=Model2.v(:,ind);
-        tsLSTM2.t=LSTM_noModel.t; tsLSTM2.v=LSTM_noModel.v(:,ind);
         
         out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
-        out2 = statCal_hindcast(tsSite,tsLSTM2,tsSMAP);
         outModel = statCal_hindcast(tsSite,tsModel,tsSMAP);
-        if ~isempty(out) && ~isempty(out2) && ~isempty(outModel)
+        if ~isempty(out) && ~isempty(outModel)
             for j=1:length(fieldLst)
                 field=fieldLst{j};
-                tempAdd=[out.(field),out2.(field),outModel.(field)];
-                plotStr.(field)=[plotStr.(field);[tempAdd([1,2,5,3,9,12])]];
+                tempAdd=[out.(field),outModel.(field)];
+                plotStr.(field)=[plotStr.(field);[tempAdd([1,5,2,3,6])]];
             end
         end
     end
@@ -111,14 +94,14 @@ for iP=1:2
         [-0.3,0.3],[0,0.3],[0,0.1],[0,1]};
     for j=1:length(fieldLst)
         plotMat={};
-        for k=1:6
+        for k=1:5
             plotMat{1,k}=plotStr.(fieldLst{j})(:,k);
         end
         labelX={'PL LSTM vs in-situ',...
-            'AL LSTM vs in-situ',...
-            'PL LSTM w/o Noah vs in-situ',...
-            'AL SMAP vs in-situ',...
-            'PL Noah vs in-situ',...
+                'PL Noah vs in-situ',...
+                'AL LSTM vs in-situ',...
+                'AL SMAP vs in-situ',...
+                'AL Noah vs in-situ',...
             'AL Noah vs SMAP'};
         labelY=titleLst(j);
         yRange=yRangeLst{iP,j};
@@ -142,9 +125,9 @@ for iP=1:2
         'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
   
     fixFigure
-    saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.fig'])
-    saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.jpg'])
-    saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.eps'])
+%     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.fig'])
+%     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.jpg'])
+%     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.eps'])
 
     
     

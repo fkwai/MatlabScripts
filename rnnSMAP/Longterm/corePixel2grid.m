@@ -26,7 +26,24 @@ if exist(saveMatFile,'file')
 else
     site = readCoreSite(siteID);
 end
-layerLst=fieldnames(site);
+% get depth list
+fieldLst=fieldnames(site);
+dLst1=[];
+dLst2=[];
+for k=1:length(fieldLst)
+    field=fieldLst{k};
+    C=strsplit(field,'_');
+    if strcmp(C{1},'SM')
+        dLst1=[dLst1;str2num(C{2})./100];
+    elseif strcmp(C{1},'ST')
+        dLst2=[dLst2;str2num(C{2})./100];
+    end
+end
+if isequal(dLst1,dLst2)
+    depthLst=dLst1;
+else
+    error('soilM and soilT has different depth')
+end
 
 %% read site info
 crd = readCoreInfo_crd(siteID);
@@ -193,29 +210,34 @@ end
 
 %% extract stations
 nSta=size(idRef,2);
-nLayer=length(layerLst);
+nLayer=length(depthLst);
 sd=site.SM_05.t(1);
 ed=site.SM_05.t(end);
-depth=zeros(nLayer,1);
 for k=1:nLayer
-    layer=layerLst{k};
-    C=strsplit(layer,'_');
-    depth(k)=str2num(C{2})/100;
-    sdt=site.(layerLst{k}).t(1);
-    edt=site.(layerLst{k}).t(end);
+    sdt1=site.(['SM_',num2str(depthLst(k)*100,'%02d')]).t(1);
+    edt1=site.(['SM_',num2str(depthLst(k)*100,'%02d')]).t(end);
+    sdt2=site.(['ST_',num2str(depthLst(k)*100,'%02d')]).t(1);
+    edt2=site.(['ST_',num2str(depthLst(k)*100,'%02d')]).t(end);
+    if sdt1~=sdt2 || edt1~=edt2
+        error('soilM and soilT are of different time')
+    else
+        sdt=sdt1;
+        edt=edt1;
+    end
     if sdt<sd,  sd=sdt; end
     if edt>ed,  ed=edt; end
 end
 tnum=[sd:ed]';
 nt=length(tnum);
 dataRaw=zeros(nt,nSta,nLayer)*nan;
+dataRawT=zeros(nt,nSta,nLayer)*nan;
 
 % extract dataRaw
 for k=1:nLayer
-    temp=site.(layerLst{k});
-    idStaStr=temp.stationID;
-    t=temp.t;
-    idSta=cellfun(@str2num,idStaStr);
+    field=['SM_',num2str(depthLst(k)*100,'%02d')];    
+    temp=site.(field);    
+    idSta=temp.stationID;
+    t=temp.t;    
     [~,indSta,indOut]=intersect(idSta,idRef(1,:));
     [~,~,indT]=intersect(t,tnum);
     data=temp.v(:,indSta);
@@ -223,11 +245,27 @@ for k=1:nLayer
     dataRaw(indT,indOut,k)=data;
 end
 
+for k=1:nLayer
+    field=['ST_',num2str(depthLst(k)*100,'%02d')];
+    temp=site.(field);    
+    idSta=temp.stationID;
+    t=temp.t;
+    [~,indSta,indOut]=intersect(idSta,idRef(1,:));
+    [~,~,indT]=intersect(t,tnum);
+    data=temp.v(:,indSta);
+    data(data<-100)=nan;
+    dataRawT(indT,indOut,k)=data;
+end
+
+%% remove frozen based on temp
+dataRawLiq=dataRaw;
+dataRawLiq(dataRawT<=10|isnan(dataRawT))=nan;
+
 %% sumarize data
 wHorMat=repmat(VectorDim(wHor,2),[nt,1]);
 
 % surface
-dataRawSurf=dataRaw(:,:,1);
+dataRawSurf=dataRawLiq(:,:,1);
 validMat=~isnan(dataRawSurf);
 rSurf=sum(validMat.*wHorMat,2);
 vSurf=nansum(dataRawSurf.*wHorMat,2)./sum(validMat.*wHorMat,2);
@@ -238,10 +276,10 @@ vSurf=vSurf(ind);
 rSurf=rSurf(ind);
 
 % rootzone
-if length(depth)>1
-    wVer=d2w_rootzone(depth);
+if length(depthLst)>1
+    wVer=d2w_rootzone(depthLst);
     wVerMat=repmat(permute(wVer,[2,3,1]),[nt,nSta,1]);
-    dataRawRoot=sum(dataRaw.*wVerMat,3);
+    dataRawRoot=sum(dataRawLiq.*wVerMat,3);
     validMat=~isnan(dataRawRoot);
     rRoot=sum(validMat.*wHorMat,2);
     vRoot=nansum(dataRawRoot.*wHorMat,2)./sum(validMat.*wHorMat,2);
@@ -258,9 +296,10 @@ else
 end
 
 
-sitePixel=struct('ID',pID,'IDstr',pIDstr,'depth',depth,'crdC',[y0,x0],'BoundingBox',bb,...
+sitePixel=struct('ID',pID,'IDstr',pIDstr,'depth',depthLst,'crdC',[y0,x0],'BoundingBox',bb,...
     'vSurf',vSurf,'vRoot',vRoot,'rSurf',rSurf,'rRoot',rRoot,'tSurf',tSurf,'tRoot',tRoot,...
-    'wVer',wVer,'wHor',wHor,'wHorCal',wHorCal,'dataRaw',dataRaw,...
+    'wVer',wVer,'wHor',wHor,'wHorCal',wHorCal,...
+    'dataRaw',dataRaw,'dataRawT',dataRawT,'dataRawLiq',dataRawLiq,...
     'crd',crd,'refpix',refpix,'vor',vor,'optWeight',optWeight);
 
 if ~isempty(msg)

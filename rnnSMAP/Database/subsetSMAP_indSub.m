@@ -1,18 +1,9 @@
-function subsetSMAP_indSub(indSub,rootName,subsetName,varargin )
+function subsetSMAP_indSub(indSub,rootDB,subsetRoot,subsetName )
 %directly write subset based on indSub
 
-global kPath
-if isempty(varargin)
-    rootDB=kPath.DBSMAP_L3;
-else
-    rootDB=varargin{1};
-end
-
-subsetFolder=[rootDB,'Subset',filesep];
-
-%% save index file. Name by default
+subsetFolder=[rootDB,filesep,'Subset',filesep];
 subsetFile=[subsetFolder,subsetName,'.csv'];
-dlmwrite(subsetFile,rootName,'');
+dlmwrite(subsetFile,subsetRoot,'');
 dlmwrite(subsetFile, indSub,'-append');
 
 end

@@ -1,4 +1,4 @@
-function out = postRnnSMAP_load(outName,dataName,timeOpt,varargin)
+function out = postRnnUncer_load(outName,dataName,timeOpt,varargin)
 %POSTRNNSMAP_LOAD 
 % load data for LSTM simulations
 

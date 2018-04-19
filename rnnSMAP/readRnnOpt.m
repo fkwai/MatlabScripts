@@ -35,7 +35,7 @@ while 1
             opt.(field)=chars;
         end
     else
-        disp('Kuai: New options? Update initRnnOpt plz.');
+        disp([field,' : New options? Update initRnnOpt plz.']);
     end
 end
 fclose(fid);

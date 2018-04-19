@@ -2,8 +2,9 @@ function out = statCal_hindcast( tsSite,tsLSTM,tsSMAP )
 % calculate stat of hindcast result given ts of site, lstm and smap
 % out : a 3*4 matrix
 % x axis -
-% 1. test(LSTM vs site), 2. train(LSTM vs site),
-% 3. train(LSTM vs site), 4. train(LSTM vs site)
+% 1. test(LSTM vs site),
+% 2. train(LSTM vs site),
+% 3. train(SMAP vs site)
 % y axis - rmse, bias, rsq
 
 
@@ -13,7 +14,8 @@ if ~isempty(outLSTM)
     temp1=statCalTemp(outLSTM.v1,outSite.v1);
     temp2=statCalTemp(outLSTM.v2,outSite.v2);
     temp3=statCalTemp(outSMAP.v,outSite.v2);
-    out=[temp1;temp2;temp3];
+    temp4=statCalTemp(outLSTM.v2,outSMAP.v);
+    out=[temp1;temp2;temp3;temp4];
 else
     out=[];
 end
@@ -21,7 +23,7 @@ end
 end
 
 function [outTemp]=statCalTemp(a,b)
-[nt,nInd]=size(a);
+[nt,~]=size(a);
 ind=~isnan(a)&~isnan(b);
 meanA=repmat(nanmean(a(ind),1),[nt,1]);
 meanB=repmat(nanmean(b(ind),1),[nt,1]);

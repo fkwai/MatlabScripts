@@ -16,16 +16,9 @@ if strcmp(siteName,'CRN')
     elseif strcmp(productName,'rootzone')
         rootOut=kPath.OutSMAP_L4;
         rootDB=kPath.DBSMAP_L4;
-        outName='CONUSv4f1_rootzone';
+        outName='CONUSv4f1wSite_rootzone';
         smapName='CONUS_CRN';
         dataName='LongTerm_CRN';
-        target='SMGP_rootzone';
-    elseif strcmp(productName,'rootzonev4f1')
-        rootOut=kPath.OutSMAP_L4;
-        rootDB=kPath.DBSMAP_L4;
-        outName='CONUSv4f1_rootzone';
-        smapName='CONUSv4f1_CRN';
-        dataName='LongTermv4f1_CRN';
         target='SMGP_rootzone';
     end    
 end
@@ -38,24 +31,21 @@ if strcmp(siteName,'CoreSite')
         outName='fullCONUS_Noah2yr';
         smapName='CONUS_Core';
         dataName='LongTermCore';
-        target='SMAP';
-        modelName='SOILM_0-10';
+        target='SMAP'; 
+    elseif strcmp(productName,'surface_1yr')
+        rootOut=kPath.OutSMAP_L3;
+        rootDB=kPath.DBSMAP_L3;
+        outName='fullCONUS_Noah2yr';
+        smapName='CONUS_Core';
+        dataName='LongTermCore';
+        target='SMAP'; 
     elseif strcmp(productName,'rootzone')
         rootOut=kPath.OutSMAP_L4;
         rootDB=kPath.DBSMAP_L4;
-        outName='CONUSv4f1_rootzone';
+        outName='CONUSv4f1wSite_rootzone';
         smapName='CONUS_Core';
         dataName='LongTermCore';
-        target='SMGP_rootzone';
-        modelName='SOILM_0-100';
-    elseif strcmp(productName,'rootzonev4f1')
-        rootOut=kPath.OutSMAP_L4;
-        rootDB=kPath.DBSMAP_L4;
-        outName='CONUSv4f1_rootzone';
-        smapName='CONUSv4f1_Core';
-        dataName='LongTermCorev4f1';
-        target='SMGP_rootzone';
-        modelName='SOILM_0-100';
+        target='SMGP_rootzone';        
     end
 end
 
@@ -75,9 +65,18 @@ for k=1:length(pred)
     dataPred(k).crd=LSTM.crd;
 end
 
+%% remove when LSTM failed
 indErr=std(LSTM.v,[],1)<0.002;
 LSTM.v(:,indErr)=[];
 LSTM.crd(indErr,:)=[];
+SMAP.v(:,indErr)=[];
+SMAP.crd(indErr,:)=[];
+for k=1:length(pred)
+    dataPred(k).v(:,indErr)=[];
+    dataPred(k).crd(indErr,:)=[];
+end
+
+
 
 end
 

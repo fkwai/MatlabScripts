@@ -2,14 +2,14 @@
 % default to convert all fields. see the -1 line 27
 
 global kPath
-yLst=2017;
+yLst=2018;
 dataLst={'FORA','FORB','NOAH'};
 %dataLst={'NOAH'};
 parpool(50)
 for yr=yLst
     sdn=datenumMulti(yr*10000+101,1);
     %edn=datenumMulti(yr*10000+1231,1);
-    edn=sdn+160;
+    edn=sdn+100;
     tLst=sdn:edn;    
     for iData=1:length(dataLst)
         dataName=dataLst{iData};
@@ -27,7 +27,7 @@ for yr=yLst
             t=tLst(iT);
             % read NLDAS
             disp([dataName,' ',datestr(t)])
-            dataTemp = readNLDAS_Hourly(dataName,t,-1);            
+            dataTemp = readNLDAS_Hourly(dataName,t,-1,kPath.NLDAS);            
             % average to daily
             dataDaily=nanmean(dataTemp,3);
 			dataNLDAS(:,:,iT,:)=dataDaily;

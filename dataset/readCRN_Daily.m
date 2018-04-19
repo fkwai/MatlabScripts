@@ -51,8 +51,15 @@ outFieldLst={'WBANNO',...
     'SOIL_MOISTURE_10_DAILY',...
     'SOIL_MOISTURE_20_DAILY',...
     'SOIL_MOISTURE_50_DAILY',...
-    'SOIL_MOISTURE_100_DAILY'};
-varLst={'ID','date','lon','lat','soilM_5','soilM_10','soilM_20','soilM_50','soilM_100'};
+    'SOIL_MOISTURE_100_DAILY',...
+    'SOIL_TEMP_5_DAILY',...
+    'SOIL_TEMP_10_DAILY',...
+    'SOIL_TEMP_20_DAILY',...
+    'SOIL_TEMP_50_DAILY',...
+    'SOIL_TEMP_100_DAILY'};
+varLst={'ID','date','lon','lat',...
+    'soilM_5','soilM_10','soilM_20','soilM_50','soilM_100',...
+    'soilT_5','soilT_10','soilT_20','soilT_50','soilT_100'};
 
 %% read all data
 yrLst=2000:2018;    % hard code
@@ -109,11 +116,12 @@ for iY=1:length(yrLst)
 end
 
 %% iterate all station to make time continuous, fill nan
-soilmVarLst={'soilM_5','soilM_10','soilM_20','soilM_50','soilM_100'};
+varLstM={'soilM_5','soilM_10','soilM_20','soilM_50','soilM_100'};
+varLstT={'soilT_5','soilT_10','soilT_20','soilT_50','soilT_100'};
 depth=[5;10;20;50;100];
 siteCRN=[];
 siteNan=[];
-for k=1:length(out)    
+for k=1:length(out)
     siteCRN(k,1).name=out(k).name;
     siteCRN(k,1).ID=out(k).ID;
     siteCRN(k,1).lon=out(k).lon;
@@ -127,14 +135,21 @@ for k=1:length(out)
     [C,ind1,ind2]=intersect(t,tnum);
     siteCRN(k,1).tnum=tnum;
     siteCRN(k,1).date=datenumMulti(tnum,2);
-    temp=zeros(length(tnum),length(depth))*nan;
-    for i=1:length(soilmVarLst)
-        v=out(k).(soilmVarLst{i});
-        temp(ind2,i)=v(ind1);
+    tempM=zeros(length(tnum),length(depth))*nan;
+    for i=1:length(varLstM)
+        v=out(k).(varLstM{i});
+        tempM(ind2,i)=v(ind1);
     end
-    temp(temp<0)=nan;
-    siteCRN(k).soilM=temp;    
-    if length(find(~isnan(temp(:))))==0
+    tempT=zeros(length(tnum),length(depth))*nan;
+    for i=1:length(varLstT)
+        v=out(k).(varLstT{i});
+        tempT(ind2,i)=v(ind1);
+    end
+    tempM(tempM<0)=nan;
+    tempT(tempT<-100)=nan;
+    siteCRN(k).soilM=tempM;
+    siteCRN(k).soilT=tempT;
+    if length(find(~isnan(tempM(:))))==0
         disp(['all nan: ', num2str(siteCRN(k).ID),' ',siteCRN(k).name]);
         siteNan=[siteNan,k];
     end
@@ -142,6 +157,6 @@ end
 siteCRN(siteNan)=[];
 
 save([CRNfolder,'siteCRN.mat'],'siteCRN')
-    
+
 end
 

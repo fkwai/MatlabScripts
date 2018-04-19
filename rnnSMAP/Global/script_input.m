@@ -5,12 +5,13 @@ t=20151025;
 %% time series data
 bb=[-125,-66;25,50];
 fieldName='GPM';
-[xData1,xStat1,crd1,time1] = readDB_Global('Global',fieldName,'yrLst',[2015]);
+[xData1,xStat1,crd1,time1] = readDB_Global('Globalv4f4',fieldName,'yrLst',[2015]);
 indC=find(crd1(:,1)>bb(2,1)&crd1(:,1)<bb(2,2)&crd1(:,2)>bb(1,1)&crd1(:,2)<bb(1,2));
 [grid1,xx1,yy1] = data2grid3d(xData1(:,indC)',crd1(indC,2),crd1(indC,1));
+[grid1,xx1,yy1] = data2grid3d(xData1',crd1(:,2),crd1(:,1));
 
 fieldName='APCP';
-[xData2,xStat2,xDataNorm2] = readDB_SMAP('CONUS',fieldName);
+[xData2,xStat2,xDataNorm2] = readDB_SMAP('CONUSv4f1',fieldName);
 crd2=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'crd.csv']);
 time2=csvread([kPath.DBSMAP_L3,filesep,'CONUS',filesep,'time.csv']);
 [grid2,xx2,yy2] = data2grid3d(xData2',crd2(:,2),crd2(:,1));

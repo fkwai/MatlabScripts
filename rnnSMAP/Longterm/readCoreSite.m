@@ -22,12 +22,17 @@ site=struct();
 for k=1:nStation
     %% read station
     folderStation=[folderSite,dirStation(k).name,filesep];
-    stationID=dirStation(k).name(5:7); % sometime string
-    disp(['reading station: ',stationID])
+    stationIDstr=dirStation(k).name(5:7); % sometime string
+    stationID=[];
+    try
+        stationID=str2num(stationIDstr);
+    end
+    disp(['reading station: ',stationIDstr])
     tic
     
     fileLst=dir([folderStation,'*.txt']);
     soilM=struct();
+    soilT=struct();
     for kk=1:length(fileLst)
         %% read data and head
         fileName=[folderStation,fileLst(kk).name];
@@ -74,52 +79,65 @@ for k=1:nStation
             end
         end
         
+        % soil temperature
+        indLst=find(strcmp(head,'ST'));
+        for i=1:length(indLst)
+            ind=indLst(i);
+            temp=data(:,ind);
+            temp(temp<-100)=nan;
+            fieldName=['ST_',sprintf('%02d',round(str2num(subHead{ind})*100))];
+            if ~isfield(soilT,fieldName)
+                soilT.(fieldName).v=temp;
+                soilT.(fieldName).t=tnum;
+            else
+                soilT.(fieldName).v=[soilT.(fieldName).v;temp];
+                soilT.(fieldName).t=[soilT.(fieldName).t;tnum];
+            end
+        end
+        
     end
     
     %% summarize stations to site
-    fieldNameLst=fieldnames(soilM);
-    for iField=1:length(fieldNameLst)        
-        % convert to daily
-        fieldName=fieldNameLst{iField};
-        t=soilM.(fieldName).t;
-        v=soilM.(fieldName).v;
-        nh=round(1/mean(t(2:end)-t(1:end-1)));
-        tnumD=[floor(t(1)):floor(t(end))]';
-        tnumH=[floor(t(1)):1/nh:floor(t(end)+1)]';
-        tnumH(end)=[];
-        [C,ind0,ind1]=intersect(tnumH,t);
-        vH=zeros(length(tnumH),1)*nan;
-        vH(ind0)=v(ind1);
-        vD=nanmean(reshape(vH,[nh,length(vH)/nh]))';
-        if length(tnum)/length(tnumH)>0.1
-            error('plz check here. intersect error?')
-        end
-        
-        % add to site
-        if ~isfield(site,fieldName)
-            site.(fieldName).v=vD;
-            site.(fieldName).t=tnumD;
-            site.(fieldName).stationID={stationID};
-        else
-            t0=site.(fieldName).t;
-            t1=tnumD;
-            if t0(1)<=t1(1) && t0(1)>=t1(1)
-                v=zeros(length(t0),1)*nan;
-                [C,ind0,ind1]=intersect(t0,t1);
-                v(ind0)=vD(ind1);
-                site.(fieldName).v=[site.(fieldName).v,v];
+    dataMat={soilM,soilT};
+    for iD=1:length(dataMat)
+        dataStr=dataMat{iD};
+        fieldNameLst=fieldnames(dataStr);
+        for iField=1:length(fieldNameLst)
+            % convert to daily
+            fieldName=fieldNameLst{iField};
+            t=dataStr.(fieldName).t;
+            v=dataStr.(fieldName).v;
+            tnumD=[floor(t(1)):floor(t(end))]';
+            vD= tsConvert(t,tnumD,v,1);
+            
+            % add to site
+            if ~isfield(site,fieldName)
+                site.(fieldName).v=vD;
+                site.(fieldName).t=tnumD;
+                site.(fieldName).stationID=[stationID];
+                site.(fieldName).stationIDstr={stationIDstr};
             else
-                tnew=[min([t0;t1]):max([t0;t1])]';
-                vold=site.(fieldName).v;
-                vnew=zeros(length(tnew),size(vold,2)+1)*nan;
-                [C,ind,ind0]=intersect(tnew,t0);
-                vnew(ind,1:size(vold,2))=vold(ind0,:);
-                [C,ind,ind1]=intersect(tnew,t1);
-                vnew(ind,end)=vD(ind1,:);
-                site.(fieldName).v=vnew;
-                site.(fieldName).t=tnew;
+                t0=site.(fieldName).t;
+                t1=tnumD;
+                if t0(1)<=t1(1) && t0(end)>=t1(end)
+                    v=zeros(length(t0),1)*nan;
+                    [C,ind0,ind1]=intersect(t0,t1);
+                    v(ind0)=vD(ind1);
+                    site.(fieldName).v=[site.(fieldName).v,v];
+                else
+                    tnew=[min([t0(1);t1(1)]):max([t0(end);t1(end)])]';
+                    vold=site.(fieldName).v;
+                    vnew=zeros(length(tnew),size(vold,2)+1)*nan;
+                    [C,ind,ind0]=intersect(tnew,t0);
+                    vnew(ind,1:size(vold,2))=vold(ind0,:);
+                    [C,ind,ind1]=intersect(tnew,t1);
+                    vnew(ind,end)=vD(ind1,:);
+                    site.(fieldName).v=vnew;
+                    site.(fieldName).t=tnew;
+                end
+                site.(fieldName).stationID=[site.(fieldName).stationID;stationID];
+                site.(fieldName).stationIDstr=[site.(fieldName).stationIDstr;{stationIDstr}];
             end
-            site.(fieldName).stationID=[site.(fieldName).stationID;{stationID}];
         end
     end
     toc

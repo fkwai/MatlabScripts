@@ -27,7 +27,7 @@ for k=1:length(yrLst)
 
     timeFile=[dirDByear,'time.csv'];
     sdn=datenumMulti(sd,1);
-    edn=datenumMulti(ed,1);
+    edn=datenumMulti(ed,1)-1;
     tnum=[sdn:edn]';
     dlmwrite(timeFile,tnum,'precision',12);
 end

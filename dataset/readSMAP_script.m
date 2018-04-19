@@ -29,7 +29,7 @@ gridFile=[kPath.SMAP,filesep,'gridEASE_36'];
 gridEASE=load(gridFile);
 
 sd=20150331;
-ed=20170614;
+ed=20180410;
 sdn=datenumMulti(sd,1);
 edn=datenumMulti(ed,1);
 tLst=[sdn:edn]';
@@ -65,7 +65,7 @@ end
 
 
 %% read all smap L4 data and to daily
-%{
+
 fieldLst={'Geophysical_Data/sm_profile','Geophysical_Data/sm_surface','Geophysical_Data/sm_rootzone'};
 saveLst={'SPL4SMGPv3_profile','SPL4SMGPv3_surface','SPL4SMGPv3_rootzone'};
 
@@ -74,7 +74,7 @@ for kk=2:length(fieldLst)
     fieldName=fieldLst{kk};
     dirSMAP=kPath.SMAP;
     sd=20150331;
-    ed=20170614;
+    ed=20180410;
     sdn=datenumMulti(sd,1);
     edn=datenumMulti(ed,1);
     tLst=[sdn:edn]';
@@ -108,5 +108,5 @@ for kk=2:length(fieldLst)
     disp(tErr)
     save([kPath.SMAP,saveLst{kk}],'data','lat','lon','tnum','-v7.3')
 end
-%}
+
 

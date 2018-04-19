@@ -17,6 +17,7 @@ for k=1:length(legLst)
     tsStr(k).t=tnum;
     tsStr(k).symb=symLst{k};
     tsStr(k).legendStr=legLst{k};
+    tsStr(k).yRight=0;
 end
 [f,cmap]=showMap(statGrid,yy,xx,'colorRange',[0,0.05],'tsStr',tsStr);
 %}
@@ -27,6 +28,8 @@ dflts={[],[],[]};
 
 if isempty(fc)
     fc=figure('Position',[100,100,1000,300]);
+else
+    clf(fc)
 end
 legendStr=[];
 
@@ -52,6 +55,13 @@ for k=length(tsStr):-1:1
     
     figure(fc)    
     ind=~isnan(v);
+    if isfield(tsStr(k),'yRight')
+        if tsStr(k).yRight==1
+            yyaxis right
+        else
+            yyaxis left
+        end
+    end
     plot(t(ind),v(ind),tsStr(k).symb);hold on
 end
 

@@ -5,32 +5,29 @@ function subsetSplit(subsetName,varargin)
 % And the inds in subset file is replace by -1
 
 global kPath
-if isempty(kPath)
-    initPath workstation
-end
 
-pnames={'dirRoot','varLst','varConstLst'};
+pnames={'rootDB','varLst','varConstLst'};
 dflts={kPath.DBSMAP_L3,'varLst','varConstLst'};
-[dirRoot,varLstName,varConstLstName]=internal.stats.parseArgs(pnames, dflts, varargin{:});
+[rootDB,varLstName,varConstLstName]=internal.stats.parseArgs(pnames, dflts, varargin{:});
 
 
 %% read variable list
 if iscell(varLstName)
     varLst=varLstName;
 elseif ischar(varLstName)
-    varFile=[dirRoot,'Variable',kPath.s,varLstName,'.csv'];
+    varFile=[rootDB,'Variable',filesep,varLstName,'.csv'];
     varLst=textread(varFile,'%s');
 end
 
 if iscell(varConstLstName)
     varConstLst=varConstLstName;
 elseif ischar(varConstLstName)
-    varConstFile=[dirRoot,'Variable',kPath.s,varConstLstName,'.csv'];
+    varConstFile=[rootDB,'Variable',filesep,varConstLstName,'.csv'];
     varConstLst=textread(varConstFile,'%s');
 end
 
 %% read subset index
-subsetFile=[dirRoot,'Subset',filesep,subsetName,'.csv'];
+subsetFile=[rootDB,'Subset',filesep,subsetName,'.csv'];
 fid=fopen(subsetFile);
 C = textscan(fid,'%s',1);
 rootName=C{1}{1};
@@ -39,10 +36,10 @@ indSub=C{1};
 fclose(fid);
 
 if indSub==-1    
-    rootFolder=[dirRoot,'CONUS',filesep];
-    saveFolder=[dirRoot,subsetName,filesep];
-    inCrd=csvread([dirRoot,'CONUS',filesep,'crd.csv']);
-    outCrd=csvread([dirRoot,subsetName,filesep,'crd.csv']);
+    rootFolder=[rootDB,'CONUS',filesep];
+    saveFolder=[rootDB,subsetName,filesep];
+    inCrd=csvread([rootDB,'CONUS',filesep,'crd.csv']);
+    outCrd=csvread([rootDB,subsetName,filesep,'crd.csv']);
     [outInd,inInd] = intersectCrd(nDigit(outCrd,3),nDigit(inCrd,3));
     if length(inInd)~=size(outCrd,1)
         error('check here')
@@ -50,8 +47,8 @@ if indSub==-1
     indSub=inInd;    
 else
     %% write crd and time
-    rootFolder=[dirRoot,rootName,filesep];
-    saveFolder=[dirRoot,subsetName,filesep];
+    rootFolder=[rootDB,rootName,filesep];
+    saveFolder=[rootDB,subsetName,filesep];
     if ~isdir(saveFolder)
         mkdir(saveFolder)
     end

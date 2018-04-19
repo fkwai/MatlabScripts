@@ -34,19 +34,21 @@ fclose(fid);
 
 %% read var
 time=[];
+xData=[];
 if indSub==-1
     if ~isConst        
         for iY=1:length(yrLst)
             tic
             yr=yrLst(iY);
             xFile=[dirDB,num2str(yr),filesep,varName,'.csv'];
-            xData=csvread(xFile);
-            xData=xData';
-            xData(xData==-9999)=nan;
+            xDataYr=csvread(xFile);
+            xDataYr=xDataYr';
+            xDataYr(xDataYr==-9999)=nan;
             disp(['read ',varName,' year ',num2str(yr),' ',num2str(toc)])
             timeFile=[dirDB,num2str(yr),filesep,'time.csv'];
             tTemp=csvread(timeFile);
             time=[time;tTemp];
+            xData=[xData;xDataYr];
         end
         xStatFile=[rootDB,filesep,'Statistics',filesep,varName,'_stat.csv'];
     else

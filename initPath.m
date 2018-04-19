@@ -25,11 +25,17 @@ if strcmp(pcStr,'server')
     
     kPath.DBSMAP_L3='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L3_CONUS/';
     kPath.DBSMAP_L3_Global='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L3/';
+    kPath.DBSMAP_L3_NA='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L3_NA/';
     kPath.DBSMAP_L4='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4_CONUS/';
+    kPath.DBSMAP_L4_NA='/mnt/sdb1/rnnSMAP/Database_SMAPgrid/Daily_L4_NA/';
     
     kPath.OutSMAP_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid/';
     kPath.OutSMAP_L3_Global='/mnt/sdb1/rnnSMAP/output_SMAPgrid_global/';
+    kPath.OutSMAP_L3_NA='/mnt/sdb1/rnnSMAP/output_SMAPgrid_NA/';
     kPath.OutSMAP_L4='/mnt/sdb1/rnnSMAP/output_SMAPL4grid/';
+    kPath.OutSMAP_L4_NA='/mnt/sdb1/rnnSMAP/output_SMAPL4grid_NA/';
+    kPath.OutSelf_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid_self/';
+    kPath.OutUncer_L3='/mnt/sdb1/rnnSMAP/output_uncertainty/';
     
     kPath.CRN='/mnt/sdb1/Database/CRN/';
     kPath.SCAN='/mnt/sdb1/Database/SCAN/';

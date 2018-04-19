@@ -5,11 +5,8 @@ dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
 dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/insitu/';
 siteName='CoreSite';
 
-productLst={'surface','rootzone','rootzonev4f1'};
 
-%for iP=1:length(productLst)
-%productName=productLst{iP};
-
+%productName='rootzone';
 productName='surface';
 if strcmp(productName,'surface')
     siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_unshift.mat'];
@@ -17,22 +14,60 @@ if strcmp(productName,'surface')
     vField='vSurf';
     tField='tSurf';
     rField='rSurf';
+    modelName={'LSOIL_0-10'};
+    modelName2={'SOILM_0-10'};
+    modelFactor=100;
 elseif strcmp(productName,'rootzone')
     siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
     siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
     vField='vRoot';
     tField='tRoot';
     rField='rRoot';
-elseif strcmp(productName,'rootzonev4f1')
-    siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
-    siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
-    vField='vRoot';
-    tField='tRoot';
-    rField='rRoot';
+    modelName={'LSOIL_0-10','LSOIL_10-40','LSOIL_40-100'};
+    modelName2={'SOILM_0-100'};
+    modelFactor=1000;
 end
 
-%% read SMAP LSTM and site
-[SMAP,LSTM] = readHindcastSite( siteName,productName);
+[SMAP,LSTM,ModelTemp1]=readHindcastSite( 'CoreSite',productName,'pred',modelName);
+[~,~,Model2]=readHindcastSite( 'CoreSite',productName,'pred',modelName2);
+Model1=struct('v',[],'t',ModelTemp1(1).t);
+for k=1:length(ModelTemp1)
+    Model1.v=cat(3,Model1.v,ModelTemp1(k).v);
+end
+Model1.v=sum(Model1.v,3)./modelFactor;
+Model2.v=sum(Model2.v,3)./modelFactor;
+
+
+%% load one year data
+if strcmp(productName,'surface')
+    test.LSTM=readRnnPred('fullCONUS_hS512_trainedYear2','CONUS_Core',500,1);
+    temp=readDB_SMAP('CONUS_Core','SMAP',kPath.DBSMAP_L3);
+    test.SMAP=temp(1:366,:);
+elseif strcmp(productName,'rootzone')
+    test.LSTM=readRnnPred('CONUSv4f1wSite_2ndyr','CONUS_Core',300,1,...
+        'rootOut',kPath.OutSMAP_L4,'rootDB',kPath.DBSMAP_L4,'targetName','SMGP_rootzone');
+    temp=readDB_SMAP('CONUS_Core','SMGP_rootzone',kPath.DBSMAP_L4);
+    test.SMAP=temp(1:366,:);
+    %test.SMAP=temp(367:732,:);
+end
+
+%% load no model prediction
+if strcmp(productName,'surface')
+    LSTM_noModel.v=readRnnPred('fullCONUS_NoModel2yr','LongTermCore',400,0);
+elseif strcmp(productName,'rootzone')
+    LSTM_noModel.v=readRnnPred('CONUSv4f1wSite_noModel','LongTermCore',500,0,...
+        'rootOut',kPath.OutSMAP_L4,'rootDB',kPath.DBSMAP_L4,'targetName','SMGP_rootzone');
+end
+LSTM_noModel.t=LSTM.t;
+
+%% remove frozen
+% maskFrozen=abs(Model1.v-Model2.v)>0.01;
+% LSTM.v(maskFrozen)=nan;
+% LSTM_noModel.v(maskFrozen)=nan;
+% Model1.v(maskFrozen)=nan;
+% Model2.v(maskFrozen)=nan;
+
+%% read site
 temp=load(siteMatFile);
 sitePixel=temp.sitePixel;
 temp=load(siteMatFile_shift);
@@ -40,6 +75,7 @@ sitePixel_shift=temp.sitePixel;
 siteMat=[sitePixel;sitePixel_shift];
 
 %% plot a map
+%{
 nameLst={'Reynolds Creek','Carman','Walnut Gulch',...
     'Little Washita','Fort Cobb','Little River',...
     'St. Josephs','South Fork','TxSON'};
@@ -73,61 +109,84 @@ hold off
 daspect([1,1,1])
 saveas(f,[dirFigure,'coreSiteMap.fig'])
 saveas(f,[dirFigure,'coreSiteMap.jpg'])
-    
-    
-%% plot time series - different rate
-%{
-    figFolder=[dirFigure,productName,filesep];
-    if ~exist(figFolder,'dir')
-        mkdir(figFolder)
-    end
-    matLst={sitePixel,sitePixel_shift};
-    for j=1:length(matLst)
-        siteLst=matLst{j};
-        for k=1:length(siteLst)
-            f=figure('Position',[1,1,1500,400]);
-            lineW=2;
-            site=siteLst(k);
-            if ~isempty(site.(vField))
-                [C,indSMAP]=min(sum(abs(site.crdC-SMAP.crd),2));
-                sdSMAP=SMAP.t(1);
-                sdSite=site.(tField)(1);
-                % site
-                rateLst=[0,0.25,0.5,0.75,1];
-                cLst=flipud(autumn(length(rateLst)));
-                hold on
-                for kk=1:length(rateLst)
-                    siteV=site.(vField);
-                    siteV(site.(rField)<rateLst(kk),1)=nan;
-                    if rateLst(kk)==1
-                        plot(site.(tField),siteV,'*-','LineWidth',lineW,'Color',cLst(kk,:));
-                    else
-                        plot(site.(tField),siteV,'-','LineWidth',lineW,'Color',cLst(kk,:));
-                    end
-                end
-                plot(LSTM.t,LSTM.v(:,indSMAP),'-b','LineWidth',lineW);
-                plot(SMAP.t,SMAP.v(:,indSMAP),'ko','LineWidth',lineW);
-                plot([sdSMAP,sdSMAP], ylim,'k-','LineWidth',lineW);
-                hold off
-                datetick('x','yy/mm')
-                xlim([sdSite,SMAP.t(end)])
-                legend('insitu 0%','insitu 25%','insitu 50%','insitu 75%','insitu 100%','LSTM','SMAP')
-                siteIdStr=num2str(site.ID,'%08d');
-                if j==1
-                    title(['Hindcast of site: ', siteIdStr])
-                    saveas(f,[figFolder,siteIdStr,'_unshift.fig'])
-                else
-                    title(['Hindcast of site: ',siteIdStr,' (shifted)'])
-                    saveas(f,[figFolder,siteIdStr,'_shift.fig'])
-                end
-                close(f)
-            end
-        end
-    end
 %}
 
 
+%% plot time series - different rate
+rateLst=[0,0.25,0.5,0.75,1];
+tabOut=cell(length(rateLst),1);
+figFolder=[dirFigure,productName,filesep];
+if ~exist(figFolder,'dir')
+    mkdir(figFolder)
+end
+matLst={sitePixel,sitePixel_shift};
+for j=1:length(matLst)
+    siteLst=matLst{j};
+    for k=1:length(siteLst)
+        f=figure('Position',[1,1,1500,400]);
+        lineW=1;
+        site=siteLst(k);
+        if ~isempty(site.(vField))
+            [C,indSMAP]=min(sum(abs(site.crdC-SMAP.crd),2));
+            
+            tsLSTM.v=LSTM.v(:,indSMAP);
+            tsLSTM.t=LSTM.t;
+            tsSMAP.v=SMAP.v(:,indSMAP);
+            tsSMAP.t=SMAP.t;
+            tsModel1.v=Model1.v(:,indSMAP);
+            tsModel1.t=Model1.t;
+            tsModel2.v=Model2.v(:,indSMAP);
+            tsModel2.t=Model2.t;
+            tsLSTM2.v=LSTM_noModel.v(:,indSMAP);
+            tsLSTM2.t=LSTM_noModel.t;            
+           
+            % site
+            hold on
+            cLst=flipud(autumn(length(rateLst)));
+            for kk=1:length(rateLst)
+                tsSite.v=site.(vField);
+                tsSite.v(site.(rField)<rateLst(kk))=nan;
+                tsSite.t=site.(tField);                
+                plot(tsSite.t,tsSite.v,'-','LineWidth',lineW,'Color',cLst(kk,:));                
+                
+                % calculate stat
+                out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
+                outModel=statCal_hindcast(tsSite,tsModel,tsSMAP);
+                if ~isempty(out)
+                    tabOut{kk}=[tabOut{kk};[site.ID,out(1).ubrmse,outModel(1).ubrmse,...
+                        out(1).rho,outModel(1).rho,...
+                        out(1).rmse,outModel(1).rmse]];
+                else
+                    tabOut{kk}=[tabOut{kk};[site.ID,nan,nan,nan,nan,nan,nan]];
+                end
+            end
+            plot(tsModel1.t,tsModel1.v,'-c','LineWidth',lineW);
+            plot(tsModel2.t,tsModel2.v,'-g','LineWidth',lineW);
+            plot(tsLSTM.t,tsLSTM.v,'-b','LineWidth',lineW);
+            plot(tsSMAP.t,tsSMAP.v,'ko','LineWidth',lineW);
+            plot([tsSMAP.t(1),tsSMAP.t(1)], ylim,'k-','LineWidth',lineW);
+            hold off
+            datetick('x','yy/mm')
+            xlim([site.(tField)(1),SMAP.t(end)])
+            legend('insitu 0%','insitu 25%','insitu 50%','insitu 75%','insitu 100%','Noah','Noah','LSTM','SMAP')
+            %legend('insitu','Noah','LSTM','SMAP')
+            siteIdStr=num2str(site.ID,'%08d');
+            if j==1
+                title(['Hindcast of site: ', siteIdStr])
+                saveas(f,[figFolder,siteIdStr,'_unshift.fig'])
+            else
+                title(['Hindcast of site: ',siteIdStr,' (shifted)'])
+                saveas(f,[figFolder,siteIdStr,'_shift.fig'])
+            end
+            close(f)
+        end
+    end
+end
+save([figFolder,'tabStat.mat'],'tabOut','tabOut')
+
+
 %% calculate stat and do bar plot
+%{
 matLst={sitePixel,sitePixel_shift};
 for j=1:length(matLst)
     siteLst=matLst{j};
@@ -185,6 +244,7 @@ for j=1:length(matLst)
     end
     
 end
+%}
 
 
-%end
+

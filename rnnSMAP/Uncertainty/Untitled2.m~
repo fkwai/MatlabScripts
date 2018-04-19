@@ -1,0 +1,52 @@
+
+global kPath
+dataNameCONUS='CONUSv4f1';
+dataNameHUC='huc2_02030406';
+outName='huc2_02030406';
+outName_Self='huc2_02030406';
+hucLst=[2,3,4,6];
+epoch=300;
+timeOpt=1;
+rootDB=kPath.DBSMAP_L3;
+
+%% load data
+yLSTM= readRnnPred(outName,dataNameCONUS,epoch,timeOpt);
+[ySMAP,~,~] = readDB_SMAP(dataNameCONUS,'SMAP');
+ySelf=readSelfPred(outName_Self,dataNameCONUS);
+tnum=csvread([rootDB,dataNameCONUS,filesep,'time.csv']);
+
+if timeOpt==1
+    ySMAP=ySMAP(1:366,:);
+    tnum=tnum(1:366,:);
+elseif timeOpt==2
+    ySMAP=ySMAP(367:732,:);
+    tnum=tnum(367:732,:);
+elseif timeOpt==3
+    ySMAP=ySMAP(1:732,:);
+    tnum=tnum(1:732,:);
+end
+
+crdHUC=csvread([rootDB,dataNameHUC,filesep,'crd.csv']);
+crdCONUS=csvread([rootDB,dataNameCONUS,filesep,'crd.csv']);
+[ind1,ind2]=intersectCrd(crdHUC,crdCONUS);
+indCONUS=[1:length(crdCONUS)]';
+indCONUS(ind2)=[];
+
+%% plot 121
+yStat=abs(yLSTM-ySMAP);
+plot(mean(ySelf(:,indCONUS),1),mean(yStat(:,indCONUS),1))
+
+%% plot map
+statMat=statCal(yLSTM,ySMAP);
+[gridStat,xx,yy] = data2grid(statMat.rmse,crdCONUS(:,2),crdCONUS(:,1));
+[gridLSTM,~,~] = data2grid3d(yLSTM',crdCONUS(:,2),crdCONUS(:,1));
+[gridSMAP,~,~] = data2grid3d(ySMAP',crdCONUS(:,2),crdCONUS(:,1));
+[gridSelf,~,~] = data2grid3d(ySelf',crdCONUS(:,2),crdCONUS(:,1));
+
+shapeAll=shaperead('/mnt/sdb1/Kuai/map/HUC/HUC2_CONUS.shp');
+shape=shapeAll(hucLst);
+clear tsStr
+tsStr(1)=struct('grid',gridLSTM,'t',tnum,'symb','-b','legendStr','LSTM','yRight',0);
+tsStr(2)=struct('grid',gridSMAP,'t',tnum,'symb','ko','legendStr','SMAP','yRight',0);
+tsStr(3)=struct('grid',gridSelf,'t',tnum,'symb','-r','legendStr','Self','yRight',1);
+[f,cmap]=showMap(gridStat,yy,xx,'tsStr',tsStr,'latLim',[25,50],'lonLim',[-125,-65],'shape',shape);

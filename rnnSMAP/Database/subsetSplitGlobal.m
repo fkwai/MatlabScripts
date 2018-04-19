@@ -43,7 +43,7 @@ if indSub==-1
     if length(inInd)~=size(outInd,1)
         error('check here')
     end
-    indSub=outInd;
+    indSub=inInd;
 else
     if ~isdir(outDB)
         mkdir(outDB)
