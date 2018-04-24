@@ -153,7 +153,9 @@ toc
 %% calculate stat
 rootDB=kPath.DBSMAP_L4_NA;
 dataName='CONUS';
-varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017);
+%varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017);
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017,'varLst',{'SMGP_rootzone','SMGP_surface'});
+
 %varWarning= statDBcsvGlobal(rootDB,dataName,2015:2016,'varLst',{'GPM'});
 
 %% scan database

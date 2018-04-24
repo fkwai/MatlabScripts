@@ -20,6 +20,16 @@ epoch=opt.nEpoch;
 crdFile=[rootDB,filesep,dataName,filesep,'crd.csv'];
 crd=csvread(crdFile);
 
+ind=randi([1,412]);
+plot(1:366,dataPred(:,ind),'-b');hold on
+plot(1:366,dataSMAP(:,ind),'ko');hold off
+
+statB = statBatch(dataPredB);
+ind=randi([1,412]);
+plot(1:366,statB.mean(:,ind),'-b');hold on
+plot(1:366,dataSMAP(:,ind),'ko');hold off
+
+
 %%
 sig=sqrt(exp(mean(dataSigB,3)))*xStat(4)^2;
 [gridSig,xx,yy] = data2grid3d(sig',crd(:,2),crd(:,1));
@@ -32,7 +42,7 @@ stdMC=statB.std;
 
 
 stat=statCal(dataPred,dataSMAP);
-statStr='rsq';
+statStr='rmse';
 figure('Position',[1,1,1200,400])
 subplot(1,3,1)
 plot(mean(stdMC,1),stat.(statStr),'b*');

@@ -61,7 +61,7 @@ for iP=1:1
     for k=1:length(siteMat)
         soilM=siteMat(k).soilM;
         soilT=siteMat(k).soilT;
-        soilM(soilT<=0)=nan;
+        %soilM(soilT<=0)=nan;
         if strcmp(productName,'surface')
             tsSite.v=soilM(:,1);
         elseif strcmp(productName,'rootzone')

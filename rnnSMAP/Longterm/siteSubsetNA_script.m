@@ -70,10 +70,13 @@ end
 indSubCONUS=subsetSMAP_interval(nv,nf,caseName,'writeSubFile',0);
 indSub=[indSub_Core;indSub_CRN;indSubCONUS];
 indSub=unique(indSub);
-subsetSMAP_indSub(indSub,rootDB,'CONUS',subsetName)
-msg=subsetSplitGlobal(subsetName,'rootDB',rootDB);
+%subsetSMAP_indSub(indSub,rootDB,'CONUS',subsetName)
+%msg=subsetSplitGlobal(subsetName,'rootDB',rootDB);
+msg=subsetSplitGlobal(subsetName,'rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});
 
 subsetSMAP_indSub(indSub_Core,rootDB,'CONUS','CoreSite')
-msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB);
+%msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB);
+msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});
 subsetSMAP_indSub(indSub_CRN,rootDB,'CONUS','CRN')
-msg2=subsetSplitGlobal('CRN','rootDB',rootDB);
+%msg2=subsetSplitGlobal('CRN','rootDB',rootDB);
+msg2=subsetSplitGlobal('CRN','rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});

@@ -9,7 +9,7 @@ global kPath
 if strcmp(productName,'surface')
     rootOut=kPath.OutSMAP_L3_NA;
     rootDB=kPath.DBSMAP_L3_NA;
-    outName='CONUSv4f1wSite_soilM';
+    outName='CONUSv4f1wSite_soilM2';
     targetName='SMAP_AM';
     yrLst=[2000:2017];
     if strcmp(siteName,'CoreSite')
@@ -24,7 +24,7 @@ end
  SMAP.t=time;
  SMAP.crd=crd;
  
-dataOut=readRnnPred(outName,dataName,300,[yrLst(1),yrLst(end)],'rootOut',rootOut,'rootDB',rootDB);
+dataOut=readRnnPred(outName,dataName,500,[yrLst(1),yrLst(end)],'rootOut',rootOut,'rootDB',rootDB);
 LSTM.v=dataOut;
 LSTM.t=[datenumMulti(yrLst(1)*10000+401):datenumMulti((yrLst(end)+1)*10000+331)]';
 LSTM.crd=SMAP.crd;

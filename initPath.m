@@ -36,6 +36,8 @@ if strcmp(pcStr,'server')
     kPath.OutSMAP_L4_NA='/mnt/sdb1/rnnSMAP/output_SMAPL4grid_NA/';
     kPath.OutSelf_L3='/mnt/sdb1/rnnSMAP/output_SMAPgrid_self/';
     kPath.OutUncer_L3='/mnt/sdb1/rnnSMAP/output_uncertainty/';
+    kPath.OutSigma_L3_NA='/mnt/sdb1/rnnSMAP/output_SMAPsigma_NA/';
+    kPath.OutSigma_L4_NA='/mnt/sdb1/rnnSMAP/output_SMAPL4sigma_NA/';
     
     kPath.CRN='/mnt/sdb1/Database/CRN/';
     kPath.SCAN='/mnt/sdb1/Database/SCAN/';

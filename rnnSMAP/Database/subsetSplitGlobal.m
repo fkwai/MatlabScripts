@@ -23,8 +23,16 @@ indSub=C{1};
 fclose(fid);
 
 if indSub==-1
-    dataName='Global';
-    disp('extract data from Global database')
+    if strcmp(rootDB,kPath.DBSMAP_L3_Global)
+        dataName='Global';
+    elseif strcmp(rootDB,kPath.DBSMAP_L3_NA)
+        dataName='CONUS';
+    elseif strcmp(rootDB,kPath.DBSMAP_L4_NA)
+        dataName='CONUS';
+    else
+        error('do not know where to extract data');
+    end        
+    disp(['extract data from ',dataName,' database'])
 end
 inDB=[rootDB,dataName,filesep];
 outDB=[rootDB,subsetName,filesep];
