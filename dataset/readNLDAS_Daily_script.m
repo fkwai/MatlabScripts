@@ -2,9 +2,9 @@
 % default to convert all fields. see the -1 line 27
 
 global kPath
-yLst=2018;
-dataLst={'FORA','FORB','NOAH'};
-%dataLst={'NOAH'};
+yLst=2000:2016;
+%dataLst={'FORA','FORB','NOAH'};
+dataLst={'VIC'};
 parpool(50)
 for yr=yLst
     sdn=datenumMulti(yr*10000+101,1);

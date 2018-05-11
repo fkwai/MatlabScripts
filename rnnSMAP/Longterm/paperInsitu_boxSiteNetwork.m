@@ -8,7 +8,7 @@ productNameLst={'surface','rootzone'};
 %for iP=1:length(productNameLst)
 for iP=1:2
     productName=productNameLst{iP};
-    if strcmp(productName,'surface')        
+    if strcmp(productName,'surface')
         modelName1={'LSOIL_0-10'};
         modelName2={'SOILM_0-10'};
         modelFactor=100;
@@ -16,15 +16,15 @@ for iP=1:2
         modelName1={'LSOIL_0-10','LSOIL_10-40','LSOIL_40-100'};
         modelName2={'SOILM_0-100'};
         modelFactor=1000;
-    end    
+    end
     [SMAP,LSTM,ModelTemp1]=readHindcastSite( 'CRN',productName,'pred',modelName1);
-    [~,~,Model2]=readHindcastSite( 'CRN',productName,'pred',modelName2);    
-    Model1=struct('v',[],'t',ModelTemp1(1).t);    
+    [~,~,Model2]=readHindcastSite( 'CRN',productName,'pred',modelName2);
+    Model1=struct('v',[],'t',ModelTemp1(1).t);
     for k=1:length(ModelTemp1)
         Model1.v=cat(3,Model1.v,ModelTemp1(k).v);
     end
     Model1.v=sum(Model1.v,3)./modelFactor;
-    Model2.v=sum(Model2.v,3)./modelFactor;   
+    Model2.v=sum(Model2.v,3)./modelFactor;
     
     %% load no model prediction
     if strcmp(productName,'surface')
@@ -35,12 +35,12 @@ for iP=1:2
     end
     LSTM_noModel.t=LSTM.t;
     
-     %% remove frozen
-%     maskFrozen=abs(Model1.v-Model2.v)>0.001;
-%     LSTM.v(maskFrozen)=nan;
-%     LSTM_noModel.v(maskFrozen)=nan;
-%     Model1.v(maskFrozen)=nan;
-%     Model2.v(maskFrozen)=nan;
+    %% remove frozen
+    %     maskFrozen=abs(Model1.v-Model2.v)>0.001;
+    %     LSTM.v(maskFrozen)=nan;
+    %     LSTM_noModel.v(maskFrozen)=nan;
+    %     Model1.v(maskFrozen)=nan;
+    %     Model2.v(maskFrozen)=nan;
     
     %% load site
     if strcmp(siteName,'CRN')
@@ -49,7 +49,7 @@ for iP=1:2
     elseif strcmp(siteName,'SCAN')
         temp=load([kPath.SCAN,filesep,'siteSCAN_CONUS']);
         siteMat=temp.siteSCAN;
-    end    
+    end
     
     %% find index of SMAP and LSTM
     indGrid=zeros(length(siteMat),1);
@@ -81,7 +81,7 @@ for iP=1:2
             tsSite.v=soilM(:,1);
         elseif strcmp(productName,'rootzone')
             weight=d2w_rootzone(siteMat(k).depth./100);
-            weight=VectorDim(weight,1);            
+            weight=VectorDim(weight,1);
             tsSite.v=soilM*weight;
         end
         tsSite.t=siteMat(k).tnum;
@@ -90,36 +90,40 @@ for iP=1:2
         tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
         tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
         tsModel.t=Model2.t; tsModel.v=Model2.v(:,ind);
-        tsLSTM2.t=LSTM_noModel.t; tsLSTM2.v=LSTM_noModel.v(:,ind);
+        %tsLSTM2.t=LSTM_noModel.t; tsLSTM2.v=LSTM_noModel.v(:,ind);
+        tsComb.v=(tsLSTM.v+tsModel.v)/2;tsComb.t=LSTM.t;
         
         out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
-        out2 = statCal_hindcast(tsSite,tsLSTM2,tsSMAP);
+        %out2 = statCal_hindcast(tsSite,tsLSTM2,tsSMAP);
         outModel = statCal_hindcast(tsSite,tsModel,tsSMAP);
-        if ~isempty(out) && ~isempty(out2) && ~isempty(outModel)
+        outComb = statCal_hindcast(tsSite,tsComb,tsSMAP);
+        %if ~isempty(out) && ~isempty(out2) && ~isempty(outModel)
+        if ~isempty(out) && ~isempty(outModel)
             for j=1:length(fieldLst)
                 field=fieldLst{j};
-                tempAdd=[out.(field),out2.(field),outModel.(field)];
-                plotStr.(field)=[plotStr.(field);[tempAdd([1,2,5,3,9,12])]];
+                tempAdd=[out.(field),outModel.(field),outComb.(field)];
+                plotStr.(field)=[plotStr.(field);[tempAdd([1,5,9,3,2,6,10])]];
             end
         end
     end
     
     %% plot Box
     f=figure('Position',[1,1,1200,600]);
-    clr='rmgkcb';    
+    clr='rgbkycm';
     yRangeLst={[-0.3,0.3],[0,0.25],[0,0.15],[0,1];...
         [-0.3,0.3],[0,0.3],[0,0.1],[0,1]};
     for j=1:length(fieldLst)
         plotMat={};
-        for k=1:6
+        for k=1:7
             plotMat{1,k}=plotStr.(fieldLst{j})(:,k);
         end
         labelX={'PL LSTM vs in-situ',...
-            'AL LSTM vs in-situ',...
-            'PL LSTM w/o Noah vs in-situ',...
-            'AL SMAP vs in-situ',...
             'PL Noah vs in-situ',...
-            'AL Noah vs SMAP'};
+            'PL Comb vs in-situ',...
+            'AL SMAP vs in-situ',...
+            'AL LSTM vs in-situ',...
+            'AL Noah vs in-situ',...
+            'AL Comb vs in-situ'};
         labelY=titleLst(j);
         yRange=yRangeLst{iP,j};
         pos=[0.1+(j-1)*0.23,0.1,0.18,0.8];
@@ -140,12 +144,12 @@ for iP=1:2
     set( gca, 'Color', 'None', 'XColor', 'None', 'YColor', 'None' ) ;
     text( 0.5,0,titleStr, 'FontSize', 16', 'FontWeight', 'Bold', ...
         'HorizontalAlignment', 'Center', 'VerticalAlignment', 'Bottom' ) ;
-  
+    
     fixFigure
     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.fig'])
     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.jpg'])
     saveas(f,[dirFigure,filesep,'boxPlot_',siteName,'_',productName,'.eps'])
-
+    
     
     
 end

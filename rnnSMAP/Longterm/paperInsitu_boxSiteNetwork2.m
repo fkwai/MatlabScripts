@@ -75,34 +75,37 @@ for iP=1:1
         tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
         tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
         tsModel.t=Model2.t; tsModel.v=Model2.v(:,ind);
+        tsComb.v=(tsLSTM.v+tsModel.v)/2;tsComb.t=LSTM.t;
         
         out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
         outModel = statCal_hindcast(tsSite,tsModel,tsSMAP);
+        outComb = statCal_hindcast(tsSite,tsComb,tsSMAP);
         if ~isempty(out) && ~isempty(outModel)
             for j=1:length(fieldLst)
-                field=fieldLst{j};
-                tempAdd=[out.(field),outModel.(field)];
-                plotStr.(field)=[plotStr.(field);[tempAdd([1,5,2,3,6])]];
+                field=fieldLst{j};                
+                tempAdd=[out.(field),outModel.(field),outComb.(field)];
+                plotStr.(field)=[plotStr.(field);[tempAdd([1,5,9,3,2,6,10])]];                
             end
         end
     end
     
     %% plot Box
     f=figure('Position',[1,1,1200,600]);
-    clr='rmgkcb';    
+    clr='rgbkycm';    
     yRangeLst={[-0.3,0.3],[0,0.25],[0,0.15],[0,1];...
         [-0.3,0.3],[0,0.3],[0,0.1],[0,1]};
     for j=1:length(fieldLst)
         plotMat={};
-        for k=1:5
+        for k=1:7
             plotMat{1,k}=plotStr.(fieldLst{j})(:,k);
         end
         labelX={'PL LSTM vs in-situ',...
                 'PL Noah vs in-situ',...
-                'AL LSTM vs in-situ',...
+                'PL Comb vs in-situ',...
                 'AL SMAP vs in-situ',...
+                'AL LSTM vs in-situ',...
                 'AL Noah vs in-situ',...
-            'AL Noah vs SMAP'};
+                'AL Comb vs in-situ'};
         labelY=titleLst(j);
         yRange=yRangeLst{iP,j};
         pos=[0.1+(j-1)*0.23,0.1,0.18,0.8];
