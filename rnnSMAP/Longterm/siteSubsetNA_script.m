@@ -2,26 +2,6 @@
 % create a subset contains L4v4f1 + Core Site + CRN sites
 global kPath
 
-%% load site crd
-dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep,'siteMat',filesep];
-mat=load([dirCoreSite,'sitePixel_root_unshift.mat']);
-sitePixel=mat.sitePixel;
-mat=load([dirCoreSite,'sitePixel_root_shift.mat']);
-sitePixel_shift=mat.sitePixel;
-siteMat_Core=[sitePixel;sitePixel_shift];
-
-temp=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
-siteMat_CRN=temp.siteCRN;
-
-crdSiteLst_Core=[];
-crdSiteLst_CRN=[];
-for k=1:length(siteMat_Core)
-    crdSiteLst_Core=[crdSiteLst_Core;siteMat_Core(k).crdC];
-end
-for k=1:length(siteMat_CRN)
-    crdSiteLst_CRN=[crdSiteLst_CRN;siteMat_CRN(k).lat,siteMat_CRN(k).lon];
-end
-
 %%
 productName='rootzone';
 if strcmp(productName,'surface')
@@ -40,6 +20,26 @@ elseif strcmp(productName,'rootzone')
     nv=16;
     nf=1;
     distThe=1;
+end
+
+%% load site crd
+dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep,'siteMat',filesep];
+mat=load([dirCoreSite,'sitePixel_root_unshift.mat']);
+sitePixel=mat.sitePixel;
+mat=load([dirCoreSite,'sitePixel_root_shift.mat']);
+sitePixel_shift=mat.sitePixel;
+siteMat_Core=[sitePixel;sitePixel_shift];
+
+temp=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
+siteMat_CRN=temp.siteCRN;
+
+crdSiteLst_Core=[];
+crdSiteLst_CRN=[];
+for k=1:length(siteMat_Core)
+    crdSiteLst_Core=[crdSiteLst_Core;siteMat_Core(k).crdC];
+end
+for k=1:length(siteMat_CRN)
+    crdSiteLst_CRN=[crdSiteLst_CRN;siteMat_CRN(k).lat,siteMat_CRN(k).lon];
 end
 
 %% find index of site
@@ -70,13 +70,21 @@ end
 indSubCONUS=subsetSMAP_interval(nv,nf,caseName,'writeSubFile',0);
 indSub=[indSub_Core;indSub_CRN;indSubCONUS];
 indSub=unique(indSub);
-%subsetSMAP_indSub(indSub,rootDB,'CONUS',subsetName)
-%msg=subsetSplitGlobal(subsetName,'rootDB',rootDB);
-msg=subsetSplitGlobal(subsetName,'rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});
+subsetSMAP_indSub(indSub,rootDB,'CONUS',subsetName)
+msg=subsetSplitGlobal(subsetName,'rootDB',rootDB);
 
 subsetSMAP_indSub(indSub_Core,rootDB,'CONUS','CoreSite')
-%msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB);
-msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});
+msg1=subsetSplitGlobal('CoreSite','rootDB',rootDB);
 subsetSMAP_indSub(indSub_CRN,rootDB,'CONUS','CRN')
-%msg2=subsetSplitGlobal('CRN','rootDB',rootDB);
-msg2=subsetSplitGlobal('CRN','rootDB',rootDB,'varLst',{'SMGP_rootzone','SMGP_surface'});
+msg2=subsetSplitGlobal('CRN','rootDB',rootDB);
+
+%% remove north east four HUCs
+shape=shaperead('/mnt/sdc/Database/Map/HUC/HUC_rmNE.shp');
+indSub=subsetSMAP_shape('CONUSv4f1wSite',shape,'CONUSv4f1wSite_rmNE',...
+    'rootDB',kPath.DBSMAP_L3_NA);
+msg1=subsetSplitGlobal('CONUSv4f1wSite_rmNE','rootDB',kPath.DBSMAP_L3_NA);
+
+indSub=subsetSMAP_shape('CONUSv16f1wSite',shape,'CONUSv16f1wSite_rmNE',...
+    'rootDB',kPath.DBSMAP_L4_NA);
+msg2=subsetSplitGlobal('CONUSv16f1wSite_rmNE','rootDB',kPath.DBSMAP_L4_NA);
+

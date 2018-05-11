@@ -9,7 +9,7 @@ global kPath
 if strcmp(productName,'surface')
     rootOut=kPath.OutSMAP_L3_NA;
     rootDB=kPath.DBSMAP_L3_NA;
-    outName='CONUSv4f1wSite_soilM2';
+    outName='CONUSv4f1wSite_rmNE';
     targetName='SMAP_AM';
     yrLst=[2000:2017];
     if strcmp(siteName,'CoreSite')

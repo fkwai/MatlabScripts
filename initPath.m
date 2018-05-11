@@ -6,16 +6,14 @@ function initPath(varargin)
 
 global kPath
 
-addpath(genpath('.'))
-
 if isempty(varargin)
     pcStr='server';
 else
     pcStr=varargin{1};
 end
 
+%%
 if strcmp(pcStr,'server')
-    kPath.s='/';
     kPath.workDir='/mnt/sdb1/Kuai/';
     
     kPath.SMAP='/mnt/sdb1/Database/SMAP/';
@@ -66,8 +64,29 @@ if strcmp(pcStr,'server')
     
 end
 
-if strcmp(pcStr,'workstation')
-    kPath.s='\';
+if strcmp(pcStr,'smallLinux')
+    kPath.workDir='/mnt/sdc/Kuai/';
+    
+    kPath.DBSMAP_L3='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3_CONUS/';
+    kPath.DBSMAP_L3_Global='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3/';
+    kPath.DBSMAP_L3_NA='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3_NA/';
+    kPath.DBSMAP_L4='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L4_CONUS/';
+    kPath.DBSMAP_L4_NA='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L4_NA/';
+    
+    kPath.OutSMAP_L3='/mnt/sdc/rnnSMAP/output_SMAP/';
+    kPath.OutSMAP_L3_Global='/mnt/sdc/rnnSMAP/output_SMAP_global/';
+    kPath.OutSMAP_L3_NA='/mnt/sdc/rnnSMAP/output_SMAP_NA/';
+    kPath.OutSMAP_L4='/mnt/sdc/rnnSMAP/output_SMAPL4/';
+    kPath.OutSMAP_L4_NA='/mnt/sdc/rnnSMAP/output_SMAPL4_NA/';
+    kPath.OutSelf_L3='/mnt/sdc/rnnSMAP/output_SMAP_self/';    
+    kPath.OutSigma_L3_NA='/mnt/sdc/rnnSMAP/output_SMAPsigma_NA/';
+    kPath.OutSigma_L4_NA='/mnt/sdc/rnnSMAP/output_SMAPL4sigma_NA/';
+    
+    kPath.SMAP_VAL='/mnt/sdc/Database/SMAP/SMAP_VAL/';
+
+end
+
+if strcmp(pcStr,'workstation')    
     kPath.workDir='E:\Kuai\';
     
     kPath.SMAP='E:\Kuai\Data\SMAP\';
@@ -91,9 +110,7 @@ if strcmp(pcStr,'workstation')
     kPath.maskSMAP_CONUS='E:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
 end
 
-if strcmp(pcStr,'pc-kuai')
-    kPath.s='/';
-    
+if strcmp(pcStr,'pc-kuai')    
     kPath.SMAP_VAL='/mnt/sdb/Database/SMAP/SMAP_VAL/';
     
     kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';
@@ -109,7 +126,11 @@ if strcmp(pcStr,'pc-kuai')
     
 end
 
-
+%% code path
+pCode=mfilename('fullpath');
+indSep=strfind(pCode,filesep);
+folderCode=pCode(1:indSep(end));
+addpath(genpath(folderCode))
 disp(['Initialized kPath on ',pcStr])
 
 end

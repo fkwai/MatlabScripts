@@ -1,4 +1,4 @@
-function f=plotBoxSMAP( statMat,labelX,labelY,varargin )
+function f=plotBoxSMAP(statMat,labelX,labelY,varargin)
 % box plot of SMAP LSTM training result
 
 % input:
