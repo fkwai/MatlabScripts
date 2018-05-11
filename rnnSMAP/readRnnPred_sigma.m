@@ -1,4 +1,4 @@
-function [dataPred,dataSig]= readRnnPred_Uncer(outName,dataName,epoch,timeOpt,varargin)
+function [dataPred,dataSig]= readRnnPred_sigma(outName,dataName,epoch,timeOpt,varargin)
 % read prediction from testRnnSMAP.lua into a matrix
 
 global kPath
@@ -38,7 +38,8 @@ end
 %% start
 if drBatch==0
     if doGlobal
-        dataFile=['test_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'.csv'];
+        dataFile1=['test_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'.csv'];
+        dataFile2=['testSigma_',dataName,'_',num2str(syr),'_',num2str(eyr),'_ep',num2str(epoch),'.csv'];
     else
         dataFile1=['test_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];
         dataFile2=['testSigma_',dataName,'_t',num2str(timeOpt),'_epoch',num2str(epoch),'.csv'];

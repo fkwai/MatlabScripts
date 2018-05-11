@@ -1,4 +1,4 @@
-function indSub=subsetSMAP_shape(rootName,shape,subsetName)
+function indSub=subsetSMAP_shape(rootName,shape,subsetName,varargin)
 % split dataset by shapefile
 
 % example:
@@ -9,11 +9,16 @@ function indSub=subsetSMAP_shape(rootName,shape,subsetName)
 % dataName='regionACDs2';
 
 global kPath
-if isempty(kPath)
-    initPath workstation
-end    
-subsetFolder=[kPath.DBSMAP_L3,'Subset',kPath.s];
-crdFileRoot=[kPath.DBSMAP_L3,rootName,kPath.s,'crd.csv'];
+
+varinTab={...
+  'rootDB',kPath.DBSMAP_L3;...
+    };
+
+[rootDB]=...
+    internal.stats.parseArgs(varinTab(:,1),varinTab(:,2), varargin{:});
+
+subsetFolder=[rootDB,'Subset',filesep];
+crdFileRoot=[rootDB,rootName,filesep,'crd.csv'];
 crd=csvread(crdFileRoot);
 
 %% find intersection of shape
@@ -59,7 +64,6 @@ else
         end
     end
 end
-
 
 indSub=find(bPick==1);
 

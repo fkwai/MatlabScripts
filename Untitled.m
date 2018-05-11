@@ -6,10 +6,10 @@ outName='CONUSv4f1wSite_soilM_2017';
 dataName1='CONUSv4f1wSite';
 dataName2='CoreSite';
 
- [xData1,~,crd1,time1] = readDB_Global(dataName1,'SMAP_AM','yrLst',[2017:2017],'rootDB',rootDB);
+[xData1,~,crd1,time1] = readDB_Global(dataName1,'SMAP_AM','yrLst',[2017:2017],'rootDB',rootDB);
 dataOut1=readRnnPred(outName,dataName1,500,[2017,2017],'rootOut',rootOut,'rootDB',rootDB);
 
- [xData2,~,crd2,time2] = readDB_Global(dataName2,'SMAP_AM','yrLst',[2015:2017],'rootDB',rootDB);
+[xData2,~,crd2,time2] = readDB_Global(dataName2,'SMAP_AM','yrLst',[2015:2017],'rootDB',rootDB);
 dataOut2=readRnnPred(outName,dataName2,500,[2015,2017],'rootOut',rootOut,'rootDB',rootDB);
 
 [ind1,ind2]=intersectCrd(crd1,crd2);
@@ -23,15 +23,18 @@ plot(time1,xData1(:,ind),'ro');hold off
 
 
 %%
-file1='/mnt/sdb1/rnnSMAP/output_SMAPsigma_NA/CONUSv4f1wSite_soilM_2017/test_CONUSv4f1wSite_2017_2017_ep500.csv';
-data1=csvread(file1);
-file2='/mnt/sdb1/rnnSMAP/output_uncertainty/CONUSv4f1wSite_test/test_CONUSv4f1wSite_t4_epoch500.csv';
-data2=csvread(file2);
+global kPath
+rootOut=kPath.OutSigma_L3_NA;
+rootDB=kPath.DBSMAP_L3_NA;
+outName='CONUSv4f1_001_200';
+dataName='CONUSv4f1';
 
-ind=randi([1,527]);
-plot(1:365,data1(:,ind),'-b');hold on
-plot(1:365,data2(:,ind),'-r');hold off
+[xData,~,crd,time] = readDB_Global(dataName,'SMAP_AM','yrLst',[2015:2015],'rootDB',rootDB);
+dataOut=readRnnPred_sigma(outName,dataName,500,[2015,2015],'rootOut',rootOut,'rootDB',rootDB);
 
+ind=randi([1,412]);
+plot(time,dataOut(:,ind),'b-');hold on
+plot(time,xData(:,ind),'ro');hold off
 
 %%
 file1='/mnt/sdb1/rnnSMAP/output_SMAPsigma_NA/CoreSite_soilM/testSigma_CoreSite_2017_2017_ep100.csv'
