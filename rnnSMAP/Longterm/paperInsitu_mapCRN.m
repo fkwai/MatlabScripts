@@ -32,7 +32,7 @@ indGrid(indRM)=[];
 dist(indRM)=[];
 
 %% calculate stat
-initMat=zeros(length(siteMat),3)*nan;
+initMat=zeros(length(siteMat),4)*nan;
 statStr=struct('bias',initMat,'rmse',initMat,'ubrmse',initMat,'rho',initMat);
 fieldLst=fieldnames(statStr);
 for k=1:length(siteMat)

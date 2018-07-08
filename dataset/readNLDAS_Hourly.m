@@ -93,8 +93,12 @@ lon=[-124.9375:0.125:-67.0625];
 fieldLst={nldas.parameter};
 for k=1:length(nldas)
     if ~strcmp(nldas(k).level,'surface')
-        ind=find(nldas(k).level==' ');
-        levStr=nldas(k).level(1:ind-1);
+        C=strsplit(nldas(k).level,' ');
+        if strcmp(C{1},'hybrid')
+            levStr=[C{2},C{3}];
+        else
+            levStr=C{1};
+        end
         fieldLst{k}=[fieldLst{k},'_',levStr];
     end
 end

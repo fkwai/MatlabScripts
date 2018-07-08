@@ -26,14 +26,13 @@ f=figure('Position',[1,1,1800,800]);
 kSub=1;
 for iS=1:length(siteNameLst)
     siteName=siteNameLst{iS};
-    slopeMatFile=[dirFigure,'slopeMat_',siteName,'_',productName,'.mat'];
+    slopeMatFile=[dirFigure,'slopeMat_',siteName,'_',productName,'_3yr.mat'];
     
     %% load data
     if strcmp(siteName,'CRN')
         temp=load([kPath.CRN,filesep,'Daily',filesep,'siteCRN.mat']);
         siteMat=temp.siteCRN;
-        [SMAP,LSTM] = readHindcastSite( siteName,productName);
-        %[SMAP,LSTM,~]=readHindcastCONUS('rootzone');
+        [SMAP,LSTM,~]=readHindcastSite2('CRN',productName);
         tField='tnum';
     elseif strcmp(siteName,'CoreSite')
         dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
@@ -94,12 +93,15 @@ for iS=1:length(siteNameLst)
             tic
             ind=indGrid(k);
             if strcmp(siteName,'CRN')
+                soilM=siteMat(k).soilM;
+                soilT=siteMat(k).soilT;
+                soilM(soilT<4)=nan;
                 if strcmp(productName,'surface')
-                    tsSite.v=siteMat(k).soilM(:,1);
+                    tsSite.v=soilM(:,1);
                 elseif strcmp(productName,'rootzone')
                     weight=d2w_rootzone(siteMat(k).depth./100);
                     weight=VectorDim(weight,1);
-                    tsSite.v=siteMat(k).soilM*weight;
+                    tsSite.v=soilM*weight;
                 end
             elseif strcmp(siteName,'CoreSite')
                 tsSite.v=siteMat(k).(vField);
@@ -130,7 +132,7 @@ for iS=1:length(siteNameLst)
 %         x=[-1.432,2.526];
 %         y=[-3.386,-0.5127];
         x=[-2.207,2.526];
-        y=[-2.156,-0.5127];
+        y=[-3.478,-0.5127];
         for k=1:length(x)
             [~,indTs]=min(abs(slopeMat(:,1)-x(k))+abs(slopeMat(:,2)-y(k)));
             titleStr=['CRN ',num2str(siteMat(indTs).ID,'%05d')];
@@ -177,6 +179,8 @@ for iS=1:length(siteNameLst)
         end
     end
     corr(slopeMat(indPick,1),slopeMat(indPick,2))
+    indBig=abs(slopeMat(indPick,1))>0.5&abs(slopeMat(indPick,2))>0.5;
+    corr(slopeMat(indPick(indBig),1),slopeMat(indPick(indBig),2))
 
 end
 

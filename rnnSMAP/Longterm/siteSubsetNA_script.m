@@ -16,8 +16,8 @@ elseif strcmp(productName,'rootzone')
     rootDB=kPath.DBSMAP_L4_NA;
     refName='CONUS';
     caseName='NA_L4';
-    subsetName='CONUSv16f1wSite';
-    nv=16;
+    subsetName='CONUSv4f1wSite';
+    nv=4;
     nf=1;
     distThe=1;
 end

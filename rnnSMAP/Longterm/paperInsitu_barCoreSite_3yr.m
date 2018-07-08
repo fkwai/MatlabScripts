@@ -30,7 +30,7 @@ dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
 productLst={'surface','rootzone'};
 rThe=0.5;
 
-for iP=1:1
+for iP=1:2
     %% load data
     f=figure('Position',[1,1,1400,900]);
     productName=productLst{iP};
@@ -39,29 +39,31 @@ for iP=1:1
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
         vField='vSurf';
         tField='tSurf';
-        rField='rSurf';
-        modelName={'LSOIL_0-10_NOAH'};
-        modelName2={'SOILM_0-10_NOAH'};
+        rField='rSurf';        
+        modelName={'SOILM_0-10_NOAH'};
+        %modelName2={'LSOIL_0-10_NOAH'};
         modelFactor=100;
     elseif strcmp(productName,'rootzone')
         siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
         vField='vRoot';
         tField='tRoot';
-        rField='rRoot';
-        modelName={'LSOIL_0-10_NOAH','LSOIL_10-40_NOAH','LSOIL_40-100_NOAH'};
-        modelName2={'SOILM_0-100_NOAH'};
+        rField='rRoot';        
+        modelName={'SOILM_0-100_NOAH'};
+        %modelName2={'LSOIL_0-10_NOAH','LSOIL_10-40_NOAH','LSOIL_40-100_NOAH'};
         modelFactor=1000;
     end
     
-    [SMAP,LSTM,ModelTemp1]=readHindcastSite2('CoreSite',productName,'pred',modelName);
-    [~,~,Model2]=readHindcastSite2('CoreSite',productName,'pred',modelName2);
-    Model1=struct('v',[],'t',ModelTemp1(1).t);
-    for k=1:length(ModelTemp1)
-        Model1.v=cat(3,Model1.v,ModelTemp1(k).v);
-    end
-    Model1.v=sum(Model1.v,3)./modelFactor;
-    Model2.v=sum(Model2.v,3)./modelFactor;
+    [SMAP,LSTM,Model]=readHindcastSite2('CoreSite',productName,'pred',modelName);
+    Model.v=Model.v/modelFactor;
+    
+%     [~,~,ModelTemp2]=readHindcastSite2('CoreSite',productName,'pred',modelName2);
+%     Model2=struct('v',[],'t',ModelTemp1(1).t);
+%     for k=1:length(ModelTemp1)
+%         Model2.v=cat(3,Model2.v,ModelTemp1(k).v);
+%     end
+%     Model2.v=sum(Model2.v,3)./modelFactor;
+    
     
     pidPlotLst=pidBarStr.(productName);
     temp=load(siteMatFile);
@@ -92,17 +94,20 @@ for iP=1:1
             tsLSTM.t=LSTM.t;
             tsSMAP.v=SMAP.v(:,indSMAP);
             tsSMAP.t=SMAP.t;
-            tsModel.v=Model2.v(:,indSMAP);
-            tsModel.t=Model2.t;
+            tsModel.v=Model.v(:,indSMAP);
+            tsModel.t=Model.t;            
+            tsComb.v=(tsLSTM.v+tsModel.v)/2;
+            tsComb.t=LSTM.t;
             
             out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
             outModel=statCal_hindcast(tsSite,tsModel,tsSMAP);
+            outComb=statCal_hindcast(tsSite,tsComb,tsSMAP);
             for i=1:length(fieldLst)
                 field=fieldLst{i};
                 temp=tempStr.(field);
-                tempAdd=[out.(field),outModel.(field)];
-                tempStr.(field)=[temp;tempAdd([1,5,2,3,6])];
-                tabStrPixel.(field)=[tabStrPixel.(field);tempAdd([1,5,2,3,6])];
+                tempAdd=[out.(field),outModel.(field),outComb.([field])];
+                tempStr.(field)=[temp;tempAdd([1,5,9,3,2,6,10])];
+                tabStrPixel.(field)=[tabStrPixel.(field);tempAdd([1,5,9,3,2,6,10])];
             end
             tabStrPixel.pid=[tabStrPixel.pid;site.ID];
         end
@@ -122,13 +127,13 @@ for iP=1:1
     end
     
     %% plot
-    clr=[1,0,0;...
-        1,0,1;...
+    clr=[1,0,0;...        
         0,1,0;...
-        1,1,0;...
-        0,0,0;...
-        0,1,1;...
         0,0,1;...
+        0,0,0;...
+        1,1,0;...        
+        0,1,1;...
+        1,0,1;...
         ];
     yRange={[-0.1,0.13],[0,0.08],[0,1];...
         [-0.13,0.1],[0,0.06],[0,1]};
@@ -148,9 +153,11 @@ for iP=1:1
         if i==2
             legend('PL LSTM vs in-situ',...
                 'PL Noah vs in-situ',...
-                'AL LSTM vs in-situ',...
+                'PL Comb vs in-situ',...
                 'AL SMAP vs in-situ',...
+                'AL LSTM vs in-situ',...
                 'AL Noah vs in-situ',...
+                'AL Comb vs in-situ',...
                 'location','northwest')
         end
         if iP==1 && i==1
@@ -170,8 +177,8 @@ for iP=1:1
 %         tabOut2,'delimiter',',','precision',8);
     
     fixFigure
-    %saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.fig'])
-    %saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.jpg'])
+    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_3yr.fig'])
+    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_3yr.jpg'])
 end
 % fixFigure
 % saveas(f,[dirFigure,'barPlot_CoreSite','_',num2str(rThe*100,'%02d'),'.fig'])

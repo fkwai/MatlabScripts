@@ -14,10 +14,11 @@ trainName='CONUSv4f1';
 rootOut=kPath.OutSMAP_L4;
 rootDB=kPath.DBSMAP_L4;
 testLst={'LongTerm8595v4f1','LongTerm9505v4f1','LongTerm0515v4f1'};
+testLst2={'LongTerm8595','LongTerm9505','LongTerm0515'};
 modelName='SOILM_0-100';
 % SMAP
 tic
-SMAP.v=readDatabaseSMAP(trainName,targetName,rootDB);
+SMAP.v=readDB_SMAP(trainName,targetName,rootDB);
 SMAP.t=csvread([rootDB,filesep,trainName,filesep,'time.csv']);
 crd=csvread([rootDB,trainName,filesep,'crd.csv']);
 toc
@@ -27,7 +28,7 @@ LSTM.v=[];
 LSTM.t=[];
 for k=1:length(testLst)
     vTemp=readRnnPred(outName,testLst{k},500,0,'rootOut',rootOut,'rootDB',rootDB,'target',targetName);
-    tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
+    tTemp=csvread([rootDB,testLst2{k},filesep,'time.csv']);
     if k>1
         LSTM.v=[LSTM.v;vTemp(2:end,:)];
         LSTM.t=[LSTM.t;tTemp(2:end,:)];
@@ -38,20 +39,20 @@ LSTM2.t=csvread([kPath.DBSMAP_L3,filesep,trainName,filesep,'time.csv']);
 toc
 
 % Model
-tic
-Noah.v=[];
-Noah.t=[];
-for k=1:length(testLst)
-    vTemp=readDatabaseSMAP(testLst{k},modelName,rootDB)./100;
-    tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
-    if k>1
-        Noah.v=[Noah.v;vTemp(2:end,:)];
-        Noah.t=[Noah.t;tTemp(2:end,:)];
-    end
-end
-Noah2.v=readDatabaseSMAP(trainName,modelName)./100;
-Noah2.t=csvread([rootDB,filesep,trainName,filesep,'time.csv']);
-toc
+% tic
+% Noah.v=[];
+% Noah.t=[];
+% for k=1:length(testLst)
+%     vTemp=readDatabaseSMAP(testLst{k},modelName,rootDB)./100;
+%     tTemp=csvread([rootDB,testLst{k},filesep,'time.csv']);
+%     if k>1
+%         Noah.v=[Noah.v;vTemp(2:end,:)];
+%         Noah.t=[Noah.t;tTemp(2:end,:)];
+%     end
+% end
+% Noah2.v=readDatabaseSMAP(trainName,modelName)./100;
+% Noah2.t=csvread([rootDB,filesep,trainName,filesep,'time.csv']);
+% toc
 
 
 %% convert to weekly and monthly
@@ -84,16 +85,16 @@ end
 dataW=nanmean(dataW_All,3);
 
 %% convert to weekly - Noah
-dataD_Noah=Noah.v(indT,:);
-dataW_All=zeros(length(tW),nGrid,7);
-for k=1:7
-    dataW_All(:,:,k)=dataD_Noah(k:end-7+k,:);
-end
-dataW_Noah=nanmean(dataW_All,3);
+% dataD_Noah=Noah.v(indT,:);
+% dataW_All=zeros(length(tW),nGrid,7);
+% for k=1:7
+%     dataW_All(:,:,k)=dataD_Noah(k:end-7+k,:);
+% end
+% dataW_Noah=nanmean(dataW_All,3);
 
 %% calculate percentile 
 dataMat=dataW;
-dataMat_Noah=dataW_Noah;
+%dataMat_Noah=dataW_Noah;
 dataT=tW;
 
 nt=size(dataMat,1);
@@ -128,11 +129,12 @@ end
 
 %% show on map
 shapefile='/mnt/sdb1/Kuai/map/USA.shp';
+shape=shaperead(shapefile);
 [outGrid,xx,yy] = data2grid3d(outMat',crd(:,2),crd(:,1));
 
-t=20141210;
+t=20140506;
 ind=find(dataT==datenumMulti(t));
-showMap(outGrid(:,:,ind),yy,xx,'nLevel',length(prcLst),'shapefile',shapefile,'title',num2str(t));
+showMap(outGrid(:,:,ind),yy,xx,'nLevel',length(prcLst),'shape',shape,'strTitle',num2str(t));
 
 tsStr(1).grid=outGrid;
 tsStr(1).t=dataT;

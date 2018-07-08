@@ -15,10 +15,11 @@ mask=maskMat.mask;
 if ~isdir(dirDB)
     mkdir(dirDB)
 end
-initDBcsvGlobal(dirDB,yrLst,0401,crd)
+%initDBcsvGlobal(dirDB,yrLst,0401,crd)
 
 %% NLDAS
-productLst={'FORA','FORB','NOAH'};
+%productLst={'FORA','FORB','NOAH'};
+productLst={'VIC'};
 for iP=1:length(productLst)
     productName=productLst{iP};
     % initial all fields
@@ -29,6 +30,7 @@ for iP=1:length(productLst)
         fieldName=fileNLDAS(k).name(1:end-4);
         fieldLst{k}=fieldName;
     end
+	fieldLst={'SOILM_lev1','SOILM_0-100'}
     
     yrLstG=[yrLst,yrLst(end)+1];
     tnumG=[datenumMulti(yrLstG(1)*10000+101):datenumMulti(yrLstG(end)*10000+1231)]';
@@ -85,6 +87,7 @@ for iP=1:length(productLst)
     end
 end
 
+%{
 %% SMAP
 matFileLst={'SPL4SMGPv3_surface','SPL4SMGPv3_rootzone'};
 varLst={'SMGP_surface','SMGP_rootzone'};
@@ -164,4 +167,4 @@ dataName='CONUS';
 outVar=scanDatabaseGlobal(dataName,1,'dirRoot',rootDB,'stdB',0.001);
 
 
-
+%}
