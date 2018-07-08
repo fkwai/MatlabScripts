@@ -4,8 +4,8 @@
 global kPath
 % maskFile is created by dataset/datasetMask
 maskFile=[kPath.SMAP,'maskSMAP_CONUS.mat'];
-%yrLst=2000:2017;
-yrLst=2000;
+yrLst=2000:2017;
+
 dirDB=[kPath.DBSMAP_L3_NA,'CONUS',filesep];
 
 maskMat=load(maskFile);
@@ -16,10 +16,11 @@ mask=maskMat.mask;
 if ~isdir(dirDB)
     mkdir(dirDB)
 end
-initDBcsvGlobal(dirDB,yrLst,0401,crd)
+%initDBcsvGlobal(dirDB,yrLst,0401,crd)
 
 %% NLDAS
-productLst={'FORA','FORB','NOAH'};
+%productLst={'FORA','FORB','NOAH'};
+productLst={'VIC'};
 for iP=1:length(productLst)
     productName=productLst{iP};
     % initial all fields
@@ -30,6 +31,10 @@ for iP=1:length(productLst)
         fieldName=fileNLDAS(k).name(1:end-4);
         fieldLst{k}=fieldName;
     end
+    
+    % temp only import several fields
+    fieldLst={'SOILM_lev1','SOILM_0-100'}
+    
     
     yrLstG=[yrLst,yrLst(end)+1];
     tnumG=[datenumMulti(yrLstG(1)*10000+101):datenumMulti(yrLstG(end)*10000+1231)]';
@@ -86,6 +91,7 @@ for iP=1:length(productLst)
     end
 end
 
+%{
 %% SMAP
 matFileLst={[kPath.SMAP,'SMAP_L3_AM.mat'],[kPath.SMAP,'SMAP_L3_PM.mat']};
 varLst={'SMAP_AM','SMAP_PM'};
@@ -171,4 +177,8 @@ dataName='CONUS';
 outVar=scanDatabaseGlobal(dataName,1,'dirRoot',rootDB,'stdB',0.001);
 
 
+%}
+rootDB=kPath.DBSMAP_L3_NA;
+dataName='CONUS';
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017,varLst',{'SOILM_lev1','SOILM_0-100');
 

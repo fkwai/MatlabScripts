@@ -5,7 +5,7 @@ labelLst={{'Reynolds';'Creek'},'Carman',{'Walnut';'Gulch'},...
 nameLst={'Reynolds Creek','Carman','Walnut Gulch',...
     'Little Washita','Fort Cobb','Little River',...
     'St. Josephs','South Fork','TxSON'};
-pidTsStr.surface=[09013601,16013604,16033603,16043604,16063603];
+pidTsStr.surface=[09013601,16013604,16023603,16033603,16043604,16063603];
 %pidTsStr.surface=[04013602,16033603,16063603,16073603];
 pidTsStr.rootzone=[16020917,16030911,16040904,16070905,48010911];
 
@@ -16,7 +16,7 @@ productLst={'surface','rootzone'};
 rThe=0.5;
 
 %for iP=1:length(productLst)
-for iP=1:1
+for iP=1:2
     %% load data
     productName=productLst{iP};
     
@@ -25,20 +25,23 @@ for iP=1:1
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
         vField='vSurf';
         tField='tSurf';
-        rField='rSurf';        
-        modelName={'SOILM_0-10'};
+        rField='rSurf';
+        modelName={'SOILM_0-10_NOAH'};
+        %modelName2={'LSOIL_0-10_NOAH'};
         modelFactor=100;
     elseif strcmp(productName,'rootzone')
         siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
         vField='vRoot';
         tField='tRoot';
-        rField='rRoot';        
-        modelName={'SOILM_0-100'};
+        rField='rRoot';
+        modelName={'SOILM_0-100_NOAH'};
+        %modelName2={'LSOIL_0-10_NOAH','LSOIL_10-40_NOAH','LSOIL_40-100_NOAH'};
         modelFactor=1000;
     end
-    [SMAP,LSTM,Model]=readHindcastSite( 'CoreSite',productName,'pred',modelName);
-    Model.v=Model.v./modelFactor;
+    
+    [SMAP,LSTM,Model]=readHindcastSite2('CoreSite',productName,'pred',modelName);
+    Model.v=Model.v/modelFactor;
     
     pidPlotLst=pidTsStr.(productName);
     temp=load(siteMatFile);
@@ -51,7 +54,11 @@ for iP=1:1
     pidLst=[siteLst.ID]';
     lineW=2;
     
-    f=figure('Position',[1,1,1200,1000]);
+    if strcmp(productName,'surface')
+        f=figure('Position',[1,1,1200,960]);
+    elseif strcmp(productName,'rootzone')
+        f=figure('Position',[1,1,1200,800]);
+    end
     for k=1:length(pidPlotLst)
         [~,indSite,~]=intersect(pidLst,pidPlotLst(k));
         site=siteLst(indSite);
@@ -76,10 +83,15 @@ for iP=1:1
         
         tTrain=SMAP.t(1);
         sd=datenumMulti(20130101);
-        ed=LSTM.t(end);
+        ed=datenumMulti(20170401);
         tnum=sd:ed;
         
-        pos=[0.05,1-k*0.19,0.9,0.15];
+        
+        if strcmp(productName,'surface')
+            pos=[0.05,0.95-k*0.15,0.9,0.12];
+        elseif strcmp(productName,'rootzone')
+            pos=[0.05,0.95-k*0.18,0.9,0.144];
+        end
         subplot('Position',pos)
         %subplot(length(pidPlotLst),1,k)
         
@@ -88,11 +100,17 @@ for iP=1:1
         [~,ind,~]=intersect(tsModel.t,tnum);
         plot(tsModel.t(ind),tsModel.v(ind)-nanmean(tsModel.v(ind)),'-g','LineWidth',lineW);
         [~,ind,~]=intersect(tsComb.t,tnum);
-%         plot(tsComb.t(ind),tsComb.v(ind)-nanmean(tsComb.v(ind)),'-g','LineWidth',lineW);
-%         [~,ind,~]=intersect(tsLSTM.t,tnum);
         plot(tsLSTM.t(ind),tsLSTM.v(ind)-nanmean(tsLSTM.v(ind)),'-b','LineWidth',lineW);
         [~,ind,~]=intersect(tsSite.t,tnum);
         plot(tsSite.t(ind),tsSite.v(ind)-nanmean(tsSite.v(ind)),'-r','LineWidth',lineW);
+        
+        %         plot(tsSMAP.t,tsSMAP.v,'ko','LineWidth',lineW);
+        %         [~,ind,~]=intersect(tsModel.t,tnum);
+        %         plot(tsModel.t(ind),tsModel.v(ind),'-g','LineWidth',lineW);
+        %         [~,ind,~]=intersect(tsComb.t,tnum);
+        %         plot(tsLSTM.t(ind),tsLSTM.v(ind),'-b','LineWidth',lineW);
+        %         [~,ind,~]=intersect(tsSite.t,tnum);
+        %         plot(tsSite.t(ind),tsSite.v(ind),'-r','LineWidth',lineW);
         
         ylimTemp=ylim;
         plot([tTrain,tTrain], ylim,'k-','LineWidth',lineW);
@@ -102,9 +120,9 @@ for iP=1:1
         xlim([sd,ed])
         
         if k==length(pidPlotLst) && strcmp(productName,'rootzone')
-            legend('SMAP','Noah','Noah+LSTM','LSTM','Core Site','location','northwest')
+            legend('SMAP','Noah','LSTM','Core Site','location','northwest')
         elseif k==2&& strcmp(productName,'surface')
-            legend('SMAP','Noah','Noah+LSTM','LSTM','Core Site','location','southwest')
+            legend('SMAP','Noah','LSTM','Core Site','location','southwest')
         end
         if k~=length(pidPlotLst)
             set(gca,'xticklabels',[])
@@ -112,8 +130,8 @@ for iP=1:1
         title(['(',char(96+k),') ',siteName,' ',siteIdStr]);
     end
     fixFigure(f)
-    saveas(f,[dirFigure,'tsCoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.fig'])
-    saveas(f,[dirFigure,'tsCoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.jpg'])
+    saveas(f,[dirFigure,'tsCoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_3yr.fig'])
+    saveas(f,[dirFigure,'tsCoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_3yr.jpg'])
     %saveas(f,[dirFigure,'tsCoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.eps'])
 end
 

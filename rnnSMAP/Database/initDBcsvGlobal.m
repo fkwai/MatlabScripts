@@ -17,7 +17,7 @@ for k=1:length(yrLst)
     yr=yrLst(k);
     yrStr=num2str(yr);
     sd=yr*10000+yrSD;
-    ed=(yr+1)*10000+yrSD;
+    ed=(yr+1)*10000+yrSD-1;
     dirDByear=[dirDB,yrStr,filesep];
     
     
