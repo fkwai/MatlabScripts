@@ -56,7 +56,7 @@ if strcmp(pcStr,'server')
     kPath.maskSMAPL4_CONUS='/mnt/sdb1/Database/SMAP/maskSMAP_CONUS_L4.mat';
     
     kPath.TRMM='/mnt/sdb1/Database/TRMM/TRMM_3B42_Daily.7/';
-    kPath.GPM='/mnt/sdb1/Database/GPM/GPM_3IMERGDF.05//';    
+    kPath.GPM='/mnt/sdb1/Database/GPM/GPM_3IMERGDF.05//';
     
     % add path of nctoolbox
     % addpath('/home/kxf227/install/nctoolbox-1.1.1/')
@@ -66,27 +66,28 @@ end
 
 if strcmp(pcStr,'smallLinux')
     kPath.workDir='/mnt/sdc/Kuai/';
+    folderDB='/mnt/sdc/rnnSMAP/Database_SMAPgrid/';
+    kPath.DBSMAP_L3=[folderDB,'Daily_L3_CONUS/'];
+    kPath.DBSMAP_L3_Global=[folderDB,'Daily_L3/'];
+    kPath.DBSMAP_L3_NA=[folderDB,'Daily_L3_NA/'];
+    kPath.DBSMAP_L4=[folderDB,'Daily_L4_CONUS/'];
+    kPath.DBSMAP_L4_NA=[folderDB,'Daily_L4_NA/'];
     
-    kPath.DBSMAP_L3='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3_CONUS/';
-    kPath.DBSMAP_L3_Global='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3/';
-    kPath.DBSMAP_L3_NA='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L3_NA/';
-    kPath.DBSMAP_L4='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L4_CONUS/';
-    kPath.DBSMAP_L4_NA='/mnt/sdc/rnnSMAP/Database_SMAPgrid/Daily_L4_NA/';
-    
-    kPath.OutSMAP_L3='/mnt/sdc/rnnSMAP/output_SMAP/';
-    kPath.OutSMAP_L3_Global='/mnt/sdc/rnnSMAP/output_SMAP_global/';
-    kPath.OutSMAP_L3_NA='/mnt/sdc/rnnSMAP/output_SMAP_NA/';
-    kPath.OutSMAP_L4='/mnt/sdc/rnnSMAP/output_SMAPL4/';
-    kPath.OutSMAP_L4_NA='/mnt/sdc/rnnSMAP/output_SMAPL4_NA/';
-    kPath.OutSelf_L3='/mnt/sdc/rnnSMAP/output_SMAP_self/';    
-    kPath.OutSigma_L3_NA='/mnt/sdc/rnnSMAP/output_SMAPsigma_NA/';
-    kPath.OutSigma_L4_NA='/mnt/sdc/rnnSMAP/output_SMAPL4sigma_NA/';
+    folderOut='/mnt/sdc/rnnSMAP/Output_SMAPgrid/';
+    kPath.OutSMAP_L3=[folderOut,'L3_CONUS/'];
+    kPath.OutSMAP_L3_Global=[folderOut,'L3_Global/'];
+    kPath.OutSMAP_L3_NA=[folderOut,'L3_NA/'];
+    kPath.OutSMAP_L4=[folderOut,'L4_CONUS/'];
+    kPath.OutSMAP_L4_NA=[folderOut,'L4_NA/'];
+    kPath.OutSelf_L3=[folderOut,'L3_self/'];
+    kPath.OutSigma_L3_NA=[folderOut,'L3_NA_sigma/'];
+    kPath.OutSigma_L4_NA=[folderOut,'L4_NA_sigma/'];
     
     kPath.SMAP_VAL='/mnt/sdc/Database/SMAP/SMAP_VAL/';
-
+    
 end
 
-if strcmp(pcStr,'workstation')    
+if strcmp(pcStr,'workstation')
     kPath.workDir='E:\Kuai\';
     
     kPath.SMAP='E:\Kuai\Data\SMAP\';
@@ -110,7 +111,7 @@ if strcmp(pcStr,'workstation')
     kPath.maskSMAP_CONUS='E:\Kuai\rnnSMAP\maskSMAP_CONUS.mat';
 end
 
-if strcmp(pcStr,'pc-kuai')    
+if strcmp(pcStr,'pc-kuai')
     kPath.SMAP_VAL='/mnt/sdb/Database/SMAP/SMAP_VAL/';
     
     kPath.DBSMAP_L3='/mnt/sdb/rnnSMAP/Database_SMAPgrid/Daily/';

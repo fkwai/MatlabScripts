@@ -60,19 +60,19 @@ else
         data2=batchMat.sigLSTM_batch;
     else
         disp('--> one by one for the first time')
-        dataFile1=[rootOut,outName,filesep,batchName,filesep,'drEm_1.csv'];
+        dataFile1=[rootOut,outName,filesep,batchName,filesep,'drMC_0.csv'];
         temp1=csvread(dataFile1);
         data1=zeros([size(temp1),drBatch]);
         data1(:,:,1)=temp1;
-        dataFile2=[rootOut,outName,filesep,batchName,filesep,'drEmSigma_1.csv'];
+        dataFile2=[rootOut,outName,filesep,batchName,filesep,'drSigma_0.csv'];
         temp2=csvread(dataFile2);
         data2=zeros([size(temp2),drBatch]);
         data2(:,:,1)=temp2;
-        for k=2:drBatch
-            dataFile1=[rootOut,outName,filesep,batchName,filesep,'drEm_',num2str(k),'.csv'];
+        for k=1:drBatch-1
+            dataFile1=[rootOut,outName,filesep,batchName,filesep,'drMC_',num2str(k),'.csv'];
             temp1=csvread(dataFile1);
             data1(:,:,k)=temp1;
-            dataFile2=[rootOut,outName,filesep,batchName,filesep,'drEmSigma_',num2str(k),'.csv'];
+            dataFile2=[rootOut,outName,filesep,batchName,filesep,'drSigma_',num2str(k),'.csv'];
             temp2=csvread(dataFile2);
             data2(:,:,k)=temp2;
         end

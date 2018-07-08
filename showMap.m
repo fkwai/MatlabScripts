@@ -99,14 +99,14 @@ elseif isfield(landareas,'X')
 end
 
 if ~isempty(strTitle)
-    title(strTitle,'fontSize',20)
+    title(strTitle,'fontSize',16)
 end
 if ~isempty(colorRange)
     %caxis auto
     caxis([0,nColor])
     h=colorbar('southoutside','Ticks',tick,'TickLabels',tickL);
     if setCBloc==1
-        set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',20,...
+        set(h,'Position',[0.13,0.08,0.77,0.04],'fontsize',16,...
             'Ticklength',0.025,'LineWidth',1.5)
     end
 end

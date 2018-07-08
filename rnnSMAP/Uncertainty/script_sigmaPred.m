@@ -5,8 +5,8 @@ rootDB=kPath.DBSMAP_L3_NA;
 dataName='CONUSv4f1';
 epoch=500;
 
-strLstC1={'1d2','3','5'};
-strLstC2={'0d05','0d15','0d3'};
+strLstC1={'1d1','2','3'};
+strLstC2={'0d2','2','4'};
 
 saveFolder='/mnt/sdc/Kuai/rnnSMAP_result/sigma/';
 
@@ -30,6 +30,8 @@ k=0;
 sigmaMat=struct('strC1','','strC2','','yLSTM1',[],'yLSTM2',[],...
     'ySigma1',[],'ySigma2',[],'sig1',[],'sig2',[]);
 fDist=figure('Position',[1,1,1200,800]);
+fEst=figure('Position',[1,1,1200,800]);
+
 
 %% iter to plot map / save data for plot
 for i1=1:length(strLstC1)
@@ -51,44 +53,60 @@ for i1=1:length(strLstC1)
         stat1=statCal(yLSTM1,ySMAP1);
         stat2=statCal(yLSTM2,ySMAP2);
         statMat=[statMat;{stat1.(statStr),stat2.(statStr)}];
-        labelY=[labelY;{[strC1,',',strC2]}];
+        labelY=[labelY;{[num2str(C1),',',num2str(C2)]}];
         
-        %% sigma map
-        sig1=sqrt(exp(ySigma1))*ySMAP_stat(4)^2;
-        sig2=sqrt(exp(ySigma2))*ySMAP_stat(4)^2;
-        [gridSig,xx,yy] = data2grid3d(sig2',crd(:,2),crd(:,1));
-        [gridRmse,~,~] = data2grid(stat2.rmse',crd(:,2),crd(:,1));
-        fmap=showMap(mean(gridSig,3),yy,xx,'strTitle',['test sigma c1=',num2str(C1),',c2=',num2str(C1)]);
-        saveas(fmap,[saveFolder,'sigmaMap',strC1,'_',strC2,'.png'])
-        fmap=showMap(gridRmse,yy,xx,'strTitle',['test RMSE c1=',num2str(C1),',c2=',num2str(C1)]);
-        saveas(fmap,[saveFolder,'rmseMap',strC1,'_',strC2,'.png'])
+%         %% sigma map
+%         strTitle=['c1=',num2str(C1),',c2=',num2str(C2)];
+%         sig1=sqrt(exp(ySigma1))*ySMAP_stat(4)^2;
+%         sig2=sqrt(exp(ySigma2))*ySMAP_stat(4)^2;
+%         [gridSig,xx,yy] = data2grid3d(sig2',crd(:,2),crd(:,1));
+%         [gridRmse,~,~] = data2grid(stat2.rmse',crd(:,2),crd(:,1));
+%         
+%         fmap=showMap(mean(gridSig,3),yy,xx,'strTitle',['test sigma ',strTitle],...
+%             'Position',[1,1,600,400],'lonTick',[],'latTick',[]);
+%         saveas(fmap,[saveFolder,'sigmaMap',strC1,'_',strC2,'.png'])
+%         close(fmap)
+%         fmap=showMap(gridRmse,yy,xx,'strTitle',['RMSE ',strTitle],...
+%             'Position',[1,1,600,400],'lonTick',[],'latTick',[]);
+%         saveas(fmap,[saveFolder,'rmseMap',strC1,'_',strC2,'.png'])
+%         close(fmap)
+        
+        %% sigma vs rmse
+        figure(fEst);
+        subplot(length(strLstC1),length(strLstC2),k)
+        plot(nanmean(sig2),stat2.rmse,'*');hold on
+        lsline
+        rho=corr(nanmean(sig2)',stat2.rmse);
+        title(['c1=',num2str(C1),';c2=',num2str(C2),';corr=',num2str(rho,'%.2f')])
+        xlabel('sigma')
+        ylabel('RMSE')
         
         %% distribution of sigma
-        alpha=C1-1;
-        beta=C2/2*ySMAP_stat(4);
-        sigSq1=sig1(:);
-        sigSq2=sig2(:);
-        [yHist1,xHist1] = histcounts(sigSq1,100);
-        dx1=nanmean(xHist1(2:end)-xHist1(1:end-1));
-        xDist1=(xHist1(1:end-1)+xHist1(2:end))/2;
-        yDist1=yHist1./length(sigSq1)./dx1;
-        [yHist2,xHist2] = histcounts(sigSq2,100);
-        dx2=nanmean(xHist2(2:end)-xHist2(1:end-1));
-        xDist2=(xHist2(1:end-1)+xHist2(2:end))/2;
-        yDist2=yHist2./length(sigSq2)./dx2;
-        
-        sigMax=max([sigSq1;sigSq2]);
-        xDist=linspace(0,sigMax,100);
-        %xDistSq=xDist.^2;
-        yDist=beta^alpha/gamma(alpha)*xDist.^(-alpha-1).*exp(-beta./xDist);
-        figure(fDist);
-        subplot(length(strLstC1),length(strLstC2),k)
-        plot(xDist,yDist,'k');hold on
-        plot(xDist1,yDist1,'b');hold on
-        plot(xDist2,yDist2,'r');hold off
-        legend('ref PDF','train','test')
-        xlabel('sigma sq')
-        title(['c1=',num2str(C1),'; ','c2=',num2str(C2)])
+%         alpha=C1-1;
+%         beta=C2/2*ySMAP_stat(4);
+%         sigSq1=sig1(:);
+%         sigSq2=sig2(:);
+%         [yHist1,xHist1] = histcounts(sigSq1,100);
+%         dx1=nanmean(xHist1(2:end)-xHist1(1:end-1));
+%         xDist1=(xHist1(1:end-1)+xHist1(2:end))/2;
+%         yDist1=yHist1./length(sigSq1)./dx1;
+%         [yHist2,xHist2] = histcounts(sigSq2,100);
+%         dx2=nanmean(xHist2(2:end)-xHist2(1:end-1));
+%         xDist2=(xHist2(1:end-1)+xHist2(2:end))/2;
+%         yDist2=yHist2./length(sigSq2)./dx2;
+%         
+%         sigMax=max([sigSq1;sigSq2]);
+%         xDist=linspace(0,sigMax,100);
+%         %xDistSq=xDist.^2;
+%         yDist=beta^alpha/gamma(alpha)*xDist.^(-alpha-1).*exp(-beta./xDist);
+%         figure(fDist);
+%         subplot(length(strLstC1),length(strLstC2),k)
+%         plot(xDist,yDist,'k','LineWidth',2);hold on
+%         plot(xDist1,yDist1,'b','LineWidth',2);hold on
+%         plot(xDist2,yDist2,'r','LineWidth',2);hold off
+%         legend('ref PDF','train','test')
+%         xlabel('sigma sq')
+%         title(['c1=',num2str(C1),'; ','c2=',num2str(C2)])
         
         %% save data
         sigmaMat(k)=struct('strC1',strC1,'strC2',strC2,'yLSTM1',yLSTM1,'yLSTM2',yLSTM2,...
@@ -99,8 +117,19 @@ end
 save([saveFolder,'sigmaMat.mat'],'sigmaMat','ySMAP1','ySMAP2',...
     'yLSTM1_org','yLSTM2_org','ySMAP_stat')
 
+%% distribution figure
+% fixFigure(fDist)
+% saveas(fDist,[saveFolder,'distFig.png'])
+
+%% sigma vs RMSE figure
+fixFigure(fEst)
+saveas(fEst,[saveFolder,'sigmaVsRMSE.png'])
+
+
 %% box plot for rmse
-f=plotBoxSMAP(statMat,{'train','test'},labelY,'yRange',[0,0.08]);
-saveas(f,[saveFolder,'soilmBox.png'])
+fBox=figure('Position',[1,1,1200,600]);
+plotBoxSMAP(statMat,{'train','test'},labelY,'yRange',[0,0.08],'newFig',0);
+fixFigure(fBox)
+saveas(fBox,[saveFolder,'soilmBox.png'])
 
 

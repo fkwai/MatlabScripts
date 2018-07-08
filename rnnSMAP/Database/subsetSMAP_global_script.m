@@ -1,13 +1,13 @@
 
 %  a script summarized all steps to create existing subsets
 
-%% interval - write Database
+%% global interval
 global kPath
 maskFile=[kPath.SMAP,'maskSMAP_L3.mat'];
 rootDB=[kPath.DBSMAP_L3_Global];
 dbName='Global';
- vecV=[4];
- vecF=[4];
+vecV=[4];
+vecF=[4];
 for k=1:length(vecV)
     interval=vecV(k);
     offset=vecF(k);
@@ -16,7 +16,7 @@ for k=1:length(vecV)
     msg=subsetSplitGlobal(subsetName);
 end
 
-%% get CONUS subset
+%%  CONUS subset
 dbName='Globalv4f4';
 crd=csvread([kPath.DBSMAP_L3_Global,dbName,filesep,'crd.csv']);
 bb=[-125,-66;25,50];
@@ -36,3 +36,17 @@ msg1=subsetSplitGlobal('Globalv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',20
 msg2=subsetSplitGlobal('CONUSv4f4','varLst',{'GPM'},'varConstLst',[],'yrLst',2000:2016);
 
 % CUDA_VISIBLE_DEVICES=0 th trainLSTM.lua -var varLst_Noah -out Globalv8f1_Noah_GPM -train Globalv8f1
+
+%% Continent
+shape=shaperead('/mnt/sdc/Database/Map/world/continent.shp');
+rootDB=kPath.DBSMAP_L3_Global;
+
+for k=1:length(shape)
+    tic
+    contName=strrep(shape(k).CONTINENT,' ','');
+    rootName='Global';
+    subsetName=['Global_',contName];
+    indSub=subsetSMAP_shape(rootName,shape(k),subsetName,'rootDB',rootDB);
+    disp(subsetName)
+    toc
+end

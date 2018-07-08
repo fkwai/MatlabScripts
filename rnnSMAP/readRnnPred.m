@@ -56,12 +56,12 @@ else
         data=batchMat.yLSTM_batch;
     else
         disp('--> one by one for the first time')
-        dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_1.csv'];
+        dataFile=[rootOut,outName,filesep,batchName,filesep,'drMC_0.csv'];
         temp=csvread(dataFile);
         data=zeros([size(temp),drBatch]);
         data(:,:,1)=temp;
-        for k=2:drBatch
-            dataFile=[rootOut,outName,filesep,batchName,filesep,'drEm_',num2str(k),'.csv'];
+        for k=1:drBatch-1
+            dataFile=[rootOut,outName,filesep,batchName,filesep,'drMC_',num2str(k),'.csv'];
             temp=csvread(dataFile);
             data(:,:,k)=temp;
         end
