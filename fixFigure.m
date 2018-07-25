@@ -22,7 +22,8 @@ for i=1:length(C)
     
     hh = get(h,'Title');
     set(hh,'FontSize',titleFont);
-    l = legend(h);
+%     l = legend(h);
+    l = findobj(gcf, 'Type', 'Legend');
     %legend('boxoff')
     if ~isempty(l)
         set(l,'FontSize',legFont);

@@ -84,6 +84,11 @@ if strcmp(pcStr,'smallLinux')
     kPath.OutSigma_L4_NA=[folderOut,'L4_NA_sigma/'];
     
     kPath.SMAP_VAL='/mnt/sdc/Database/SMAP/SMAP_VAL/';
+    kPath.CRN='/mnt/sdc/Database/CRN/';
+    
+    kPath.maskSMAP_CONUS='/mnt/sdc/Database/SMAP/maskSMAP_CONUS.mat';
+    kPath.maskSMAP='/mnt/sdc/Database/SMAP/maskSMAP_L3.mat';
+    kPath.maskSMAPL4_CONUS='/mnt/sdc/Database/SMAP/maskSMAP_CONUS_L4.mat';    
     
 end
 
