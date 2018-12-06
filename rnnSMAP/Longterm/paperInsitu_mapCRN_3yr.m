@@ -1,6 +1,6 @@
 global kPath
 siteName='CRN';
-dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
+dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
 
 productNameLst={'surface','rootzone'};
 for iP=1:length(productNameLst)
@@ -34,7 +34,7 @@ for iP=1:length(productNameLst)
     for k=1:length(siteMat)
         soilM=siteMat(k).soilM;
         soilT=siteMat(k).soilT;
-        soilM(soilT<=4)=nan;
+        soilM(soilT<=0)=nan;
         if strcmp(productName,'surface')
             tsSite.v=soilM(:,1);
         elseif strcmp(productName,'rootzone')
@@ -64,7 +64,7 @@ for iP=1:length(productNameLst)
     end
     
     %% map of sites
-    shapeUS=shaperead('/mnt/sdb1/Kuai/map/USA.shp');
+    shapeUS=shaperead([kPath.workDir,filesep,'Map',filesep,'USA.shp']);
     statLst={'ubrmse','rho'};
     statStrLst={'Unbiased RMSE','Pearson Correlation'};
     titleLst={'LSTM hindcast vs In-situ','SMAP vs In-situ'};

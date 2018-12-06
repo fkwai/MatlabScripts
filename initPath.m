@@ -73,7 +73,7 @@ if strcmp(pcStr,'smallLinux')
     kPath.DBSMAP_L4=[folderDB,'Daily_L4_CONUS/'];
     kPath.DBSMAP_L4_NA=[folderDB,'Daily_L4_NA/'];
     
-    folderOut='/mnt/sdc/rnnSMAP/Output_SMAPgrid/';
+    folderOut='/mnt/sdb/rnnSMAP/Output_SMAPgrid/';
     kPath.OutSMAP_L3=[folderOut,'L3_CONUS/'];
     kPath.OutSMAP_L3_Global=[folderOut,'L3_Global/'];
     kPath.OutSMAP_L3_NA=[folderOut,'L3_NA/'];

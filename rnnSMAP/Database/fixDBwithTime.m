@@ -1,6 +1,6 @@
 
 global kPath
-rootDB=kPath.DBSMAP_L3_Global;
+rootDB=kPath.DBSMAP_L3_NA;
 yrLst=2000:2016;
 
 %% get all database
@@ -36,15 +36,15 @@ for iD=1:length(dataNameLst)
             tnum=tnum(1:end-1);
             dlmwrite([folder,'time.csv'],tnum,'precision',12);
         end
-        parfor k=1:length(fieldNameLst)
+        for k=1:length(fieldNameLst)
             tic
             dataFile=[folder,fieldNameLst{k},'.csv'];
             data=csvread(dataFile);
             if size(data,2)==length(tnum)+1
-                dlmwrite(dataFile,data(:,1:end-1),'precision',8);
-                disp([fieldNameLst{k},' ',num2str(yrLst(iY)),' ',num2str(size(data,2))])
+%                 dlmwrite(dataFile,data(:,1:end-1),'precision',8);
+                disp([dataNameLst{iD},' ',fieldNameLst{k},' ',num2str(yrLst(iY)),' ',num2str(size(data,2))])
             end
-            disp([fieldNameLst{k},' ',num2str(yrLst(iY)),' ',num2str(toc)])
+            disp([dataNameLst{iD},' ',fieldNameLst{k},' ',num2str(yrLst(iY)),' ',num2str(toc)])
         end
     end
 end

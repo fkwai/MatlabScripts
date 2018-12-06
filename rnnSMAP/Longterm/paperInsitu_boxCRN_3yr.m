@@ -1,6 +1,6 @@
 
 global kPath
-dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
+dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
 siteName='CRN';
 %siteName='SCAN';
 productNameLst={'surface','rootzone'};
@@ -54,7 +54,7 @@ for iP=1:2
     for k=1:length(siteMat)
         soilM=siteMat(k).soilM;
         soilT=siteMat(k).soilT;
-        soilM(soilT<=4)=nan;
+        soilM(soilT<=0)=nan;
         if strcmp(productName,'surface')
             tsSite.v=soilM(:,1);
         elseif strcmp(productName,'rootzone')
@@ -67,7 +67,7 @@ for iP=1:2
         ind=indGrid(k);
         tsLSTM.t=LSTM.t; tsLSTM.v=LSTM.v(:,ind);
         tsSMAP.t=SMAP.t; tsSMAP.v=SMAP.v(:,ind);
-        tsModel.t=Model2.t; tsModel.v=Model2.v(:,ind);
+        tsModel.t=Model.t; tsModel.v=Model.v(:,ind);
         tsComb.v=(tsLSTM.v+tsModel.v)/2;tsComb.t=LSTM.t;
         
         out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);

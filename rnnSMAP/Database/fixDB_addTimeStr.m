@@ -1,5 +1,5 @@
 global kPath
-rootDB=kPath.DBSMAP_L4_NA;
+rootDB=kPath.DBSMAP_L3_NA;
 yrLst=2000:2017;
 
 %% get all database
@@ -16,6 +16,7 @@ for k=1:length(folderLst)
 end
 
 %%
+dataNameLst={'CONUSv2fx2','CONUSv2fy2'}
 for iD=1:length(dataNameLst)
     for iY=1:length(yrLst)
         folder=[rootDB,filesep,dataNameLst{iD},filesep,num2str(yrLst(iY)),filesep];

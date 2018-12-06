@@ -29,7 +29,9 @@ if ischar(varLst)
             dirDB=[rootDB,dataName,filesep,num2str(yrLst(k)),filesep];
             fileLst=dir([dirDB,'*.csv']);
             for kk=1:length(fileLst)
-                if ~strcmp(fileLst(kk).name,'time.csv') && ~strcmp(fileLst(kk).name,'crd.csv')
+                if ~strcmp(fileLst(kk).name,'time.csv') ...
+                        && ~strcmp(fileLst(kk).name,'timeStr.csv')...
+                        && ~strcmp(fileLst(kk).name,'crd.csv')
                     varLstTemp=[varLstTemp;{fileLst(kk).name(1:end-4)}];
                 end
             end

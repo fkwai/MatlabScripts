@@ -7,7 +7,8 @@ epoch=500;
 saveFolder='/mnt/sdc/Kuai/rnnSMAP_result/sigma/';
 
 outName='cudnn_local3';
-outSigmaName='cudnn_sigma2';
+outSigmaName='cudnn_sigma';
+outSigmaName='CONUSv4f1_y15_soilM2';
 
 [ySMAP1,ySMAP_stat,crd,t1]=readDB_Global(dataName,'SMAP_AM','yrLst',2015,'rootDB',rootDB);
 [ySMAP2,~,~,t2]=readDB_Global(dataName,'SMAP_AM','yrLst',2016:2017,'rootDB',rootDB);
@@ -58,10 +59,10 @@ yLSTM2_MC=stat2_batch.mean;
 stat1_MC=statCal(yLSTM1_MC,ySMAP1);
 stat2_MC=statCal(yLSTM2_MC,ySMAP2);
 
-ySigma1=mean(sigma1_batch(end,:,:),3);
-ySigma2=mean(sigma2_batch(end,:,:),3);
-sig1=sqrt(exp(ySigma1))*ySMAP_stat(4);
-sig2=sqrt(exp(ySigma2))*ySMAP_stat(4);
+% ySigma1=mean(sigma1_batch(end,:,:),3);
+% ySigma2=mean(sigma2_batch(end,:,:),3);
+% sig1=sqrt(exp(ySigma1))*ySMAP_stat(4);
+% sig2=sqrt(exp(ySigma2))*ySMAP_stat(4);
 
 
 
@@ -82,7 +83,7 @@ showMap(mean(gridStdMC,3),yy,xx,'strTitle',['test stdMC'],...
 
 
 %% 121 plot between error and uncertainty
-% xx=[sig2(end,:)',nanmean(stdMC2)'];
+%xx=[sig2(end,:)',nanmean(stdMC2)'];
 xx=[nanmean(sig2)',nanmean(stdMC2)'];
 xLabelLst={'sigma','stdMC'};
 % xx=[nanmean(sig2.^2)',nanmean(stdMC2.^2)'];

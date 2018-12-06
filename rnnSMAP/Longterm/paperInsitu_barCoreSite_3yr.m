@@ -26,17 +26,19 @@ pidBarStr.rootzone={...
     };
 
 dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
-dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
+dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
 productLst={'surface','rootzone'};
 rThe=0.5;
 
 for iP=1:2
     %% load data
-    f=figure('Position',[1,1,1400,900]);
+    f=figure('Position',[0,0,514,300]);
     productName=productLst{iP};
     if strcmp(productName,'surface')
-        siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_unshift.mat'];
-        siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
+%         siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_unshift.mat'];
+%         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
+        siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_unshift_0D.mat'];
+        siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift_0D.mat'];
         vField='vSurf';
         tField='tSurf';
         rField='rSurf';        
@@ -44,8 +46,10 @@ for iP=1:2
         %modelName2={'LSOIL_0-10_NOAH'};
         modelFactor=100;
     elseif strcmp(productName,'rootzone')
-        siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
-        siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
+%         siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
+%         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
+        siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift_0D.mat'];
+        siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift_0D.mat'];
         vField='vRoot';
         tField='tRoot';
         rField='rRoot';        
@@ -141,11 +145,14 @@ for iP=1:2
         colormap(clr)
         pos=[0.08,0.98-i*0.3,0.9,0.28];
         subplot('Position',pos)
-        bar(plotStr.(fieldLst{i}))
+        b=bar(plotStr.(fieldLst{i}));
+        for kk=1:length(b)
+            set(b(kk),'FaceColor',clr(kk,:))        
+        end
         nSite=size(plotStr.(fieldLst{i}),1);
         xlim([0.5,nSite+0.5])
         if i==length(fieldLst)
-            xTickText(1:nSite,xLabel,'fontsize',16);
+            xTickText(1:nSite,xLabel,'fontsize',9);
         else
             set(gca,'XTick',[1:nSite],'XTickLabel',[])
         end
@@ -169,12 +176,12 @@ for iP=1:2
     end
     
     %% write table
-    tabOut1=[tabStrSite.sid,tabStrSite.bias,tabStrSite.ubrmse,tabStrSite.rho];
-    tabOut2=[tabStrPixel.pid,tabStrPixel.bias,tabStrPixel.ubrmse,tabStrPixel.rho];
-%     dlmwrite([dirFigure,'tabCoreSite_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
-%         tabOut1,'delimiter',',','precision',8);
-%     dlmwrite([dirFigure,'tabCorePixel_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
-%         tabOut2,'delimiter',',','precision',8);
+    tabOut1=[tabStrSite.sid,tabStrSite.ubrmse];
+    tabOut2=[tabStrPixel.pid,tabStrPixel.ubrmse];
+    dlmwrite([dirFigure,'tabCoreSite_',productName,num2str(rThe*100,'%02d'),'.csv'],...
+        tabOut1,'delimiter',',','precision',8);
+    dlmwrite([dirFigure,'tabCorePixel_',productName,num2str(rThe*100,'%02d'),'.csv'],...
+        tabOut2,'delimiter',',','precision',8);
     
     fixFigure
     saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_3yr.fig'])

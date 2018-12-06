@@ -1,3 +1,5 @@
+
+global kPath
 idLst=[0401,0901,1601,1602,1603,1604,1606,1607,4801];
 labelLst={{'Reynolds';'Creek'},'Carman',{'Walnut';'Gulch'},...
     {'Little';'Washita'},{'Fort';'Cobb'},{'Little';'River'},...
@@ -10,7 +12,7 @@ pidTsStr.surface=[09013601,16013604,16023603,16033603,16043604,16063603];
 pidTsStr.rootzone=[16020917,16030911,16040904,16070905,48010911];
 
 dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
-dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
+dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
 productLst={'surface','rootzone'};
 %productLst={'surface'};
 rThe=0.5;
@@ -55,9 +57,9 @@ for iP=1:2
     lineW=2;
     
     if strcmp(productName,'surface')
-        f=figure('Position',[1,1,1200,960]);
+        f=figure('Position',[1,1,1000,1000]);
     elseif strcmp(productName,'rootzone')
-        f=figure('Position',[1,1,1200,800]);
+        f=figure('Position',[1,1,1000,800]);
     end
     for k=1:length(pidPlotLst)
         [~,indSite,~]=intersect(pidLst,pidPlotLst(k));
@@ -88,21 +90,21 @@ for iP=1:2
         
         
         if strcmp(productName,'surface')
-            pos=[0.05,0.95-k*0.15,0.9,0.12];
+            pos=[0.05,1-k*0.16,0.9,0.12];
         elseif strcmp(productName,'rootzone')
-            pos=[0.05,0.95-k*0.18,0.9,0.144];
+            pos=[0.05,1-k*0.19,0.9,0.144];
         end
         subplot('Position',pos)
         %subplot(length(pidPlotLst),1,k)
         
         hold on
-        plot(tsSMAP.t,tsSMAP.v-nanmean(tsSMAP.v),'ko','LineWidth',lineW);
+        plot(tsSMAP.t,tsSMAP.v-nanmean(tsSMAP.v),'ko','LineWidth',1.5);
         [~,ind,~]=intersect(tsModel.t,tnum);
-        plot(tsModel.t(ind),tsModel.v(ind)-nanmean(tsModel.v(ind)),'-g','LineWidth',lineW);
+        plot(tsModel.t(ind),tsModel.v(ind)-nanmean(tsModel.v(ind)),'-.g','LineWidth',lineW);
         [~,ind,~]=intersect(tsComb.t,tnum);
         plot(tsLSTM.t(ind),tsLSTM.v(ind)-nanmean(tsLSTM.v(ind)),'-b','LineWidth',lineW);
         [~,ind,~]=intersect(tsSite.t,tnum);
-        plot(tsSite.t(ind),tsSite.v(ind)-nanmean(tsSite.v(ind)),'-r','LineWidth',lineW);
+        plot(tsSite.t(ind),tsSite.v(ind)-nanmean(tsSite.v(ind)),'--r','LineWidth',lineW);
         
         %         plot(tsSMAP.t,tsSMAP.v,'ko','LineWidth',lineW);
         %         [~,ind,~]=intersect(tsModel.t,tnum);
@@ -119,10 +121,9 @@ for iP=1:2
         datetick('x','yy/mm')
         xlim([sd,ed])
         
-        if k==length(pidPlotLst) && strcmp(productName,'rootzone')
-            legend('SMAP','Noah','LSTM','Core Site','location','northwest')
-        elseif k==2&& strcmp(productName,'surface')
-            legend('SMAP','Noah','LSTM','Core Site','location','southwest')
+        if k==length(pidPlotLst) 
+            legend('SMAP','Noah','LSTM','Core Site','location','northwest',...
+                'Orientation','horizontal')
         end
         if k~=length(pidPlotLst)
             set(gca,'xticklabels',[])

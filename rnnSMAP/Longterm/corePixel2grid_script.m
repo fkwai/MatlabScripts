@@ -70,7 +70,7 @@ for kk=1:length(1:length(pidLstAll))
             msg=[msg,newline,m];
         end
     end
-    save([dirSave,saveNameLst{kk},'.mat'],'sitePixel','msg')
+    save([dirSave,saveNameLst{kk},'_0.mat'],'sitePixel','msg')
     fid=fopen([dirSave,saveNameLst{kk},'_msg.txt'],'wt');
     fprintf(fid,msg);
     fclose(fid);
