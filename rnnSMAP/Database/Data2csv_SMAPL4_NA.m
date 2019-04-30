@@ -165,6 +165,8 @@ varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017,'varLst',{'SMGP_rootzone',
 rootDB=kPath.DBSMAP_L4_NA;
 dataName='CONUS';
 outVar=scanDatabaseGlobal(dataName,1,'dirRoot',rootDB,'stdB',0.001);
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017,'varLst',{});
+
 
 
 %}

@@ -30,7 +30,7 @@ for iY=1:length(yrLst)
     fileLst=dir([dirDByear,'*.csv']);
     for k=1:length(fileLst)
         varName=fileLst(k).name(1:end-4);
-        if ~strcmp(varName,'time')
+        if ~strcmp(varName,'time') && ~strcmp(varName,'timeStr')
             varLstTemp=[varLstTemp;varName];
         end
     end

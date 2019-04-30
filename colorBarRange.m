@@ -81,4 +81,4 @@ tickPos  = t1:div:t2;
 
 % f1 = @(x) num2str(x,'%.3f');
 % tickLabel =cellfun(f1,num2cell(bounds),'UniformOutput',false);
-tickLabel =cellfun(@num2str,num2cell(bounds),'UniformOutput',false);
+tickLabel =cellfun(@(x) num2str(x,'%.2g'),num2cell(bounds),'UniformOutput',false);

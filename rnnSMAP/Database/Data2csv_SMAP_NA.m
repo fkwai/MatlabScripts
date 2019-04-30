@@ -180,5 +180,5 @@ outVar=scanDatabaseGlobal(dataName,1,'dirRoot',rootDB,'stdB',0.001);
 %}
 rootDB=kPath.DBSMAP_L3_NA;
 dataName='CONUS';
-varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017,varLst',{'SOILM_lev1','SOILM_0-100');
+varWarning= statDBcsvGlobal(rootDB,dataName,2015:2017);
 

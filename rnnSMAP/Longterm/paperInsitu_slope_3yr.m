@@ -21,9 +21,10 @@ pidRootLst=[...
     [48010911],...
     ];
 
-dirFigure='/mnt/sdb1/Kuai/rnnSMAP_result/paper_Insitu/';
+dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
 f=figure('Position',[1,1,1800,800]);
 kSub=1;
+slopeMatAll=[]
 for iS=1:length(siteNameLst)
     siteName=siteNameLst{iS};
     slopeMatFile=[dirFigure,'slopeMat_',siteName,'_',productName,'_3yr.mat'];
@@ -39,7 +40,7 @@ for iS=1:length(siteNameLst)
         if strcmp(productName,'surface')
             siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_unshift.mat'];
             siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
-            vField='vSurf';
+            vField='vSurf';cl;e
             tField='tSurf';
             rField='rSurf';
             pidPlotLst=pidSurfLst;
@@ -51,7 +52,7 @@ for iS=1:length(siteNameLst)
             rField='rRoot';
             pidPlotLst=pidRootLst;
         end
-        [SMAP,LSTM] = readHindcastSite( siteName,productName);
+        [SMAP,LSTM] = readHindcastSite2( siteName,productName);
         temp=load(siteMatFile);
         sitePixel=temp.sitePixel;
         temp=load(siteMatFile_shift);
@@ -95,7 +96,7 @@ for iS=1:length(siteNameLst)
             if strcmp(siteName,'CRN')
                 soilM=siteMat(k).soilM;
                 soilT=siteMat(k).soilT;
-                soilM(soilT<4)=nan;
+                soilM(soilT<0)=nan;
                 if strcmp(productName,'surface')
                     tsSite.v=soilM(:,1);
                 elseif strcmp(productName,'rootzone')
@@ -125,16 +126,17 @@ for iS=1:length(siteNameLst)
     pos=[0.05,0.1,0.4,0.8];
     sf=subplot('Position',pos);    
 
-    indPick=find(rateLst>0.9);
+    indPick=find(rateLst>0.9 & (yearMat(:,2)-yearMat(:,1))>2);
     if strcmp(siteName,'CRN')
         subplot(sf);
         plot(slopeMat(indPick,1),slopeMat(indPick,2),'bo','MarkerSize',8,'LineWidth',2);hold on
 %         x=[-1.432,2.526];
 %         y=[-3.386,-0.5127];
-        x=[-2.207,2.526];
-        y=[-3.478,-0.5127];
+        x=[-1.5,2];
+        y=[-1.75,0.5];
         for k=1:length(x)
-            [~,indTs]=min(abs(slopeMat(:,1)-x(k))+abs(slopeMat(:,2)-y(k)));
+            [~,indTsTemp]=min(abs(slopeMat(indPick,1)-x(k))+abs(slopeMat(indPick,2)-y(k)));
+            indTs=indPick(indTsTemp);
             titleStr=['CRN ',num2str(siteMat(indTs).ID,'%05d')];
             subplot(sf)
             text(slopeMat(indTs,1),slopeMat(indTs,2)+0.15,titleStr,'fontsize',16,'HorizontalAlignment','center')
@@ -161,8 +163,9 @@ for iS=1:length(siteNameLst)
         plot(slopeMat(indPick,1),slopeMat(indPick,2),'r*','MarkerSize',8,'LineWidth',2);hold on
         x=[-1.93,1.838];
         y=[-0.8528,0.9149];
+
         for k=1:length(x)
-            [~,indTs]=min(abs(slopeMat(:,1)-x(k))+abs(slopeMat(:,2)-y(k)));
+            [~,indTs]=min(abs(slopeMat(:,1)-x(k))+abs(slopeMat(:,2)-y(k)));            
             titleStr=['Core Site ',num2str(siteMat(indTs).ID,'%08d')];
             subplot(sf)
             text(slopeMat(indTs,1),slopeMat(indTs,2)+0.15,titleStr,'fontsize',16,'HorizontalAlignment','center')
@@ -179,25 +182,29 @@ for iS=1:length(siteNameLst)
         end
     end
     corr(slopeMat(indPick,1),slopeMat(indPick,2))
-    indBig=abs(slopeMat(indPick,1))>0.5&abs(slopeMat(indPick,2))>0.5;
+%     indBig=abs(slopeMat(indPick,1))>0.5&abs(slopeMat(indPick,2))>0.5;
+    indBig=abs(slopeMat(indPick,1))>0.5;
     corr(slopeMat(indPick(indBig),1),slopeMat(indPick(indBig),2))
-
+    
+    slopeMatAll=[slopeMatAll;slopeMat(indPick,:)];
 end
+indBig=abs(slopeMatAll(:,1))>0.5;
+corr(slopeMatAll(indBig,1),slopeMatAll(indBig,2))
+
 
 subplot(sf)
 title(['Comparison of Multi-year Trend of Root-zone Soil Moisture'])
 xlabel('Sens Slope of Site [% / yr]')
 ylabel('Sens Slope of LSTM [% / yr]')
-legend('Core Validation Site','CRN Network','Location','northwest')
-xlim([-4,3])
-ylim([-4,3])
+xlim([-2,2.5])
+ylim([-2,2.5])
 plot121Line
 daspect([1,1,1])
+legend('Core Validation Site','CRN Network','Location','northwest')
+
 
 fixFigure(f)
 saveas(f,[dirFigure,'slopeCRN','_',productName,'.fig'])
-saveas(f,[dirFigure,'slopeCRN','_',productName,'.jpg'])
-saveas(f,[dirFigure,'slopeCRN','_',productName,'.eps'])
 
 
 

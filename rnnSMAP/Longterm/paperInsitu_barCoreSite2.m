@@ -26,11 +26,11 @@ pidBarStr.rootzone={...
     };
 
 dirCoreSite=[kPath.SMAP_VAL,'coresite',filesep];
-dirFigure=[kPath.workDir,'rnnSMAP_result',filesep,'paper_Insitu',filesep];
+dirFigure=[kPath.workDir,'rnnSMAP_result/paper_Insitu/'];
 productLst={'surface','rootzone'};
 rThe=0.5;
 
-for iP=1:2
+for iP=1:1
     %% load data
     f=figure('Position',[1,1,1400,900]);
     productName=productLst{iP};
@@ -39,39 +39,29 @@ for iP=1:2
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_surf_shift.mat'];
         vField='vSurf';
         tField='tSurf';
-        rField='rSurf';        
-        modelName={'SOILM_0-10_NOAH','SOILM_lev1_VIC'};
+        rField='rSurf';
+        modelName={'LSOIL_0-10_NOAH'};
+        modelName2={'SOILM_0-10_NOAH'};
         modelFactor=100;
     elseif strcmp(productName,'rootzone')
         siteMatFile=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_unshift.mat'];
         siteMatFile_shift=[dirCoreSite,filesep,'siteMat',filesep,'sitePixel_root_shift.mat'];
         vField='vRoot';
         tField='tRoot';
-        rField='rRoot';        
-        modelName={'SOILM_0-100_NOAH','SOILM_0-100_VIC'};
+        rField='rRoot';
+        modelName={'LSOIL_0-10_NOAH','LSOIL_10-40_NOAH','LSOIL_40-100_NOAH'};
+        modelName2={'SOILM_0-100_NOAH'};
         modelFactor=1000;
     end
     
-    [SMAP,LSTM,ModelTemp]=readHindcastSite2('CoreSite',productName,'pred',modelName);
-    Model=ModelTemp(1);Model.v=Model.v/modelFactor;
-    Model2=ModelTemp(2);Model2.v=Model2.v/modelFactor;
-    
-    %% load one year training
-    if strcmp(productName,'surface')
-        rootDB=kPath.DBSMAP_L3_NA;
-        rootOut=kPath.OutSMAP_L3_NA;        
-        test.LSTM=readRnnPred('CONUS_2017_Forcing','CoreSite',500,[2015,2016],...
-            'rootOut',rootOut,'rootDB',rootDB,'targetName','SMAP_AM');
-        [test.SMAP,~,test.crd,time] = readDB_Global('CoreSite','SMAP_AM',...
-            'yrLst',[2015:2016],'rootDB',rootDB);
-    elseif strcmp(productName,'rootzone')
-        rootDB=kPath.DBSMAP_L4_NA;
-        rootOut=kPath.OutSMAP_L4_NA;        
-        test.LSTM=readRnnPred('CONUSv4f1wSite_2017_Forcing','CoreSite',500,[2015,2016],...
-            'rootOut',rootOut,'rootDB',rootDB,'targetName','SMGP_rootzone');
-        [test.SMAP,~,test.crd,time] = readDB_Global('CoreSite','SMGP_rootzone',...
-            'yrLst',[2015:2016],'rootDB',rootDB);
-    end    
+    [SMAP,LSTM,ModelTemp1]=readHindcastSite2('CoreSite',productName,'pred',modelName);
+    [~,~,Model2]=readHindcastSite2('CoreSite',productName,'pred',modelName2);
+    Model1=struct('v',[],'t',ModelTemp1(1).t);
+    for k=1:length(ModelTemp1)
+        Model1.v=cat(3,Model1.v,ModelTemp1(k).v);
+    end
+    Model1.v=sum(Model1.v,3)./modelFactor;
+    Model2.v=sum(Model2.v,3)./modelFactor;
     
     pidPlotLst=pidBarStr.(productName);
     temp=load(siteMatFile);
@@ -98,30 +88,21 @@ for iP=1:2
             tsSite.v=site.(vField);
             tsSite.v(site.(rField)<rThe)=nan;
             tsSite.t=site.(tField);
-            tsLSTM.v=LSTM.v(:,indSMAP);tsLSTM.t=LSTM.t;
-            tsSMAP.v=SMAP.v(:,indSMAP);tsSMAP.t=SMAP.t;
-            tsModel.v=Model.v(:,indSMAP);tsModel.t=Model.t;            
-            tsModel2.v=Model2.v(:,indSMAP);tsModel2.t=Model2.t;           
-            tsComb.v=(tsLSTM.v+tsModel.v)/2;tsComb.t=LSTM.t;
-            tsComb2.v=(tsLSTM.v+tsModel2.v)/2;tsComb2.t=tsModel.t;
-            tsComb3.v=(tsModel.v+tsModel2.v)/2;tsComb3.t=tsModel.t;
+            tsLSTM.v=LSTM.v(:,indSMAP);
+            tsLSTM.t=LSTM.t;
+            tsSMAP.v=SMAP.v(:,indSMAP);
+            tsSMAP.t=SMAP.t;
+            tsModel.v=Model2.v(:,indSMAP);
+            tsModel.t=Model2.t;
             
             out = statCal_hindcast(tsSite,tsLSTM,tsSMAP);
             outModel=statCal_hindcast(tsSite,tsModel,tsSMAP);
-            outModel2=statCal_hindcast(tsSite,tsModel2,tsSMAP);
-            outComb=statCal_hindcast(tsSite,tsComb,tsSMAP);
-            outComb2=statCal_hindcast(tsSite,tsComb2,tsSMAP);
-            outComb3=statCal_hindcast(tsSite,tsComb3,tsSMAP);
-            
-            [C,indTest]=min(sum(abs(site.crdC-test.crd),2));
-            outTest=statCal(test.LSTM(:,indTest),test.SMAP(:,indTest));
-            outTest.rho=outTest.rsq;
             for i=1:length(fieldLst)
                 field=fieldLst{i};
                 temp=tempStr.(field);
-                tempAdd=[outComb.(field),outComb2.(field),outComb3.(field),outTest.(field)];
-                tempStr.(field)=[temp;tempAdd([1,5,9,13,2,6,10])];
-                tabStrPixel.(field)=[tabStrPixel.(field);tempAdd([1,5,9,13,2,6,10])];
+                tempAdd=[out.(field),outModel.(field)];
+                tempStr.(field)=[temp;tempAdd([1,5,2,3,6])];
+                tabStrPixel.(field)=[tabStrPixel.(field);tempAdd([1,5,2,3,6])];
             end
             tabStrPixel.pid=[tabStrPixel.pid;site.ID];
         end
@@ -141,13 +122,13 @@ for iP=1:2
     end
     
     %% plot
-    clr=[1,0,0;...        
+    clr=[1,0,0;...
+        1,0,1;...
         0,1,0;...
-        0,0,1;...
+        1,1,0;...
         0,0,0;...
-        1,1,0;...        
-        0,1,1;...        
-        1,0,1;...        
+        0,1,1;...
+        0,0,1;...
         ];
     yRange={[-0.1,0.13],[0,0.08],[0,1];...
         [-0.13,0.1],[0,0.06],[0,1]};
@@ -155,10 +136,7 @@ for iP=1:2
         colormap(clr)
         pos=[0.08,0.98-i*0.3,0.9,0.28];
         subplot('Position',pos)
-        b=bar(plotStr.(fieldLst{i}));
-        for kk=1:length(b)
-            set(b(kk),'FaceColor',clr(kk,:))        
-        end
+        bar(plotStr.(fieldLst{i}))
         nSite=size(plotStr.(fieldLst{i}),1);
         xlim([0.5,nSite+0.5])
         if i==length(fieldLst)
@@ -168,14 +146,11 @@ for iP=1:2
         end
         ylim(yRange{iP,i});
         if i==2
-            legend(...
-                'PL LSTM+Noah vs in-situ',...
-                'PL LSTM+VIC vs in-situ',...                
-                'PL Noah+VIC vs in-situ',...                
-                'AL (1Yr Test) LSTM vs in-situ',...
-                'AL LSTM+Noah vs in-situ',...
-                'AL LSTM+VIC vs in-situ',...                
-                'AL Noah+VIC vs in-situ',...                
+            legend('PL LSTM vs in-situ',...
+                'PL Noah vs in-situ',...
+                'AL LSTM vs in-situ',...
+                'AL SMAP vs in-situ',...
+                'AL Noah vs in-situ',...
                 'location','northwest')
         end
         if iP==1 && i==1
@@ -189,15 +164,12 @@ for iP=1:2
     %% write table
     tabOut1=[tabStrSite.sid,tabStrSite.bias,tabStrSite.ubrmse,tabStrSite.rho];
     tabOut2=[tabStrPixel.pid,tabStrPixel.bias,tabStrPixel.ubrmse,tabStrPixel.rho];
-%     dlmwrite([dirFigure,'tabCoreSite_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
-%         tabOut1,'delimiter',',','precision',8);
-%     dlmwrite([dirFigure,'tabCorePixel_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
-%         tabOut2,'delimiter',',','precision',8);
+    dlmwrite([dirFigure,'tabCoreSite_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
+        tabOut1,'delimiter',',','precision',8);
+    dlmwrite([dirFigure,'tabCorePixel_',productName,'_wModel_',num2str(rThe*100,'%02d'),'.csv'],...
+        tabOut2,'delimiter',',','precision',8);
     
     fixFigure
-    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_sp.fig'])
-    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'_sp.jpg'])
+    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.fig'])
+    saveas(f,[dirFigure,'barPlot_CoreSite_',productName,'_',num2str(rThe*100,'%02d'),'.jpg'])
 end
-% fixFigure
-% saveas(f,[dirFigure,'barPlot_CoreSite','_',num2str(rThe*100,'%02d'),'.fig'])
-% saveas(f,[dirFigure,'barPlot_CoreSite','_',num2str(rThe*100,'%02d'),'.jpg'])

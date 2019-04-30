@@ -44,7 +44,7 @@ labelLst2={};
 for j=1:ny
     for i=1:nx
         nData=length(statMat{j,i});
-        dataLst=[dataLst;statMat{j,i}];
+        dataLst=[dataLst;VectorDim(statMat{j,i},1)];
         labelLst1=[labelLst1;repmat(labelX(i),nData,1)];
         labelLst2=[labelLst2;repmat(labelY(j),nData,1)];
     end

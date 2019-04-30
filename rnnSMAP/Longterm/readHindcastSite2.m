@@ -11,7 +11,8 @@ global kPath
 if strcmp(productName,'surface')
     rootOut=kPath.OutSMAP_L3_NA;
     rootDB=kPath.DBSMAP_L3_NA;
-    outName='CONUSv4f1wSite_soilM';
+    %outName='CONUSv4f1wSite_soilM';
+    outName='CONUS_3yr_Forcing';
     targetName='SMAP_AM';
     yrLst=[2000:2017];
     if strcmp(siteName,'CoreSite')
@@ -22,7 +23,7 @@ if strcmp(productName,'surface')
 elseif strcmp(productName,'rootzone')
     rootOut=kPath.OutSMAP_L4_NA;
     rootDB=kPath.DBSMAP_L4_NA;
-    outName='CONUSv16f1wSite_soilM';
+    outName='CONUSv4f1wSite_3yr_Forcing';
     targetName='SMGP_rootzone';
     yrLst=[2000:2017];
     if strcmp(siteName,'CoreSite')
