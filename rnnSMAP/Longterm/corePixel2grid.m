@@ -259,7 +259,7 @@ end
 
 %% remove frozen based on temp
 dataRawLiq=dataRaw;
-dataRawLiq(dataRawT<4|isnan(dataRawT))=nan;
+dataRawLiq(dataRawT<0|isnan(dataRawT))=nan;
 
 %% sumarize data
 wHorMat=repmat(VectorDim(wHor,2),[nt,1]);
