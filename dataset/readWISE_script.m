@@ -1,48 +1,48 @@
-% read ISRIC-WISE soil data
-% 
-% %% deal with table
-% xlsFile='Y:\SoilGlobal\wise5by5min_v1b\WISEsummaryFile.xlsx';
-% [num,txt,raw]=xlsread(xlsFile);
-% 
-% n=size(num,1);
-% dataField={'SDTO','STPC','CLPC','TAWC','BULK'};
-% %{
-% SDTO - Sand (mass %)
-% STPC - Silt (mass %)
-% CLPC - Clay (mass %)
-% TAWC - Available water capacity (cm m^-1, -33 to -1500 kPa conform to USDA standards)
-% BULK - Bukl density (kg dm^3)
-% %}
-% tab=zeros(size(num,1),length(dataField))*nan;
-% for i=1:length(dataField)
-%     field=dataField{i};
-%     ind=strcmp(field,raw(1,2:end));
-%     tab(:,i)=num(:,ind);
-% end
-% tab(tab<0)=nan;
-% 
-% layer=cellfun(@(x)(str2num(x(2))),raw(2:end,strcmp('Layer',raw(1,:))));
-% id=num(:,strcmp('SUID',raw(1,2:end)));
-% prop=num(:,strcmp('PROP',raw(1,2:end)));
-% 
-% uid=unique(id);
-% data=zeros(length(uid),length(dataField),length(unique(layer)));
-% for i=1:length(uid)
-%     i
-%     for j=1:5
-%         ind=find(id==uid(i));
-%         ind=ind(layer(ind)==j);
-%         
-%         tempdata=tab(ind,:);
-%         tempprop=prop(ind,:);
-%         indnan=isnan(tempdata(:,1)); % tested - all valid or all nan
-%         tempprop(indnan)=nan;
-%         tempprop=tempprop./nansum(tempprop);
-%         temp=nansum(repmat(tempprop,[1,length(dataField)]).*tempdata,1);
-%         data(i,:,j)=temp;
-%     end
-% end
-% save Y:\SoilGlobal\wise5by5min_v1b\soilTab.mat data uid
+read ISRIC-WISE soil data
+
+%% deal with table
+xlsFile='Y:\SoilGlobal\wise5by5min_v1b\WISEsummaryFile.xlsx';
+[num,txt,raw]=xlsread(xlsFile);
+
+n=size(num,1);
+dataField={'SDTO','STPC','CLPC','TAWC','BULK'};
+%{
+SDTO - Sand (mass %)
+STPC - Silt (mass %)
+CLPC - Clay (mass %)
+TAWC - Available water capacity (cm m^-1, -33 to -1500 kPa conform to USDA standards)
+BULK - Bukl density (kg dm^3)
+%}
+tab=zeros(size(num,1),length(dataField))*nan;
+for i=1:length(dataField)
+    field=dataField{i};
+    ind=strcmp(field,raw(1,2:end));
+    tab(:,i)=num(:,ind);
+end
+tab(tab<0)=nan;
+
+layer=cellfun(@(x)(str2num(x(2))),raw(2:end,strcmp('Layer',raw(1,:))));
+id=num(:,strcmp('SUID',raw(1,2:end)));
+prop=num(:,strcmp('PROP',raw(1,2:end)));
+
+uid=unique(id);
+data=zeros(length(uid),length(dataField),length(unique(layer)));
+for i=1:length(uid)
+    i
+    for j=1:5
+        ind=find(id==uid(i));
+        ind=ind(layer(ind)==j);
+        
+        tempdata=tab(ind,:);
+        tempprop=prop(ind,:);
+        indnan=isnan(tempdata(:,1)); % tested - all valid or all nan
+        tempprop(indnan)=nan;
+        tempprop=tempprop./nansum(tempprop);
+        temp=nansum(repmat(tempprop,[1,length(dataField)]).*tempdata,1);
+        data(i,:,j)=temp;
+    end
+end
+save Y:\SoilGlobal\wise5by5min_v1b\soilTab.mat data uid
 
 %% link table to map
 load('Y:\SoilGlobal\wise5by5min_v1b\soilTab.mat')

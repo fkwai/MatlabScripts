@@ -1,7 +1,8 @@
 %%
 % We want to grow a new tree which is divided by only one predictor for given gages inside a shape. 
 
-figfolder='E:\Kuai\SSRS\paper\mB\';
+% figfolder='E:\Kuai\SSRS\paper\mB\';
+figfolder='H:\Wenping\1.paper\0_soil_test\CART_analysis\tree\4_slope\';
 usgsCorrMatfile='E:\Kuai\SSRS\data\usgsCorr_mB_4949.mat';
 shapefile='E:\Kuai\SSRS\data\gages_mB_4949.shp';
 datafile='E:\Kuai\SSRS\data\dataset_mB_4949.mat';
@@ -38,8 +39,8 @@ dist=distAll(indGage,:);
 save(saveMatFile,'field','dataset','dist','indGage');
 
 %% 3. plot tree
-treeMatFile=['E:\Kuai\SSRS\paper\mB\nodeSplit\tree',figLabel,'.mat'];
-%plotTreeStampSolo(treeMatFile,0,indGage)
+treeMatFile=['H:\Wenping\1.paper\0_soil_test\CART_analysis\tree\4_slope\nodeSplit\tree',figLabel,'.mat'];
+plotTreeStampSolo(treeMatFile,0,indGage)
 
 %% 4. plot split map
 figName=['nodeSplitMap_',figLabel];

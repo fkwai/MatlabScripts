@@ -118,8 +118,11 @@ for i=1:length(treeMat.nodeind)
     end
     
     fname=[folder_bar,'node',num2str(i-1),suffix];
-    export_fig(fname,'-transparent');
-    close(f)
+
+%     % comment export_fig, due to can't find "using_hg2"
+%     export_fig(fname,'-transparent');
+%     close(f)
+
 end
 
 %% 1.5 bar stamp legend
